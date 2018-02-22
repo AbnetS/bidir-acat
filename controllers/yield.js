@@ -63,15 +63,15 @@ exports.create = function* createYield(next) {
       throw new Error('ACAT Form Does Not Exist')
     }
 
-    let _yield = yield YieldDal.get({ type: 'YIELD' });
+    let _yield = yield YieldDal.get({ title: 'YIELD' });
     if(_yield) {
-      throw new Error('Yield  already exists!!');
+      throw new Error('Yield Section already exists!!');
     }
 
     if(body.has_cost_list) {
       let costList = yield CostListDal.create({});
 
-      body.costlist = costlist._id;
+      body.cost_list = costList._id;
     }
 
     // Create Yield Type
@@ -79,13 +79,13 @@ exports.create = function* createYield(next) {
 
     form = form.toJSON();
 
-    let _yields = form._yields.slice();
+    let sections = form.sections.slice();
 
-    _yields.push(_yield._id);
+    sections.push(_yield._id);
 
     yield ACATFormDal.update({ _id: form._id },{
-        _yields: _yields
-      });
+      sections: sections
+    });
 
     this.body = _yield;
 
