@@ -20,29 +20,50 @@ var router  = Router();
  * @apiDescription Create new Section. 
  *
  * @apiParam {String} title Section Title
- * @apiParam {Array} [questions] Section Questions
- * @apiParam {String} form Form associated with section
+ * @apiParam {String} number Section Numberr
+ * @apiParam {String} [has_cost_list] If Section has Cost list
+ * @apiParam {String} [parent_section] if Section is a sub section
  *
  * @apiParamExample Request Example:
  *  {
- *    title: "Crop Fertiliser Distribution ",
- *    questions : ["556e1174a8952c9521286a60"],
- *    form : "556e1174a8952c9521286a60"
+ *    title: "Fertiliser",
+ *    has_cost_list : true,
+ *    parent_section : "556e1174a8952c9521286a60",
+ *    number : "1.1.2"
  *  }
  *
  * @apiSuccess {String} _id section id
  * @apiSuccess {String} title Section Title
- * @apiSuccess {Array} questions Section Questions
- * @apiSuccess {String} number Question Order number
+ * @apiSuccess {String} number Section Number
+ * @apiSuccess {Number} estimated_total Estimated Total
+ * @apiSuccess {Number} achieved_sub_total Achieved Sub Total
+ * @apiSuccess {Object} cash_flow Cash Flow
+ * @apiSuccess {Array} sub_sections Sub Sections
+ * @apiSuccess {Object} [cost_list] Cost List
+ * @apiSuccess {String} [seed_source] Seed Source (SEED type only)
+ * @apiSuccess {String} [variety] Seed Variety (SEED type only)
+ * @apiSuccess {Object} [estimated] Estimated Values(YIELD type only)
+ * @apiSuccess {Object} [achieved] Achieved Values(YIELD type only)
+ * @apiSuccess {Object} [marketable_yield] Marketable yield(YIELD type only)
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    title: "Crop Fertiliser Distribution ",
- *    questions: [{
+ *    title: "Fertiliser",
+ *    number : "1.1.2",
+ *    estimated_total:  100,
+ *    achieved_sub_total : 97,
+ *    sub_sections: [{
  *		 _id : "556e1174a8952c9521286a60",
  *       ....
- *    }]
+ *    }],
+ *    cash_flow: {
+ *        jan: '',
+ *        feb: '',
+ *        mar: '',
+ *        ...
+ *    },
+ *    ...
  *  }
  *
  */
@@ -60,17 +81,36 @@ router.post('/create', acl(['*']), sectionController.create);
  *
  * @apiSuccess {String} _id section id
  * @apiSuccess {String} title Section Title
- * @apiSuccess {Array} questions Section Questions
- * @apiSuccess {String} number Question Order number
+ * @apiSuccess {String} number Section Number
+ * @apiSuccess {Number} estimated_total Estimated Total
+ * @apiSuccess {Number} achieved_sub_total Achieved Sub Total
+ * @apiSuccess {Object} cash_flow Cash Flow
+ * @apiSuccess {Array} sub_sections Sub Sections
+ * @apiSuccess {Object} [cost_list] Cost List
+ * @apiSuccess {String} [seed_source] Seed Source (SEED type only)
+ * @apiSuccess {String} [variety] Seed Variety (SEED type only)
+ * @apiSuccess {Object} [estimated] Estimated Values(YIELD type only)
+ * @apiSuccess {Object} [achieved] Achieved Values(YIELD type only)
+ * @apiSuccess {Object} [marketable_yield] Marketable yield(YIELD type only)
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    title: "Crop Fertiliser Distribution ",
- *    questions: [{
+ *    title: "Fertiliser",
+ *    number : "1.1.2",
+ *    estimated_total:  100,
+ *    achieved_sub_total : 97,
+ *    sub_sections: [{
  *     _id : "556e1174a8952c9521286a60",
  *       ....
- *    }]
+ *    }],
+ *    cash_flow: {
+ *        jan: '',
+ *        feb: '',
+ *        mar: '',
+ *        ...
+ *    },
+ *    ...
  *  }
  *
  */
@@ -94,17 +134,36 @@ router.get('/:id', acl(['*']), sectionController.fetchOne);
  *
  * @apiSuccess {String} _id section id
  * @apiSuccess {String} title Section Title
- * @apiSuccess {Array} questions Section Questions
- * @apiSuccess {String} number Question Order number
+ * @apiSuccess {String} number Section Number
+ * @apiSuccess {Number} estimated_total Estimated Total
+ * @apiSuccess {Number} achieved_sub_total Achieved Sub Total
+ * @apiSuccess {Object} cash_flow Cash Flow
+ * @apiSuccess {Array} sub_sections Sub Sections
+ * @apiSuccess {Object} [cost_list] Cost List
+ * @apiSuccess {String} [seed_source] Seed Source (SEED type only)
+ * @apiSuccess {String} [variety] Seed Variety (SEED type only)
+ * @apiSuccess {Object} [estimated] Estimated Values(YIELD type only)
+ * @apiSuccess {Object} [achieved] Achieved Values(YIELD type only)
+ * @apiSuccess {Object} [marketable_yield] Marketable yield(YIELD type only)
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    title: "Crop Fertiliser and Chemicals Distribution ",
- *    questions: [{
+ *    title: "Fertiliser",
+ *    number : "1.1.2",
+ *    estimated_total:  100,
+ *    achieved_sub_total : 97,
+ *    sub_sections: [{
  *     _id : "556e1174a8952c9521286a60",
  *       ....
- *    }]
+ *    }],
+ *    cash_flow: {
+ *        jan: '',
+ *        feb: '',
+ *        mar: '',
+ *        ...
+ *    },
+ *    ...
  *  }
  */
 router.put('/:id', acl(['*']), sectionController.update);
@@ -121,20 +180,39 @@ router.put('/:id', acl(['*']), sectionController.update);
  *
  * @apiSuccess {String} _id section id
  * @apiSuccess {String} title Section Title
- * @apiSuccess {Array} questions Section Questions
- * @apiSuccess {String} number Question Order number
+ * @apiSuccess {String} number Section Number
+ * @apiSuccess {Number} estimated_total Estimated Total
+ * @apiSuccess {Number} achieved_sub_total Achieved Sub Total
+ * @apiSuccess {Object} cash_flow Cash Flow
+ * @apiSuccess {Array} sub_sections Sub Sections
+ * @apiSuccess {Object} [cost_list] Cost List
+ * @apiSuccess {String} [seed_source] Seed Source (SEED type only)
+ * @apiSuccess {String} [variety] Seed Variety (SEED type only)
+ * @apiSuccess {Object} [estimated] Estimated Values(YIELD type only)
+ * @apiSuccess {Object} [achieved] Achieved Values(YIELD type only)
+ * @apiSuccess {Object} [marketable_yield] Marketable yield(YIELD type only)
  *
  * @apiSuccessExample Response Example:
  *  {
  *    "total_pages": 1,
  *    "total_docs_count": 0,
  *    "docs": [{
- *      _id : "556e1174a8952c9521286a60",
- *      title: "Crop Fertiliser and Chemicals Distribution ",
- *      questions: [{
- *        _id : "556e1174a8952c9521286a60",
- *        ....
- *      }]
+ *    _id : "556e1174a8952c9521286a60",
+ *    title: "Fertiliser",
+ *    number : "1.1.2",
+ *    estimated_total:  100,
+ *    achieved_sub_total : 97,
+ *    sub_sections: [{
+ *     _id : "556e1174a8952c9521286a60",
+ *       ....
+ *    }],
+ *    cash_flow: {
+ *        jan: '',
+ *        feb: '',
+ *        mar: '',
+ *        ...
+ *    },
+ *    ...
  *    }]
  *  }
  */

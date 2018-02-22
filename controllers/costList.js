@@ -52,8 +52,6 @@ exports.addItem = function* addtem(next) {
 
   this.checkBody('type')
       .notEmpty('Cost List Item type is either linear or grouped');
-  this.checkBody('type')
-      .notEmpty('Cost List Item type is either linear or grouped');
 
   if(this.errors) {
     return this.throw(new CustomError({
@@ -83,6 +81,8 @@ exports.addItem = function* addtem(next) {
         throw new Error('Cost List Does Not Exist')
       }
     }
+
+    body.type = body.type.toLowerCase();
 
     let item;
     if(body.type == 'linear') {

@@ -28,9 +28,34 @@ var ACATSectionSchema = new Schema({
       dec:             { type: String, default: '' }
     },
     cost_list:       { type: Schema.Types.ObjectId, ref: 'CostList' },
-    variety:         { type: String, default: 'N/A' },
-    seed_source:     { type: String, default: 'N/A' },
+    variety:         { type: String },
+    seed_source:     { type: String },
     sub_sections:    [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
+    estimated:       {
+      yield: {
+        uofm_for_yield: { type: String },
+        max:            { type: Number }
+      },
+      price: {
+        uofm_for_price: { type: String },
+        max:            { type: Number }
+      }
+    },
+    achieved:       {
+      yield: {
+        uofm_for_yield: { type: String },
+        max:            { type: Number }
+      },
+      price: {
+        uofm_for_price: { type: String },
+        max:            { type: Number }
+      }
+    },
+    marketable_yield: {
+      own:          { type: String },
+      seed_reserve: { type: String },
+      for_market:   { type: String }
+    },
     number:          { type: String, default: '' },
     date_created:    { type: Date },
     last_modified:   { type: Date }
@@ -63,15 +88,18 @@ ACATSectionSchema.pre('save', function preSaveMiddleware(next) {
  * Filter ACATSection Attributes to expose
  */
 ACATSectionSchema.statics.attributes = {      
-    title:              1,
-    estimated_total:    1,
-    achieved_sub_total: 1,
-    cash_flow:       1,
-    cost_list:       1,
-    variety:         1,
-    seed_source:     1,
-    sub_sections:    1,
-    number:          1,
+  title:              1,
+  estimated_total:    1,
+  achieved_sub_total: 1,
+  cash_flow:       1,
+  cost_list:       1,
+  variety:         1,
+  seed_source:     1,
+  sub_sections:    1,
+  number:          1,
+  estimated:  1,
+  achieved:   1,
+  marketable_yield: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1

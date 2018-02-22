@@ -9,7 +9,6 @@ const debug  = require('debug')('api:app-router');
 const rootRouter          = require('./root');
 const acatRouter      = require('./acat');
 const sectionRouter      = require('./section');
-const yieldRouter      = require('./yield');
 const costListRouter      = require('./costList');
 
 var appRouter = new Router();
@@ -26,8 +25,6 @@ appRouter.OPEN_ENDPOINTS = OPEN_ENDPOINTS;
 composeRoute('', rootRouter);
 //Add ACAT Router
 composeRoute('acat', acatRouter);
-//Add Yields Router
-composeRoute('acat/yields', yieldRouter);
 //Add Cost List Router
 composeRoute('acat/costLists', costListRouter);
 //Add Sections Router

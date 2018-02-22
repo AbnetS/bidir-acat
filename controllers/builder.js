@@ -49,6 +49,8 @@ exports.create = function* createACATForm(next) {
 
   this.checkBody('title')
       .notEmpty('ACATForm Title is Empty');
+  this.checkBody('crop')
+      .notEmpty('ACATForm Crop Value is Empty');
 
   if(this.errors) {
     return this.throw(new CustomError({

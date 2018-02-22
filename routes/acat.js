@@ -19,45 +19,54 @@ var router  = Router();
  *
  * @apiDescription Create new ACAT. 
  *
- * @apiParam {String} type ACAT Type ie Screening or ACAT Application
- * @apiParam {String} description ACAT Description
+ * @apiParam {String} subtitle ACAT Subtitle
+ * @apiParam {String} purpose ACAT Purpose
  * @apiParam {String} title ACAT Title
- * @apiParam {String} process ACAT Process
- * @apiParam {Array} questions ACAT Questions
- * @apiParam {String} created_by Officer Account registering this
+ * @apiParam {String} crop ACAT Crop
  *
  * @apiParamExample Request Example:
  *  {
- *    type: "Screening",
  *    description: "This is a Description",
- *    title: "ACAT Title",
- *    process: "",
- *    questions : ["556e1174a8952c9521286a60"],
- *    created_by : "556e1174a8952c9521286a60"
+ *    title: "ACAT Form",
+ *    crop: "Maize"
  *  }
  *
- * @apiSuccess {String} _id builder id
- * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
- * @apiSuccess {String} description ACAT Description
- * @apiSuccess {String} title ACAT Title
- * @apiSuccess {String} process ACAT Process
- * @apiSuccess {Array} questions ACAT Questions
+ * @apiSuccess {String} _id ACAT form id
+ * @apiSuccess {String} type Form Type ACAT
+ * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} title ACAT Form Title
+ * @apiSuccess {String} purpose ACAT Form Purpose
+ * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {Object} estimated Estimated ACAT Values
+ * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    type: "Screening",
+ *    type: "ACAT",
+ *    crop: "Maize",
  *    description: "This is a Description",
- *    title: "ACAT Title",
+ *    title: "ACAT Form",
  *    process: "",
- *    questions: ]{
+ *    sections: [{
  *		 _id : "556e1174a8952c9521286a60",
  *       ....
  *    }],
- *    created_by: {
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
+ *    created_by: "556e1174a8952c9521286a60",
+ *    achieved: {
+ *        net_cash_flow: 0,
+ *        net_income: 0,
+ *        total_revenue: 0,
+ *        total_cost: 0
+ *    },
+ *    estimated: {
+ *      net_cash_flow: 0,
+ *      net_income: 0,
+ *      total_revenue: 0,
+ *      total_cost: 0
  *    }
  *  }
  *
@@ -75,32 +84,46 @@ router.post('/create', acl(['*']), builderController.create);
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  *
- * @apiSuccess {String} _id builder id
- * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
- * @apiSuccess {String} description ACAT Description
- * @apiSuccess {String} title ACAT Title
- * @apiSuccess {String} process ACAT Process
- * @apiSuccess {Array} questions ACAT Questions
+ * @apiSuccess {String} _id ACAT form id
+ * @apiSuccess {String} type Form Type ACAT
+ * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} title ACAT Form Title
+ * @apiSuccess {String} purpose ACAT Form Purpose
+ * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {Object} estimated Estimated ACAT Values
+ * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
  *    "total_pages": 1,
  *    "total_docs_count": 0,
  *    "docs": [{
- *    _id : "556e1174a8952c9521286a60",
- *    type: "Screening",
- *    description: "This is a Description",
- *    title: "ACAT Title",
- *    process: "",
- *    questions: ]{
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: {
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
- *    }
+ *        _id : "556e1174a8952c9521286a60",
+ *        type: "ACAT",
+ *        crop: "Maize",
+ *        description: "This is a Description",
+ *        title: "ACAT Form",
+ *        process: "",
+ *        sections: [{
+ *            _id : "556e1174a8952c9521286a60",
+ *            ....
+ *        }],
+ *        created_by: "556e1174a8952c9521286a60",
+ *        achieved: {
+ *            net_cash_flow: 0,
+ *            net_income: 0,
+ *            total_revenue: 0,
+ *            total_cost: 0
+ *        },
+ *        estimated: {
+ *            net_cash_flow: 0,
+ *            net_income: 0,
+ *            total_revenue: 0,
+ *            total_cost: 0
+ *        }
  *    }]
  *  }
  */
@@ -114,28 +137,42 @@ router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
  *
  * @apiDescription Get a user builder with the given id
  *
- * @apiSuccess {String} _id builder id
- * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
- * @apiSuccess {String} description ACAT Description
- * @apiSuccess {String} title ACAT Title
- * @apiSuccess {String} process ACAT Process
- * @apiSuccess {Array} questions ACAT Questions
+ * @apiSuccess {String} _id ACAT form id
+ * @apiSuccess {String} type Form Type ACAT
+ * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} title ACAT Form Title
+ * @apiSuccess {String} purpose ACAT Form Purpose
+ * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {Object} estimated Estimated ACAT Values
+ * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    type: "Screening",
+ *    type: "ACAT",
+ *    crop: "Maize",
  *    description: "This is a Description",
- *    title: "ACAT Title",
+ *    title: "ACAT Form",
  *    process: "",
- *    questions: ]{
- *		 _id : "556e1174a8952c9521286a60",
+ *    sections: [{
+ *     _id : "556e1174a8952c9521286a60",
  *       ....
  *    }],
- *    created_by: {
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
+ *    created_by: "556e1174a8952c9521286a60",
+ *    achieved: {
+ *        net_cash_flow: 0,
+ *        net_income: 0,
+ *        total_revenue: 0,
+ *        total_cost: 0
+ *    },
+ *    estimated: {
+ *      net_cash_flow: 0,
+ *      net_income: 0,
+ *      total_revenue: 0,
+ *      total_cost: 0
  *    }
  *  }
  *
@@ -158,28 +195,42 @@ router.get('/:id', acl(['*']), builderController.fetchOne);
  *    title: "MFI ACAT Title"
  * }
  *
- * @apiSuccess {String} _id builder id
- * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
- * @apiSuccess {String} description ACAT Description
- * @apiSuccess {String} title ACAT Title
- * @apiSuccess {String} process ACAT Process
- * @apiSuccess {Array} questions ACAT Questions
+ * @apiSuccess {String} _id ACAT form id
+ * @apiSuccess {String} type Form Type ACAT
+ * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} title ACAT Form Title
+ * @apiSuccess {String} purpose ACAT Form Purpose
+ * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {Object} estimated Estimated ACAT Values
+ * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    type: "Screening",
+ *    type: "ACAT",
+ *    crop: "Maize",
  *    description: "This is a Description",
- *    title: "MFI ACAT Title",
+ *    title: "ACAT Form",
  *    process: "",
- *    questions: ]{
- *		 _id : "556e1174a8952c9521286a60",
+ *    sections: [{
+ *     _id : "556e1174a8952c9521286a60",
  *       ....
  *    }],
- *    created_by: {
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
+ *    created_by: "556e1174a8952c9521286a60",
+ *    achieved: {
+ *        net_cash_flow: 0,
+ *        net_income: 0,
+ *        total_revenue: 0,
+ *        total_cost: 0
+ *    },
+ *    estimated: {
+ *      net_cash_flow: 0,
+ *      net_income: 0,
+ *      total_revenue: 0,
+ *      total_cost: 0
  *    }
  *  }
  */

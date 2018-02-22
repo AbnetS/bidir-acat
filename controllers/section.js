@@ -81,7 +81,47 @@ exports.create = function* createSection(next) {
       body.cost_list = costList._id;
     }
 
-    // Create Section Type
+    if(body.title.toLowerCase() == 'seed') {
+      let attrs = {
+        variety: '',
+        seed_source: ''
+      };
+
+      _.merge(body, attrs);
+
+
+    } else if(body.title.toLowerCase() == 'yield') {
+      let attrs = {
+        estimated: {
+          yield: {
+            uofm_for_yield: '' ,
+            max:            0
+          },
+          price: {
+            uofm_for_price: '',
+            max:            0
+          }
+        },
+        achieved: {
+          yield: {
+            uofm_for_yield: '' ,
+            max:            0
+          },
+          price: {
+            uofm_for_price: '',
+            max:            0
+          }
+        },
+        marketable_yield: {
+          own:          '',
+          seed_reserve: '',
+          for_market:   ''
+        }
+      };
+
+      _.merge(body, attrs);
+    }
+
     section = yield SectionDal.create(body);
 
     if(body.parent_section) {

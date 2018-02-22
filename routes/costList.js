@@ -12,37 +12,53 @@ const acl               = authController.accessControl;
 var router  = Router();
 
 /**
- * @api {post} /acat/costLists/add Add new CostList
+ * @api {post} /acat/costLists/add Add  CostList Item
  * @apiVersion 1.0.0
  * @apiName AddCostList
  * @apiGroup CostList
  *
- * @apiDescription Create new CostList. 
+ * @apiDescription Create new CostList Item. 
  *
- * @apiParam {String} title CostList Title
- * @apiParam {Array} [questions] CostList Questions
- * @apiParam {String} form Form associated with costList
+ * @apiParam {String} type Linear or Grouped
+ * @apiParam {String} [parent_cost_list] If adding to Parent CostList Reference
+ * @apiParam {String} [parent_grouped_list] If adding to Parent Grouped CostList Reference
  *
  * @apiParamExample Request Example:
  *  {
- *    title: "Crop Fertiliser Distribution ",
- *    questions : ["556e1174a8952c9521286a60"],
- *    form : "556e1174a8952c9521286a60"
+ *    type: "linear",
+ *    parent_cost_list : "556e1174a8952c9521286a60"
  *  }
  *
- * @apiSuccess {String} _id costList id
- * @apiSuccess {String} title CostList Title
- * @apiSuccess {Array} questions CostList Questions
- * @apiSuccess {String} number Question Order number
+ * @apiSuccess {String} _id costList Item id
+ * @apiSuccess {String} item Item Name
+ * @apiSuccess {String} unit Item Unit
+ * @apiSuccess {Object} estimated Unit Estimated Values
+ * @apiSuccess {Object} achieved Unit Achieved Values
+ * @apiSuccess {Object} cash_flow Cash Flow Values
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    title: "Crop Fertiliser Distribution ",
- *    questions: [{
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
- *    }]
+ *    item: "Item",
+ *    unit: "MM",
+ *    achieved: {
+ *        net_cash_flow: 0,
+ *        net_income: 0,
+ *        total_revenue: 0,
+ *        total_cost: 0
+ *    },
+ *    estimated: {
+ *      net_cash_flow: 0,
+ *      net_income: 0,
+ *      total_revenue: 0,
+ *      total_cost: 0
+ *    },
+ *    cash_flow: {
+ *        jan: '',
+ *        feb: '',
+ *        mar: '',
+ *        ...
+ *    }
  *  }
  *
  */
@@ -60,22 +76,39 @@ router.post('/add', acl(['*']), costListController.addItem);
  *
  * @apiParamExample Request example:
  * {
- *    title: "Crop Fertiliser and Chemicals Distribution "
+ *    unit: "Millimeters"
  * }
  *
- * @apiSuccess {String} _id costList id
- * @apiSuccess {String} title CostList Title
- * @apiSuccess {Array} questions CostList Questions
- * @apiSuccess {String} number Question Order number
+ * @apiSuccess {String} _id costList Item id
+ * @apiSuccess {String} item Item Name
+ * @apiSuccess {String} unit Item Unit
+ * @apiSuccess {Object} estimated Unit Estimated Values
+ * @apiSuccess {Object} achieved Unit Achieved Values
+ * @apiSuccess {Object} cash_flow Cash Flow Values
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
- *    title: "Crop Fertiliser and Chemicals Distribution ",
- *    questions: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }]
+ *    item: "Item",
+ *    unit: "Millimeters",
+ *    achieved: {
+ *        net_cash_flow: 0,
+ *        net_income: 0,
+ *        total_revenue: 0,
+ *        total_cost: 0
+ *    },
+ *    estimated: {
+ *      net_cash_flow: 0,
+ *      net_income: 0,
+ *      total_revenue: 0,
+ *      total_cost: 0
+ *    },
+ *    cash_flow: {
+ *        jan: '',
+ *        feb: '',
+ *        mar: '',
+ *        ...
+ *    }
  *  }
  */
 router.put('/:id', acl(['*']), costListController.update);
