@@ -1,43 +1,40 @@
 'use strict';
-// Access Layer for Question Data.
+// Access Layer for CostListItem Data.
 
 /**
  * Load Module Dependencies.
  */
-const debug   = require('debug')('api:dal-question');
+const debug   = require('debug')('api:dal-costListItem');
 const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
 
-const Question    = require('../models/question');
+const CostListItem    = require('../models/costListItem');
 const mongoUpdate   = require('../lib/mongo-update');
 
-var returnFields = Question.attributes;
-var population = [{
-  path: 'sub_questions',
-  select: Question.attributes
-}];
+var returnFields = CostListItem.attributes;
+var population = [];
 
 /**
- * create a new question.
+ * create a new costListItem.
  *
- * @desc  creates a new question and saves them
+ * @desc  creates a new costListItem and saves them
  *        in the database
  *
- * @param {Object}  questionData  Data for the question to create
+ * @param {Object}  costListItemData  Data for the costListItem to create
  *
  * @return {Promise}
  */
-exports.create = function create(questionData) {
-  debug('creating a new question');
+exports.create = function create(costListItemData) {
+  debug('creating a new costListItem');
 
   return co(function* () {
 
-    let unsavedQuestion = new Question(questionData);
-    let newQuestion = yield unsavedQuestion.save();
-    let question = yield exports.get({ _id: newQuestion._id });
+    let unsavedCostListItem = new CostListItem(costListItemData);
+    let newCostListItem = yield unsavedCostListItem.save();
+    let costListItem = yield exports.get({ _id: newCostListItem._id });
 
-    return question;
+    return costListItem;
 
 
   });
@@ -45,37 +42,37 @@ exports.create = function create(questionData) {
 };
 
 /**
- * delete a question
+ * delete a costListItem
  *
- * @desc  delete data of the question with the given
+ * @desc  delete data of the costListItem with the given
  *        id
  *
  * @param {Object}  query   Query Object
  *
  * @return {Promise}
  */
-exports.delete = function deleteQuestion(query) {
-  debug('deleting question: ', query);
+exports.delete = function deleteCostListItem(query) {
+  debug('deleting costListItem: ', query);
 
   return co(function* () {
-    let question = yield exports.get(query);
+    let costListItem = yield exports.get(query);
     let _empty = {};
 
-    if(!question) {
+    if(!costListItem) {
       return _empty;
     } else {
-      yield question.remove();
+      yield costListItem.remove();
 
-      return question;
+      return costListItem;
     }
 
   });
 };
 
 /**
- * update a question
+ * update a costListItem
  *
- * @desc  update data of the question with the given
+ * @desc  update data of the costListItem with the given
  *        id
  *
  * @param {Object} query Query object
@@ -84,7 +81,7 @@ exports.delete = function deleteQuestion(query) {
  * @return {Promise}
  */
 exports.update = function update(query, updates) {
-  debug('updating question: ', query);
+  debug('updating costListItem: ', query);
 
   let now = moment().toISOString();
   let opts = {
@@ -94,44 +91,44 @@ exports.update = function update(query, updates) {
 
   updates = mongoUpdate(updates);
 
-  return Question.findOneAndUpdate(query, updates, opts)
+  return CostListItem.findOneAndUpdate(query, updates, opts)
       .populate(population)
       .exec();
 };
 
 /**
- * get a question.
+ * get a costListItem.
  *
- * @desc get a question with the given id from db
+ * @desc get a costListItem with the given id from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
-exports.get = function get(query, question) {
-  debug('getting question ', query);
+exports.get = function get(query, costListItem) {
+  debug('getting costListItem ', query);
 
-  return Question.findOne(query, returnFields)
+  return CostListItem.findOne(query, returnFields)
     .populate(population)
     .exec();
 
 };
 
 /**
- * get a collection of questions
+ * get a collection of costListItems
  *
- * @desc get a collection of questions from db
+ * @desc get a collection of costListItems from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
 exports.getCollection = function getCollection(query, qs) {
-  debug('fetching a collection of questions');
+  debug('fetching a collection of costListItems');
 
   return new Promise((resolve, reject) => {
     resolve(
-     Question
+     CostListItem
       .find(query, returnFields)
       .populate(population)
       .stream());
@@ -141,16 +138,16 @@ exports.getCollection = function getCollection(query, qs) {
 };
 
 /**
- * get a collection of questions using pagination
+ * get a collection of costListItems using pagination
  *
- * @desc get a collection of questions from db
+ * @desc get a collection of costListItems from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
 exports.getCollectionByPagination = function getCollection(query, qs) {
-  debug('fetching a collection of questions');
+  debug('fetching a collection of costListItems');
 
   let opts = {
     select:  returnFields,
@@ -162,7 +159,7 @@ exports.getCollectionByPagination = function getCollection(query, qs) {
 
 
   return new Promise((resolve, reject) => {
-    Question.paginate(query, opts, function (err, docs) {
+    CostListItem.paginate(query, opts, function (err, docs) {
       if(err) {
         return reject(err);
       }

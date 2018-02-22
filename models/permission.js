@@ -7,21 +7,22 @@ var mongoose  = require('mongoose');
 var moment    = require('moment');
 var paginator = require('mongoose-paginate');
 
-var enums     = require ('../lib/enums');
+var MODULES     = require ('../lib/enums').MODULE;
 
 var Schema = mongoose.Schema;
 
 var PermissionSchema = new Schema({       
     name:           { type: String, required: true },
-    description:    { type: String }, 
+    description:    { type: String },
+    entity:         { type: String, required: true },
     module:         { 
       type: String, 
-      enums:[enums.MODULES.MFI_SETUP,enums.MODULES.USER_MANAGEMENT]
+      enums: MODULES
     },
     endpoints:  [{
       url: { type: String }
     }],
-    operations:     [{ type: String }],
+    operation:     { type: String },
     date_created:   { type: Date },
     last_modified:  { type: Date }
 });
@@ -56,8 +57,9 @@ PermissionSchema.statics.whitelist = {
   name: 1,
   description: 1,
   module: 1,
-  operations: 1,
+  operation: 1,
   endpoints: 1,
+  entity: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1

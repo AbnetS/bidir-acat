@@ -3,45 +3,45 @@
  * Load Module Dependencies.
  */
 const Router  = require('koa-router');
-const debug   = require('debug')('api:form-router');
+const debug   = require('debug')('api:acat-router');
 
-const formController  = require('../controllers/form');
+const builderController  = require('../controllers/builder');
 const authController     = require('../controllers/auth');
 
 const acl               = authController.accessControl;
 var router  = Router();
 
 /**
- * @api {post} /forms/create Create new Form
+ * @api {post} /acat/create Create new ACAT
  * @apiVersion 1.0.0
- * @apiName CreateForm
- * @apiGroup Form
+ * @apiName CreateACAT
+ * @apiGroup ACAT
  *
- * @apiDescription Create new Form. 
+ * @apiDescription Create new ACAT. 
  *
- * @apiParam {String} type Form Type ie Screening or Form Application
- * @apiParam {String} description Form Description
- * @apiParam {String} title Form Title
- * @apiParam {String} process Form Process
- * @apiParam {Array} questions Form Questions
+ * @apiParam {String} type ACAT Type ie Screening or ACAT Application
+ * @apiParam {String} description ACAT Description
+ * @apiParam {String} title ACAT Title
+ * @apiParam {String} process ACAT Process
+ * @apiParam {Array} questions ACAT Questions
  * @apiParam {String} created_by Officer Account registering this
  *
  * @apiParamExample Request Example:
  *  {
  *    type: "Screening",
  *    description: "This is a Description",
- *    title: "Form Title",
+ *    title: "ACAT Title",
  *    process: "",
  *    questions : ["556e1174a8952c9521286a60"],
  *    created_by : "556e1174a8952c9521286a60"
  *  }
  *
- * @apiSuccess {String} _id form id
- * @apiSuccess {String} type Form Type ie Screening or Form Application
- * @apiSuccess {String} description Form Description
- * @apiSuccess {String} title Form Title
- * @apiSuccess {String} process Form Process
- * @apiSuccess {Array} questions Form Questions
+ * @apiSuccess {String} _id builder id
+ * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
+ * @apiSuccess {String} description ACAT Description
+ * @apiSuccess {String} title ACAT Title
+ * @apiSuccess {String} process ACAT Process
+ * @apiSuccess {Array} questions ACAT Questions
  * @apiSuccess {String} created_by Officer Account registering this
  *
  * @apiSuccessExample Response Example:
@@ -49,7 +49,7 @@ var router  = Router();
  *    _id : "556e1174a8952c9521286a60",
  *    type: "Screening",
  *    description: "This is a Description",
- *    title: "Form Title",
+ *    title: "ACAT Title",
  *    process: "",
  *    questions: ]{
  *		 _id : "556e1174a8952c9521286a60",
@@ -62,25 +62,25 @@ var router  = Router();
  *  }
  *
  */
-router.post('/create', acl(['*']), formController.create);
+router.post('/create', acl(['*']), builderController.create);
 
 
 /**
- * @api {get} /forms/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get forms collection
+ * @api {get} /acat/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get builders collection
  * @apiVersion 1.0.0
  * @apiName FetchPaginated
- * @apiGroup Form
+ * @apiGroup ACAT
  *
- * @apiDescription Get a collection of forms. The endpoint has pagination
+ * @apiDescription Get a collection of builders. The endpoint has pagination
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  *
- * @apiSuccess {String} _id form id
- * @apiSuccess {String} type Form Type ie Screening or Form Application
- * @apiSuccess {String} description Form Description
- * @apiSuccess {String} title Form Title
- * @apiSuccess {String} process Form Process
- * @apiSuccess {Array} questions Form Questions
+ * @apiSuccess {String} _id builder id
+ * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
+ * @apiSuccess {String} description ACAT Description
+ * @apiSuccess {String} title ACAT Title
+ * @apiSuccess {String} process ACAT Process
+ * @apiSuccess {Array} questions ACAT Questions
  * @apiSuccess {String} created_by Officer Account registering this
  *
  * @apiSuccessExample Response Example:
@@ -91,7 +91,7 @@ router.post('/create', acl(['*']), formController.create);
  *    _id : "556e1174a8952c9521286a60",
  *    type: "Screening",
  *    description: "This is a Description",
- *    title: "Form Title",
+ *    title: "ACAT Title",
  *    process: "",
  *    questions: ]{
  *		 _id : "556e1174a8952c9521286a60",
@@ -104,22 +104,22 @@ router.post('/create', acl(['*']), formController.create);
  *    }]
  *  }
  */
-router.get('/paginate', acl(['*']), formController.fetchAllByPagination);
+router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
 
 /**
- * @api {get} /forms/:id Get Form Form
+ * @api {get} /acat/:id Get ACAT ACAT
  * @apiVersion 1.0.0
  * @apiName Get
- * @apiGroup Form
+ * @apiGroup ACAT
  *
- * @apiDescription Get a user form with the given id
+ * @apiDescription Get a user builder with the given id
  *
- * @apiSuccess {String} _id form id
- * @apiSuccess {String} type Form Type ie Screening or Form Application
- * @apiSuccess {String} description Form Description
- * @apiSuccess {String} title Form Title
- * @apiSuccess {String} process Form Process
- * @apiSuccess {Array} questions Form Questions
+ * @apiSuccess {String} _id builder id
+ * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
+ * @apiSuccess {String} description ACAT Description
+ * @apiSuccess {String} title ACAT Title
+ * @apiSuccess {String} process ACAT Process
+ * @apiSuccess {Array} questions ACAT Questions
  * @apiSuccess {String} created_by Officer Account registering this
  *
  * @apiSuccessExample Response Example:
@@ -127,7 +127,7 @@ router.get('/paginate', acl(['*']), formController.fetchAllByPagination);
  *    _id : "556e1174a8952c9521286a60",
  *    type: "Screening",
  *    description: "This is a Description",
- *    title: "Form Title",
+ *    title: "ACAT Title",
  *    process: "",
  *    questions: ]{
  *		 _id : "556e1174a8952c9521286a60",
@@ -140,30 +140,30 @@ router.get('/paginate', acl(['*']), formController.fetchAllByPagination);
  *  }
  *
  */
-router.get('/:id', acl(['*']), formController.fetchOne);
+router.get('/:id', acl(['*']), builderController.fetchOne);
 
 
 /**
- * @api {put} /forms/:id Update Form Form
+ * @api {put} /acat/:id Update ACAT 
  * @apiVersion 1.0.0
  * @apiName Update
- * @apiGroup Form 
+ * @apiGroup ACAT 
  *
- * @apiDescription Update a Form form with the given id
+ * @apiDescription Update a ACAT builder with the given id
  *
  * @apiParam {Object} Data Update data
  *
  * @apiParamExample Request example:
  * {
- *    title: "MFI Form Title"
+ *    title: "MFI ACAT Title"
  * }
  *
- * @apiSuccess {String} _id form id
- * @apiSuccess {String} type Form Type ie Screening or Form Application
- * @apiSuccess {String} description Form Description
- * @apiSuccess {String} title Form Title
- * @apiSuccess {String} process Form Process
- * @apiSuccess {Array} questions Form Questions
+ * @apiSuccess {String} _id builder id
+ * @apiSuccess {String} type ACAT Type ie Screening or ACAT Application
+ * @apiSuccess {String} description ACAT Description
+ * @apiSuccess {String} title ACAT Title
+ * @apiSuccess {String} process ACAT Process
+ * @apiSuccess {Array} questions ACAT Questions
  * @apiSuccess {String} created_by Officer Account registering this
  *
  * @apiSuccessExample Response Example:
@@ -171,7 +171,7 @@ router.get('/:id', acl(['*']), formController.fetchOne);
  *    _id : "556e1174a8952c9521286a60",
  *    type: "Screening",
  *    description: "This is a Description",
- *    title: "MFI Form Title",
+ *    title: "MFI ACAT Title",
  *    process: "",
  *    questions: ]{
  *		 _id : "556e1174a8952c9521286a60",
@@ -183,7 +183,7 @@ router.get('/:id', acl(['*']), formController.fetchOne);
  *    }
  *  }
  */
-router.put('/:id', acl(['*']), formController.update);
+router.put('/:id', acl(['*']), builderController.update);
 
-// Expose Form Router
+// Expose ACAT Router
 module.exports = router;

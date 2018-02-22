@@ -1,43 +1,40 @@
 'use strict';
-// Access Layer for Question Data.
+// Access Layer for GroupedList Data.
 
 /**
  * Load Module Dependencies.
  */
-const debug   = require('debug')('api:dal-question');
+const debug   = require('debug')('api:dal-groupedList');
 const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
 
-const Question    = require('../models/question');
+const GroupedList    = require('../models/groupedList');
 const mongoUpdate   = require('../lib/mongo-update');
 
-var returnFields = Question.attributes;
-var population = [{
-  path: 'sub_questions',
-  select: Question.attributes
-}];
+var returnFields = GroupedList.attributes;
+var population = [];
 
 /**
- * create a new question.
+ * create a new groupedList.
  *
- * @desc  creates a new question and saves them
+ * @desc  creates a new groupedList and saves them
  *        in the database
  *
- * @param {Object}  questionData  Data for the question to create
+ * @param {Object}  groupedListData  Data for the groupedList to create
  *
  * @return {Promise}
  */
-exports.create = function create(questionData) {
-  debug('creating a new question');
+exports.create = function create(groupedListData) {
+  debug('creating a new groupedList');
 
   return co(function* () {
 
-    let unsavedQuestion = new Question(questionData);
-    let newQuestion = yield unsavedQuestion.save();
-    let question = yield exports.get({ _id: newQuestion._id });
+    let unsavedGroupedList = new GroupedList(groupedListData);
+    let newGroupedList = yield unsavedGroupedList.save();
+    let groupedList = yield exports.get({ _id: newGroupedList._id });
 
-    return question;
+    return groupedList;
 
 
   });
@@ -45,37 +42,37 @@ exports.create = function create(questionData) {
 };
 
 /**
- * delete a question
+ * delete a groupedList
  *
- * @desc  delete data of the question with the given
+ * @desc  delete data of the groupedList with the given
  *        id
  *
  * @param {Object}  query   Query Object
  *
  * @return {Promise}
  */
-exports.delete = function deleteQuestion(query) {
-  debug('deleting question: ', query);
+exports.delete = function deleteGroupedList(query) {
+  debug('deleting groupedList: ', query);
 
   return co(function* () {
-    let question = yield exports.get(query);
+    let groupedList = yield exports.get(query);
     let _empty = {};
 
-    if(!question) {
+    if(!groupedList) {
       return _empty;
     } else {
-      yield question.remove();
+      yield groupedList.remove();
 
-      return question;
+      return groupedList;
     }
 
   });
 };
 
 /**
- * update a question
+ * update a groupedList
  *
- * @desc  update data of the question with the given
+ * @desc  update data of the groupedList with the given
  *        id
  *
  * @param {Object} query Query object
@@ -84,7 +81,7 @@ exports.delete = function deleteQuestion(query) {
  * @return {Promise}
  */
 exports.update = function update(query, updates) {
-  debug('updating question: ', query);
+  debug('updating groupedList: ', query);
 
   let now = moment().toISOString();
   let opts = {
@@ -94,44 +91,44 @@ exports.update = function update(query, updates) {
 
   updates = mongoUpdate(updates);
 
-  return Question.findOneAndUpdate(query, updates, opts)
+  return GroupedList.findOneAndUpdate(query, updates, opts)
       .populate(population)
       .exec();
 };
 
 /**
- * get a question.
+ * get a groupedList.
  *
- * @desc get a question with the given id from db
+ * @desc get a groupedList with the given id from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
-exports.get = function get(query, question) {
-  debug('getting question ', query);
+exports.get = function get(query, groupedList) {
+  debug('getting groupedList ', query);
 
-  return Question.findOne(query, returnFields)
+  return GroupedList.findOne(query, returnFields)
     .populate(population)
     .exec();
 
 };
 
 /**
- * get a collection of questions
+ * get a collection of groupedLists
  *
- * @desc get a collection of questions from db
+ * @desc get a collection of groupedLists from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
 exports.getCollection = function getCollection(query, qs) {
-  debug('fetching a collection of questions');
+  debug('fetching a collection of groupedLists');
 
   return new Promise((resolve, reject) => {
     resolve(
-     Question
+     GroupedList
       .find(query, returnFields)
       .populate(population)
       .stream());
@@ -141,16 +138,16 @@ exports.getCollection = function getCollection(query, qs) {
 };
 
 /**
- * get a collection of questions using pagination
+ * get a collection of groupedLists using pagination
  *
- * @desc get a collection of questions from db
+ * @desc get a collection of groupedLists from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
 exports.getCollectionByPagination = function getCollection(query, qs) {
-  debug('fetching a collection of questions');
+  debug('fetching a collection of groupedLists');
 
   let opts = {
     select:  returnFields,
@@ -162,7 +159,7 @@ exports.getCollectionByPagination = function getCollection(query, qs) {
 
 
   return new Promise((resolve, reject) => {
-    Question.paginate(query, opts, function (err, docs) {
+    GroupedList.paginate(query, opts, function (err, docs) {
       if(err) {
         return reject(err);
       }

@@ -1,5 +1,5 @@
 'use strict';
-// Access Layer for Form Data.
+// Access Layer for ACATForm Data.
 
 /**
  * Load Module Dependencies.
@@ -9,14 +9,21 @@ const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
 
-const Form    = require('../models/form');
-const Question = require('../models/question');
+const ACATForm          = require('../models/ACATForm');
+const ACATSection       = require('../models/ACATSection');
 const mongoUpdate   = require('../lib/mongo-update');
 
-var returnFields = Form.attributes;
+var returnFields = ACATForm.attributes;
 var population = [{
-  path: 'questions',
-  select: Question.attributes
+  path: 'sections',
+  select: ACATSection.attributes,
+  populate: {
+    path: 'sub_sections',
+    select: ACATSection.attributes,
+  },
+  options: {
+    sort: { number: '1' }
+  }
 }];
 
 /**
@@ -34,9 +41,9 @@ exports.create = function create(formData) {
 
   return co(function* () {
 
-    let unsavedForm = new Form(formData);
-    let newForm = yield unsavedForm.save();
-    let form = yield exports.get({ _id: newForm._id });
+    let unsavedACATForm = new ACATForm(formData);
+    let newACATForm = yield unsavedACATForm.save();
+    let form = yield exports.get({ _id: newACATForm._id });
 
     return form;
 
@@ -55,7 +62,7 @@ exports.create = function create(formData) {
  *
  * @return {Promise}
  */
-exports.delete = function deleteForm(query) {
+exports.delete = function deleteACATForm(query) {
   debug('deleting form: ', query);
 
   return co(function* () {
@@ -95,7 +102,7 @@ exports.update = function update(query, updates) {
 
   updates = mongoUpdate(updates);
 
-  return Form.findOneAndUpdate(query, updates, opts)
+  return ACATForm.findOneAndUpdate(query, updates, opts)
       .populate(population)
       .exec();
 };
@@ -112,7 +119,7 @@ exports.update = function update(query, updates) {
 exports.get = function get(query, form) {
   debug('getting form ', query);
 
-  return Form.findOne(query, returnFields)
+  return ACATForm.findOne(query, returnFields)
     .populate(population)
     .exec();
 
@@ -132,7 +139,7 @@ exports.getCollection = function getCollection(query, qs) {
 
   return new Promise((resolve, reject) => {
     resolve(
-     Form
+     ACATForm
       .find(query, returnFields)
       .populate(population)
       .stream());
@@ -155,7 +162,7 @@ exports.getCollectionByPagination = function getCollection(query, qs) {
 
   let opts = {
     select:  returnFields,
-    sortBy:   qs.sort || {},
+    sort:   qs.sort || {},
     populate: population,
     page:     qs.page,
     limit:    qs.limit
@@ -163,7 +170,7 @@ exports.getCollectionByPagination = function getCollection(query, qs) {
 
 
   return new Promise((resolve, reject) => {
-    Form.paginate(query, opts, function (err, docs) {
+    ACATForm.paginate(query, opts, function (err, docs) {
       if(err) {
         return reject(err);
       }

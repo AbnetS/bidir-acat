@@ -1,43 +1,44 @@
 'use strict';
-// Access Layer for Question Data.
+// Access Layer for Yield Data.
 
 /**
  * Load Module Dependencies.
  */
-const debug   = require('debug')('api:dal-question');
+const debug   = require('debug')('api:dal-_yield');
 const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
 
-const Question    = require('../models/question');
+const Yield    = require('../models/yield');
+const CostList    = require('../models/costList');
 const mongoUpdate   = require('../lib/mongo-update');
 
-var returnFields = Question.attributes;
+var returnFields = Yield.attributes;
 var population = [{
-  path: 'sub_questions',
-  select: Question.attributes
+  path: 'cost_list',
+  select: CostList.attributes
 }];
 
 /**
- * create a new question.
+ * create a new _yield.
  *
- * @desc  creates a new question and saves them
+ * @desc  creates a new _yield and saves them
  *        in the database
  *
- * @param {Object}  questionData  Data for the question to create
+ * @param {Object}  _yieldData  Data for the _yield to create
  *
  * @return {Promise}
  */
-exports.create = function create(questionData) {
-  debug('creating a new question');
+exports.create = function create(_yieldData) {
+  debug('creating a new _yield');
 
   return co(function* () {
 
-    let unsavedQuestion = new Question(questionData);
-    let newQuestion = yield unsavedQuestion.save();
-    let question = yield exports.get({ _id: newQuestion._id });
+    let unsavedYield = new Yield(_yieldData);
+    let newYield = yield unsavedYield.save();
+    let _yield = yield exports.get({ _id: newYield._id });
 
-    return question;
+    return _yield;
 
 
   });
@@ -45,37 +46,37 @@ exports.create = function create(questionData) {
 };
 
 /**
- * delete a question
+ * delete a _yield
  *
- * @desc  delete data of the question with the given
+ * @desc  delete data of the _yield with the given
  *        id
  *
  * @param {Object}  query   Query Object
  *
  * @return {Promise}
  */
-exports.delete = function deleteQuestion(query) {
-  debug('deleting question: ', query);
+exports.delete = function deleteYield(query) {
+  debug('deleting _yield: ', query);
 
   return co(function* () {
-    let question = yield exports.get(query);
+    let _yield = yield exports.get(query);
     let _empty = {};
 
-    if(!question) {
+    if(!_yield) {
       return _empty;
     } else {
-      yield question.remove();
+      yield _yield.remove();
 
-      return question;
+      return _yield;
     }
 
   });
 };
 
 /**
- * update a question
+ * update a _yield
  *
- * @desc  update data of the question with the given
+ * @desc  update data of the _yield with the given
  *        id
  *
  * @param {Object} query Query object
@@ -84,7 +85,7 @@ exports.delete = function deleteQuestion(query) {
  * @return {Promise}
  */
 exports.update = function update(query, updates) {
-  debug('updating question: ', query);
+  debug('updating _yield: ', query);
 
   let now = moment().toISOString();
   let opts = {
@@ -94,44 +95,44 @@ exports.update = function update(query, updates) {
 
   updates = mongoUpdate(updates);
 
-  return Question.findOneAndUpdate(query, updates, opts)
+  return Yield.findOneAndUpdate(query, updates, opts)
       .populate(population)
       .exec();
 };
 
 /**
- * get a question.
+ * get a _yield.
  *
- * @desc get a question with the given id from db
+ * @desc get a _yield with the given id from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
-exports.get = function get(query, question) {
-  debug('getting question ', query);
+exports.get = function get(query, _yield) {
+  debug('getting _yield ', query);
 
-  return Question.findOne(query, returnFields)
+  return Yield.findOne(query, returnFields)
     .populate(population)
     .exec();
 
 };
 
 /**
- * get a collection of questions
+ * get a collection of _yields
  *
- * @desc get a collection of questions from db
+ * @desc get a collection of _yields from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
 exports.getCollection = function getCollection(query, qs) {
-  debug('fetching a collection of questions');
+  debug('fetching a collection of _yields');
 
   return new Promise((resolve, reject) => {
     resolve(
-     Question
+     Yield
       .find(query, returnFields)
       .populate(population)
       .stream());
@@ -141,16 +142,16 @@ exports.getCollection = function getCollection(query, qs) {
 };
 
 /**
- * get a collection of questions using pagination
+ * get a collection of _yields using pagination
  *
- * @desc get a collection of questions from db
+ * @desc get a collection of _yields from db
  *
  * @param {Object} query Query Object
  *
  * @return {Promise}
  */
 exports.getCollectionByPagination = function getCollection(query, qs) {
-  debug('fetching a collection of questions');
+  debug('fetching a collection of _yields');
 
   let opts = {
     select:  returnFields,
@@ -162,7 +163,7 @@ exports.getCollectionByPagination = function getCollection(query, qs) {
 
 
   return new Promise((resolve, reject) => {
-    Question.paginate(query, opts, function (err, docs) {
+    Yield.paginate(query, opts, function (err, docs) {
       if(err) {
         return reject(err);
       }
