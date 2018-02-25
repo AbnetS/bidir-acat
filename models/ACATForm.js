@@ -24,13 +24,39 @@ var ACATFormSchema = new Schema({
       total_cost:     { type: Number, default: 0 },
       total_revenue:  { type: Number, default: 0 },
       net_income:     { type: Number, default: 0 },
-      net_cash_flow:  { type: Number, default: 0 }
+      net_cash_flow:  {
+        jan:             { type: String, default: '' },
+        feb:             { type: String, default: '' },
+        mar:             { type: String, default: '' },
+        apr:             { type: String, default: '' },
+        may:             { type: String, default: '' },
+        june:            { type: String, default: '' },
+        july:            { type: String, default: '' },
+        aug:             { type: String, default: '' },
+        sep:             { type: String, default: '' },
+        oct:             { type: String, default: '' },
+        nov:             { type: String, default: '' },
+        dec:             { type: String, default: '' }
+      }
     },
     achieved:      {
       total_cost:     { type: Number, default: 0 },
       total_revenue:  { type: Number, default: 0 },
       net_income:     { type: Number, default: 0 },
-      net_cash_flow:  { type: Number, default: 0 }
+      net_cash_flow:  {
+        jan:             { type: String, default: '' },
+        feb:             { type: String, default: '' },
+        mar:             { type: String, default: '' },
+        apr:             { type: String, default: '' },
+        may:             { type: String, default: '' },
+        june:            { type: String, default: '' },
+        july:            { type: String, default: '' },
+        aug:             { type: String, default: '' },
+        sep:             { type: String, default: '' },
+        oct:             { type: String, default: '' },
+        nov:             { type: String, default: '' },
+        dec:             { type: String, default: '' }
+      }
     },
     date_created:   { type: Date },
     last_modified:  { type: Date }

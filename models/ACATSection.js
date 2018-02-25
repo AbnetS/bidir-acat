@@ -10,9 +10,9 @@ var paginator = require('mongoose-paginate');
 var Schema = mongoose.Schema;
 
 var ACATSectionSchema = new Schema({       
-    title:              { type: String, default: '' },
-    estimated_total:    { type: Number, default: 0 },
-    achieved_sub_total: { type: Number, default: 0 },
+    title:                { type: String, default: '' },
+    estimated_sub_total:  { type: Number, default: 0 },
+    achieved_sub_total:   { type: Number, default: 0 },
     cash_flow:       {
       jan:             { type: String, default: '' },
       feb:             { type: String, default: '' },
@@ -89,7 +89,7 @@ ACATSectionSchema.pre('save', function preSaveMiddleware(next) {
  */
 ACATSectionSchema.statics.attributes = {      
   title:              1,
-  estimated_total:    1,
+  estimated_sub_total:    1,
   achieved_sub_total: 1,
   cash_flow:       1,
   cost_list:       1,
