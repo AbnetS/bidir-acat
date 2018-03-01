@@ -27,6 +27,65 @@ const SectionDal      = require('../dal/ACATSection');
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
 /**
+ * Initialize acat skeleton.
+ *
+ * @desc Initialize ACAT Skeleton for a crop
+ *
+ * @param {Function} next Middleware dispatcher
+ *
+ */
+exports.initialize = function* initializeACATForm(next) {
+  debug('initialize acat form');
+
+  let isPermitted = yield hasPermission(this.state._user, 'CREATE');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'INITIALIZE_ACAT_FORM_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
+  let body = this.request.body;
+
+  this.checkBody('title')
+      .notEmpty('ACATForm Title is Empty');
+  this.checkBody('crop')
+      .notEmpty('ACATForm Crop Value is Empty');
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'INITIALIZE_FORM_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
+  // PREDEFINED SECTIONS
+
+  try {
+    body.type = 'ACAT';
+
+    let form = yield ACATFormDal.get({ type: body.type });
+    if(form) {
+      throw new Error('ACAT Form already exists!!');
+    }
+
+    body.created_by = this.state._user._id;
+
+    // Create ACATForm Type
+    form = yield ACATFormDal.create(body);
+
+    this.body = form;
+
+  } catch(ex) {
+    this.throw(new CustomError({
+      type: 'INITIALIZE_ACAT_FORM_ERROR',
+      message: ex.message
+    }));
+  }
+
+};
+
+/**
  * Create a form.
  *
  * @desc create a form using basic Authentication or Social Media

@@ -23,18 +23,18 @@ var CostListItemSchema = new Schema({
       total_price:    { type: Number, default: 0 }
     },
     cash_flow:       {
-      jan:             { type: String, default: '' },
-      feb:             { type: String, default: '' },
-      mar:             { type: String, default: '' },
-      apr:             { type: String, default: '' },
-      may:             { type: String, default: '' },
-      june:            { type: String, default: '' },
-      july:            { type: String, default: '' },
-      aug:             { type: String, default: '' },
-      sep:             { type: String, default: '' },
-      oct:             { type: String, default: '' },
-      nov:             { type: String, default: '' },
-      dec:             { type: String, default: '' }
+      jan:             { type: Number, default: 0 },
+      feb:             { type: Number, default: 0 },
+      mar:             { type: Number, default: 0 },
+      apr:             { type: Number, default: 0 },
+      may:             { type: Number, default: 0 },
+      june:            { type: Number, default: 0 },
+      july:            { type: Number, default: 0 },
+      aug:             { type: Number, default: 0 },
+      sep:             { type: Number, default: 0 },
+      oct:             { type: Number, default: 0 },
+      nov:             { type: Number, default: 0 },
+      dec:             { type: Number, default: 0 }
     },
     date_created:    { type: Date },
     last_modified:   { type: Date }
