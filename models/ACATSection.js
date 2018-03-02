@@ -34,27 +34,27 @@ var ACATSectionSchema = new Schema({
     estimated:       {
       yield: {
         uofm_for_yield: { type: String },
-        max:            { type: Number }
+        max:            { type: Number },
+        min:            { type: Number },
+        avg:            { type: Number }
       },
       price: {
         uofm_for_price: { type: String },
-        max:            { type: Number }
+        max:            { type: Number },
+        min:            { type: Number },
+        avg:            { type: Number }
       }
     },
     achieved:       {
-      yield: {
-        uofm_for_yield: { type: String },
-        max:            { type: Number }
-      },
-      price: {
-        uofm_for_price: { type: String },
-        max:            { type: Number }
-      }
+      uofm_for_yield:   { type: String },
+      yield:            { type: Number },
+      uofm_for_price:   { type: String },
+      price:            { type: Number }
     },
     marketable_yield: {
-      own:          { type: String },
-      seed_reserve: { type: String },
-      for_market:   { type: String }
+      own:          { type: Number },
+      seed_reserve: { type: Number },
+      for_market:   { type: Number }
     },
     number:          { type: Number, default: 1 },
     date_created:    { type: Date },

@@ -28,7 +28,27 @@ var population = [{
   }]
 },{
   path: 'sub_sections',
-  select: ACATSection.attributes
+  select: ACATSection.attributes,
+  options: {
+    sort: { number: 1 }
+  },
+  populate: [{
+    path: 'sub_sections',
+    select: ACATSection.attributes,
+    options: {
+      sort: { number: 1 }
+    }
+  },{
+    path: 'cost_list',
+    select: CostList.attributes,
+    populate: [{
+      path: 'linear',
+      select: CostListItem.attributes
+    },{
+       path: 'grouped',
+      select: GroupedList.attributes
+    }]
+  }]
 }];
 
 /**

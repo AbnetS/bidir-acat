@@ -19,10 +19,14 @@ const CustomError         = require('../lib/custom-error');
 const checkPermissions    = require('../lib/permissions');
 const FORM                = require ('../lib/enums').FORM;
 
+const Section         = require('../models/ACATSection');
+const Form            = require('../models/ACATForm');
+
 const TokenDal         = require('../dal/token');
-const ACATFormDal          = require('../dal/ACATForm');
+const FormDal          = require('../dal/ACATForm');
 const LogDal           = require('../dal/log');
 const SectionDal      = require('../dal/ACATSection');
+const CostListDal       = require('../dal/costList');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -62,17 +66,31 @@ exports.initialize = function* initializeACATForm(next) {
   // PREDEFINED SECTIONS
 
   try {
+
     body.type = 'ACAT';
 
-    let form = yield ACATFormDal.get({ type: body.type });
+    let form = yield FormDal.get({ crop: body.crop });
     if(form) {
-      throw new Error('ACAT Form already exists!!');
+      throw new Error('ACAT For Crop already exists!!');
     }
 
     body.created_by = this.state._user._id;
 
     // Create ACATForm Type
-    form = yield ACATFormDal.create(body);
+    form = yield FormDal.create(body);
+
+    for(let section of FORM.ACAT_STRUCTURE) {
+      form = yield Form.findOne({ _id: form._id }).exec();
+      form = form.toJSON();
+
+      if(section.name == 'Inputs And Activity Costs') {
+        form = yield createIAC(form);
+
+      } else if(section.name == 'Yield') {
+        form = yield createYield(form);
+
+      }
+    }
 
     this.body = form;
 
@@ -121,7 +139,7 @@ exports.create = function* createACATForm(next) {
   try {
     body.type = 'ACAT';
 
-    let form = yield ACATFormDal.get({ type: body.type });
+    let form = yield FormDal.get({ type: body.type });
     if(form) {
       throw new Error('ACAT Form already exists!!');
     }
@@ -129,7 +147,7 @@ exports.create = function* createACATForm(next) {
     body.created_by = this.state._user._id;
 
     // Create ACATForm Type
-    form = yield ACATFormDal.create(body);
+    form = yield FormDal.create(body);
 
     this.body = form;
 
@@ -166,7 +184,7 @@ exports.fetchOne = function* fetchOneACATForm(next) {
   };
 
   try {
-    let form = yield ACATFormDal.get(query);
+    let form = yield FormDal.get(query);
 
     yield LogDal.track({
       event: 'view_form',
@@ -223,7 +241,7 @@ exports.update = function* updateACATForm(next) {
     delete body.signatures;
     delete body.type;
 
-    let form = yield ACATFormDal.update(query, body);
+    let form = yield FormDal.update(query, body);
 
     yield LogDal.track({
       event: 'form_update',
@@ -278,7 +296,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   };
 
   try {
-    let forms = yield ACATFormDal.getCollectionByPagination(query, opts);
+    let forms = yield FormDal.getCollectionByPagination(query, opts);
 
     this.body = forms;
   } catch(ex) {
@@ -305,7 +323,7 @@ exports.remove = function* removeACATForm(next) {
   };
 
   try {
-    let form = yield ACATFormDal.delete(query);
+    let form = yield FormDal.delete(query);
     if(!form._id) {
       throw new Error('ACATForm Does Not Exist!');
     }
@@ -336,3 +354,149 @@ exports.remove = function* removeACATForm(next) {
   }
 
 };
+
+// Utilities
+function createIAC(form) {
+  return co(function* () {
+    // create Main Section
+    let mainSection = yield SectionDal.create({
+      title:'Inputs And Activity Costs',
+      number: 1
+    });
+
+    // Add Main Section to Form
+    let formSections = form.sections.slice();
+    formSections.push(mainSection._id)
+    form = yield FormDal.update({ _id: form._id },{
+      sections: formSections
+    });
+
+
+    // Create Sub Sections
+    let subSections = ['Input', 'Labour Cost', 'Other Costs'];
+    let _sections = [];
+    
+
+    for(let sub of subSections) {
+      let costList;
+      let sect;
+
+      switch(sub) {
+        case 'Labour Cost':
+          costList = yield CostListDal.create({});
+
+          sect = yield SectionDal.create({
+            number: 2,
+            cost_list: costList._id,
+            title:'Labour Cost'
+          });
+
+          _sections.push(sect._id);
+
+        break;
+        case 'Other Costs':
+          costList = yield CostListDal.create({});
+
+          sect = yield SectionDal.create({
+            number: 3,
+            cost_list: costList._id,
+            title: 'Other Costs'
+          });
+
+          _sections.push(sect._id);
+
+        break;
+        case 'Input':
+          let subs = []
+
+          // create Seed Section
+          costList = yield CostListDal.create({});
+          let seedSection = yield SectionDal.create({
+            variety: '',
+            seed_source: '',
+            title: 'Seed',
+            number: 1,
+            cost_list: costList._id
+          });
+          subs.push(seedSection._id)
+
+          // create Fertilizers Section
+          costList = yield CostListDal.create({});
+          let fertilizersSection = yield SectionDal.create({
+            title: 'Fertilizers',
+            number: 2,
+            cost_list: costList._id
+          })
+          subs.push(fertilizersSection._id)
+
+          // create Chemicals Section
+          costList = yield CostListDal.create({});
+          let chemicalsSection = yield SectionDal.create({
+            title: 'Chemicals',
+            number: 3,
+            cost_list: costList._id
+          });
+          subs.push(chemicalsSection._id);
+
+          sect = yield SectionDal.create({
+            number: 1,
+            title: 'Input',
+            sub_sections: subs
+          });
+
+          _sections.push(sect._id);
+        break;
+      }
+    }
+
+    yield SectionDal.update({ _id: mainSection._id },{
+      sub_sections: _sections.slice()
+    });
+
+    return form;
+  });
+}
+
+function createYield(form) {
+  return co(function* () {
+    // create Main Section
+    let mainSection = yield SectionDal.create({
+      title:'Yield',
+      number: 2,
+      estimated: {
+        yield: {
+          uofm_for_yield: '',
+          max: 0,
+          min: 0,
+          avg: 0
+        },
+        price: {
+          uofm_for_price: '',
+          max: 0,
+          min: 0,
+          avg: 0
+        }
+      },
+      achieved: {
+        uofm_for_price: '',
+        price: 0,
+        uofm_for_yield: '',
+        yield: 0
+      },
+      marketable_yield: {
+        own:          0,
+        seed_reserve: 0,
+        for_market:   0
+      }
+    });
+
+    // Add Main Section to Form
+    let formSections = form.sections.slice();
+    formSections.push(mainSection._id)
+    form = yield FormDal.update({ _id: form._id },{
+      sections: formSections
+    });
+
+    return form;
+  });
+}

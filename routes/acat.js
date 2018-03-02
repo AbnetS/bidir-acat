@@ -19,14 +19,14 @@ var router  = Router();
  *
  * @apiDescription Initialize skeleton ACAT With defaults
  *
- * @apiParam {String} subtitle ACAT Subtitle
- * @apiParam {String} purpose ACAT Purpose
+ * @apiParam {String} [subtitle] ACAT Subtitle
+ * @apiParam {String} [purpose] ACAT Purpose
  * @apiParam {String} title ACAT Title
  * @apiParam {String} crop ACAT Crop
  *
  * @apiParamExample Request Example:
  *  {
- *    description: "This is a Description",
+ *    subtitle: "This is a subtitle",
  *    title: "ACAT Form",
  *    crop: "Maize"
  *  }

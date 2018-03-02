@@ -11,16 +11,61 @@ const co      = require('co');
 
 const ACATForm          = require('../models/ACATForm');
 const ACATSection       = require('../models/ACATSection');
+const CostList          = require('../models/costList');
+const CostListItem      = require('../models/costListItem');
+const GroupedList       = require('../models/groupedList');
+
 const mongoUpdate   = require('../lib/mongo-update');
 
 var returnFields = ACATForm.attributes;
 var population = [{
   path: 'sections',
   select: ACATSection.attributes,
-  populate: {
+  populate: [{
     path: 'sub_sections',
     select: ACATSection.attributes,
-  },
+    options: {
+      sort: { number: '1' }
+    },
+    populate: [{
+      path: 'sub_sections',
+      select: ACATSection.attributes,
+      options: {
+        sort: { number: '1' }
+      },
+      populate: {
+        path: 'cost_list',
+        select: CostList.attributes,
+        populate: [{
+          path: 'linear',
+          select: CostListItem.attributes
+        },{
+           path: 'grouped',
+          select: GroupedList.attributes
+        }]
+      }
+    },{
+      path: 'cost_list',
+      select: CostList.attributes,
+      populate: [{
+        path: 'linear',
+        select: CostListItem.attributes
+      },{
+         path: 'grouped',
+        select: GroupedList.attributes
+      }]
+    }]
+  },{
+    path: 'cost_list',
+    select: CostList.attributes,
+    populate: [{
+      path: 'linear',
+      select: CostListItem.attributes
+    },{
+       path: 'grouped',
+      select: GroupedList.attributes
+    }]
+  }],
   options: {
     sort: { number: '1' }
   }
