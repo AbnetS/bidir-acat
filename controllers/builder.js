@@ -18,6 +18,7 @@ const config              = require('../config');
 const CustomError         = require('../lib/custom-error');
 const checkPermissions    = require('../lib/permissions');
 const FORM                = require ('../lib/enums').FORM;
+const googleBuckets      = require('../lib/google-buckets');
 
 const Section         = require('../models/ACATSection');
 const Form            = require('../models/ACATForm');
@@ -50,6 +51,27 @@ exports.initialize = function* initializeACATForm(next) {
   }
 
   let body = this.request.body;
+  let bodyKeys = Object.keys(body);
+  let isMultipart = (bodyKeys.indexOf('fields') !== -1) && (bodyKeys.indexOf('files') !== -1);
+
+  // If content is multipart reduce fields and files path
+  if(isMultipart) {
+    let _clone = {};
+
+    for(let key of bodyKeys) {
+      let props = body[key];
+      let propsKeys = Object.keys(props);
+
+      for(let prop of propsKeys) {
+        _clone[prop] = props[prop];
+      }
+    }
+
+    this.request.body = _clone;
+
+    body = this.request.body;
+
+  }
 
   this.checkBody('title')
       .notEmpty('ACATForm Title is Empty');
@@ -75,6 +97,17 @@ exports.initialize = function* initializeACATForm(next) {
     }
 
     body.created_by = this.state._user._id;
+
+    if(body.crop_image) {
+      let filename  = body.crop.trim().toUpperCase().split(/\s+/).join('_');
+      let id        = crypto.randomBytes(6).toString('hex');
+      let extname   = path.extname(body.crop_image.name);
+      let assetName = `${filename}_${id}${extname}`;
+
+      let url       = yield googleBuckets(body.crop_image.path, assetName);
+
+      body.crop_image = url;
+    }
 
     // Create ACATForm Type
     form = yield FormDal.create(body);
@@ -123,6 +156,27 @@ exports.create = function* createACATForm(next) {
   }
 
   let body = this.request.body;
+  let bodyKeys = Object.keys(body);
+  let isMultipart = (bodyKeys.indexOf('fields') !== -1) && (bodyKeys.indexOf('files') !== -1);
+
+  // If content is multipart reduce fields and files path
+  if(isMultipart) {
+    let _clone = {};
+
+    for(let key of bodyKeys) {
+      let props = body[key];
+      let propsKeys = Object.keys(props);
+
+      for(let prop of propsKeys) {
+        _clone[prop] = props[prop];
+      }
+    }
+
+    this.request.body = _clone;
+
+    body = this.request.body;
+
+  }
 
   this.checkBody('title')
       .notEmpty('ACATForm Title is Empty');
@@ -145,6 +199,17 @@ exports.create = function* createACATForm(next) {
     }
 
     body.created_by = this.state._user._id;
+
+    if(body.crop_image) {
+      let filename  = body.crop.trim().toUpperCase().split(/\s+/).join('_');
+      let id        = crypto.randomBytes(6).toString('hex');
+      let extname   = path.extname(body.crop_image.name);
+      let assetName = `${filename}_${id}${extname}`;
+
+      let url       = yield googleBuckets(body.crop_image.path, assetName);
+
+      body.crop_image = url;
+    }
 
     // Create ACATForm Type
     form = yield FormDal.create(body);

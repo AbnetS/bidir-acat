@@ -50,16 +50,6 @@ exports.addItem = function* addtem(next) {
 
   let body = this.request.body;
 
-  this.checkBody('type')
-      .notEmpty('Cost List Item type is either linear or grouped');
-
-  if(this.errors) {
-    return this.throw(new CustomError({
-      type: 'ADD_COST_LIST_ITEM_ERROR',
-      message: JSON.stringify(this.errors)
-    }));
-  }
-
   try {
 
     if(!body.parent_grouped_list && !body.parent_cost_list) {
@@ -82,18 +72,18 @@ exports.addItem = function* addtem(next) {
       }
     }
 
-    body.type = body.type.toLowerCase();
+    body.type = body.type ? body.type.toLowerCase() : 'none';
 
     let item;
     if(body.type == 'linear') {
-      item = yield CostListItemDal.create({});
+      item = yield CostListItemDal.create(body);
 
     } else if(body.type == 'grouped') {
       // Create Section Type
-      item  = yield GroupedListDal.create({
-        title: body.title
-      });
+      item  = yield GroupedListDal.create(body);
 
+    } else {
+      item = yield CostListItemDal.create(body);
     }
 
     if(body.parent_cost_list) {

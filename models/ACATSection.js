@@ -29,7 +29,7 @@ var ACATSectionSchema = new Schema({
     },
     cost_list:       { type: Schema.Types.ObjectId, ref: 'CostList' },
     variety:         { type: String },
-    seed_source:     { type: String },
+    seed_source:     [{ type: String }],
     sub_sections:    [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
     estimated:       {
       yield: {

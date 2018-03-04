@@ -17,18 +17,22 @@ var router  = Router();
  * @apiName InitializeACAT
  * @apiGroup ACAT
  *
- * @apiDescription Initialize skeleton ACAT With defaults
+ * @apiDescription Initialize skeleton ACAT With defaults. Use _MULTIPART/FORMDATA_
  *
  * @apiParam {String} [subtitle] ACAT Subtitle
  * @apiParam {String} [purpose] ACAT Purpose
  * @apiParam {String} title ACAT Title
  * @apiParam {String} crop ACAT Crop
+ * @apiParam {String} crop_category ACAT Crop Category
+ * @apiParam {Object} crop_image ACAT Crop Image
  *
  * @apiParamExample Request Example:
  *  {
  *    subtitle: "This is a subtitle",
  *    title: "ACAT Form",
- *    crop: "Maize"
+ *    crop: "Maize",
+ *    crop_category: "Grain"
+ *    crop_image: "<IMAGE_OBJECT>"
  *  }
  *
  * @apiSuccess {String} _id ACAT form id
@@ -40,6 +44,8 @@ var router  = Router();
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {String} crop_category ACAT Crop Category
+ * @apiSuccess {String} crop_image ACAT Crop Image
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
@@ -48,6 +54,8 @@ var router  = Router();
  *    _id : "556e1174a8952c9521286a60",
  *    type: "ACAT",
  *    crop: "Maize",
+ *    crop_category: "Grain"
+ *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
  *    description: "This is a Description",
  *    title: "ACAT Form",
  *    process: "",
@@ -79,18 +87,22 @@ router.post('/initialize', acl(['*']), builderController.initialize);
  * @apiName CreateACAT
  * @apiGroup ACAT
  *
- * @apiDescription Create new ACAT. 
+ * @apiDescription Create new ACAT. Use _MULTIPART/FORMDATA_
  *
  * @apiParam {String} subtitle ACAT Subtitle
  * @apiParam {String} purpose ACAT Purpose
  * @apiParam {String} title ACAT Title
  * @apiParam {String} crop ACAT Crop
+ * @apiParam {String} crop_category ACAT Crop Category
+ * @apiParam {Object} crop_image ACAT Crop Image
  *
  * @apiParamExample Request Example:
  *  {
  *    description: "This is a Description",
  *    title: "ACAT Form",
- *    crop: "Maize"
+ *    crop: "Maize",
+ *    crop_category: "Grain"
+ *    crop_image: "<IMAGE_OBJECT>"
  *  }
  *
  * @apiSuccess {String} _id ACAT form id
@@ -102,6 +114,8 @@ router.post('/initialize', acl(['*']), builderController.initialize);
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {String} crop_category ACAT Crop Category
+ * @apiSuccess {String} crop_image ACAT Crop Image
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
@@ -112,6 +126,8 @@ router.post('/initialize', acl(['*']), builderController.initialize);
  *    crop: "Maize",
  *    description: "This is a Description",
  *    title: "ACAT Form",
+ *    crop_category: "Grain"
+ *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
  *    process: "",
  *    sections: [{
  *		 _id : "556e1174a8952c9521286a60",
@@ -155,6 +171,8 @@ router.post('/create', acl(['*']), builderController.create);
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {String} crop_category ACAT Crop Category
+ * @apiSuccess {String} crop_image ACAT Crop Image
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
@@ -166,6 +184,8 @@ router.post('/create', acl(['*']), builderController.create);
  *        _id : "556e1174a8952c9521286a60",
  *        type: "ACAT",
  *        crop: "Maize",
+ *        crop_category: "Grain",
+ *        crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
  *        description: "This is a Description",
  *        title: "ACAT Form",
  *        process: "",
@@ -208,6 +228,8 @@ router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {String} crop_category ACAT Crop Category
+ * @apiSuccess {String} crop_image ACAT Crop Image
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
@@ -216,6 +238,8 @@ router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
  *    _id : "556e1174a8952c9521286a60",
  *    type: "ACAT",
  *    crop: "Maize",
+ *    crop_category: "Grain"
+ *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
  *    description: "This is a Description",
  *    title: "ACAT Form",
  *    process: "",
@@ -266,6 +290,8 @@ router.get('/:id', acl(['*']), builderController.fetchOne);
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
+ * @apiSuccess {String} crop_category ACAT Crop Category
+ * @apiSuccess {String} crop_image ACAT Crop Image
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
@@ -274,6 +300,8 @@ router.get('/:id', acl(['*']), builderController.fetchOne);
  *    _id : "556e1174a8952c9521286a60",
  *    type: "ACAT",
  *    crop: "Maize",
+ *    crop_category: "Grain"
+ *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
  *    description: "This is a Description",
  *    title: "ACAT Form",
  *    process: "",

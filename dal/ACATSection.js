@@ -24,7 +24,11 @@ var population = [{
     select: CostListItem.attributes
   },{
      path: 'grouped',
-    select: GroupedList.attributes
+    select: GroupedList.attributes,
+    populate: {
+      path: 'items',
+      select: CostListItem.attributes
+    }
   }]
 },{
   path: 'sub_sections',
@@ -45,8 +49,12 @@ var population = [{
       path: 'linear',
       select: CostListItem.attributes
     },{
-       path: 'grouped',
-      select: GroupedList.attributes
+      path: 'grouped',
+      select: GroupedList.attributes,
+      populate: {
+        path: 'items',
+        select: CostListItem.attributes
+      }
     }]
   }]
 }];

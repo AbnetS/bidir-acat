@@ -12,6 +12,7 @@ var Schema = mongoose.Schema;
 var CostListItemSchema = new Schema({
     item:            { type: String, default: '' },
     unit:            { type: String, default: '' },
+    remark:          { type: String, default: '' },
     estimated:       {
       value:            { type: Number, default: 0 },
       unit_price:       { type: Number, default: 0 },
