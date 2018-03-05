@@ -7,9 +7,11 @@ const Router = require('koa-router');
 const debug  = require('debug')('api:app-router');
 
 const rootRouter          = require('./root');
-const acatRouter      = require('./acat');
-const sectionRouter      = require('./section');
+const acatRouter          = require('./acat');
+const sectionRouter       = require('./section');
 const costListRouter      = require('./costList');
+const cropRouter          = require('./crop');
+const loanProductRouter   = require('./loanProduct');
 
 var appRouter = new Router();
 
@@ -29,6 +31,10 @@ composeRoute('acat', acatRouter);
 composeRoute('acat/costLists', costListRouter);
 //Add Sections Router
 composeRoute('acat/sections', sectionRouter);
+//Add Crops Router
+composeRoute('acat/crops', cropRouter);
+//Add Loan Products Router
+composeRoute('acat/loan-products', loanProductRouter);
 
 function composeRoute(endpoint, router){
   appRouter.use(`/${endpoint}`, router.routes(), router.allowedMethods());

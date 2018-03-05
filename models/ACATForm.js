@@ -19,9 +19,7 @@ var ACATFormSchema = new Schema({
     created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
     sections:       [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
-    crop:           { type: String, default: '' },
-    crop_image:     { type: String, default: '' },
-    crop_category:  { type: String, default: '' },
+    crop:           { type: Schema.Types.ObjectId, ref: 'Crop' },
     estimated:      {
       total_cost:     { type: Number, default: 0 },
       total_revenue:  { type: Number, default: 0 },
@@ -101,8 +99,6 @@ ACATFormSchema.statics.attributes = {
   crop: 1,
   estimated: 1,
   achieved: 1,
-  crop_category: 1,
-  crop_image: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1
