@@ -73,6 +73,7 @@ CostListItemSchema.statics.attributes = {
   estimated: 1,
   achieved: 1,
   cash_flow: 1,
+  remark: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1
