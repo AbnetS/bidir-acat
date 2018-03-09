@@ -15,14 +15,17 @@ var LoanProductSchema = new Schema({
     type:           { type: String, enum: FORM.TYPES },
     name:           { type: String, default: '' },
     purpose:        { type: String, default: '' },
+    currency:       { type: String, default: '' },
     maximum_loan_amount: { type: Number, default: 0 },
     deductibles:    [{
       fixed_amount:   { type: Number, default: 0 },
-      percent:        { type: Number, default: 0 }
+      percent:        { type: Number, default: 0 },
+      item:           { type: String, default: ''}
     }],
     cost_of_loan:   [{
       fixed_amount:   { type: Number, default: 0 },
-      percent:        { type: Number, default: 0 }
+      percent:        { type: Number, default: 0 },
+      item:           { type: String, default: ''}
     }],    
     created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
@@ -65,6 +68,7 @@ LoanProductSchema.statics.attributes = {
   purpose: 1,
   layout: 1,
   cost_of_loan: 1,
+  currency: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1

@@ -21,11 +21,13 @@ var router  = Router();
  *
  * @apiParam {String} name LoanProduct Name
  * @apiParam {String} maximum_loan_amount LoanProduct Maximum Loan Amount
+ * @apiParam {String} [currency] LoanProduct Currency
  *
  * @apiParamExample Request Example:
  *  {
  *    name: "Loan Something Something",
  *    maximum_loan_amount : 100000000000000000000000000000, // Very rich guy
+ *    currency: "$"
  *  }
  *
  * @apiSuccess {String} _id loanProduct id
@@ -33,12 +35,14 @@ var router  = Router();
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
  * @apiSuccess {Array} deductibles Deductibles List
  * @apiSuccess {Array} cost_of_loan Cost of Loan
+ * @apiSuccess {String} currency Currency
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
  *    name: "Loan Something Something",
  *    maximum_loan_amount : 100000000000000000000000000000,
+ *    currency: "$"
  *    deductibles: [],
  *    cost_of_loan: [],
  *    ...
@@ -62,19 +66,23 @@ router.post('/create', acl(['*']), loanProductController.create);
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
  * @apiSuccess {Array} deductibles Deductibles List
  * @apiSuccess {Array} cost_of_loan Cost of Loan
+ * @apiSuccess {String} currency Currency
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
  *    name: "Loan Something Something",
  *    maximum_loan_amount : 100000000000000000000000000000,
+ *    currency: "$"
  *    deductibles: [{
  *      fixed_amount: 0,
- *      percent: 5 
+ *      percent: 5 ,
+ *      item: "Item"
  *    }],
  *    cost_of_loan: [{
  *      fixed_amount: 0,
- *      percent: 5 
+ *      percent: 5,
+ *      item: "Item"
  *    }],
  *    ...
  *  }
@@ -103,19 +111,23 @@ router.get('/:id', acl(['*']), loanProductController.fetchOne);
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
  * @apiSuccess {Array} deductibles Deductibles List
  * @apiSuccess {Array} cost_of_loan Cost of Loan
+ * @apiSuccess {String} currency Currency
  *
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
  *    name: "Loan Something Something",
  *    maximum_loan_amount : 100000000000000000000000000000,
+ *    currency: "$"
  *    deductibles: [{
  *      fixed_amount: 0,
- *      percent: 5 
+ *      percent: 5,
+ *      item: "Item" 
  *    }],
  *    cost_of_loan: [{
  *      fixed_amount: 0,
- *      percent: 5 
+ *      percent: 5,
+ *      item: "Item" 
  *    }],
  *    ...
  *  }
@@ -137,6 +149,7 @@ router.put('/:id', acl(['*']), loanProductController.update);
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
  * @apiSuccess {Array} deductibles Deductibles List
  * @apiSuccess {Array} cost_of_loan Cost of Loan
+ * @apiSuccess {String} currency Currency
  *
  * @apiSuccessExample Response Example:
  *  {
@@ -146,13 +159,16 @@ router.put('/:id', acl(['*']), loanProductController.update);
  *    _id : "556e1174a8952c9521286a60",
  *    name: "Loan Something Something",
  *    maximum_loan_amount : 100000000000000000000000000000,
+ *    currency: "$"
  *    deductibles: [{
  *      fixed_amount: 0,
- *      percent: 5 
+ *      percent: 5,
+ *      item: "Item" 
  *    }],
  *    cost_of_loan: [{
  *      fixed_amount: 0,
- *      percent: 5 
+ *      percent: 5,
+ *      item: "Item" 
  *    }],
  *    ...
  *    }]
