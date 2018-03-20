@@ -1,4 +1,4 @@
-// ACATForm Model Definiton.
+// ACAT Model Definiton.
 
 /**
  * Load Module Dependencies.
@@ -11,11 +11,12 @@ const FORM     = require ('../lib/enums').FORM
 
 var Schema = mongoose.Schema;
 
-var ACATFormSchema = new Schema({
+var ACATSchema = new Schema({
     type:           { type: String, enum: FORM.TYPES },
     title:          { type: String, default: '' },
     subtitle:       { type: String, default: '' },
-    purpose:        { type: String, default: '' },     
+    purpose:        { type: String, default: '' },
+    client:         { type: Schema.Types.ObjectId, ref: 'Client' },     
     created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
     sections:       [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
@@ -25,6 +26,7 @@ var ACATFormSchema = new Schema({
       latitude:   { type: Number, default: 0 },
       longitude:  { type: Number, default: 0 }
     },
+    status:              { type: String, default: 'new' },
     first_expense_month: { type: String, default: 'None' }, 
     estimated:      {
       total_cost:     { type: Number, default: 0 },
@@ -69,7 +71,7 @@ var ACATFormSchema = new Schema({
 });
 
 // add mongoose-troop middleware to support pagination
-ACATFormSchema.plugin(paginator);
+ACATSchema.plugin(paginator);
 
 /**
  * Pre save middleware.
@@ -78,7 +80,7 @@ ACATFormSchema.plugin(paginator);
  *          attributes prior to save.
  *        - Hash tokens password.
  */
-ACATFormSchema.pre('save', function preSaveMiddleware(next) {
+ACATSchema.pre('save', function preSaveMiddleware(next) {
   var instance = this;
 
   // set date modifications
@@ -92,10 +94,11 @@ ACATFormSchema.pre('save', function preSaveMiddleware(next) {
 });
 
 /**
- * Filter ACATForm Attributes to expose
+ * Filter ACAT Attributes to expose
  */
-ACATFormSchema.statics.attributes = {
+ACATSchema.statics.attributes = {
   type: 1,
+  client: 1,
   title: 1,
   created_by: 1,
   sections: 1,
@@ -106,6 +109,7 @@ ACATFormSchema.statics.attributes = {
   estimated: 1,
   achieved: 1,
   first_expense_month: 1,
+  status: 1,
   cropping_area_size: 1,
   gps_location: 1,
   date_created: 1,
@@ -114,5 +118,5 @@ ACATFormSchema.statics.attributes = {
 };
 
 
-// Expose ACATForm model
-module.exports = mongoose.model('ACATForm', ACATFormSchema);
+// Expose ACAT model
+module.exports = mongoose.model('ACAT', ACATSchema);

@@ -12,6 +12,7 @@ const sectionRouter       = require('./section');
 const costListRouter      = require('./costList');
 const cropRouter          = require('./crop');
 const loanProductRouter   = require('./loanProduct');
+const clientRouter        = require('./client');
 
 var appRouter = new Router();
 
@@ -33,6 +34,8 @@ composeRoute('acat/costLists', costListRouter);
 composeRoute('acat/sections', sectionRouter);
 //Add Crops Router
 composeRoute('acat/crops', cropRouter);
+//Add clients Router
+composeRoute('acat/clients', clientRouter);
 //Add Loan Products Router
 composeRoute('acat/loan-products', loanProductRouter);
 
