@@ -131,6 +131,37 @@ exports.addItem = function* addtem(next) {
 };
 
 /**
+ * Get a single item.
+ *
+ * @desc Fetch a section with the given id from the database
+ *       and update their data
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.fetchOne = function* fetchOne(next) {
+  debug(`get item: ${this.params.id}`);
+
+  let query = {
+    _id: this.params.id
+  };
+
+  try {
+    let costList = yield CostListDal.update(query);
+
+
+    this.body = costList;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'FETCH_COST_LIST_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
+/**
  * Update a single item.
  *
  * @desc Fetch a section with the given id from the database
@@ -169,6 +200,174 @@ exports.update = function* updateItem(next) {
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'UPDATE_COST_LIST_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
+/**
+ * Remove Linear item.
+ *
+ * @desc Remove Linear Item for costlist
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.removeLinear = function* removeLinear(next) {
+  debug(`removing item: ${this.params.id}`);
+
+
+  let query = {
+    _id: this.params.id
+  };
+
+  let body = this.request.body;
+
+  this.checkBody('item_id')
+      .notEmpty('Cost List Item Reference is Empty');
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ITEM_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
+  try {
+
+    let item;
+    let costList = yield CostList.findOne(query).exec();
+    if(!costList) throw new Error('Cost List Item Does Not Exist');
+
+    item = yield CostListItemDal.delete({ _id: body.item_id });
+    if(!item || !item._id) throw new Error('Cost List Item Does Not Exist');
+
+    let linearItems = costList.linear.slice();
+
+    _.remove(linearItems, item._id);
+
+    yield CostListDal.update({ _id: costList._id },{ linear: linearItems });
+
+    this.body = item;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ITEM_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
+/**
+ * Remove Grouped item.
+ *
+ * @desc Remove Linear Item for costlist
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.removeGroupedItem = function* removeGroupedItem(next) {
+  debug(`removing item: ${this.params.id}`);
+
+
+  let query = {
+    _id: this.params.id
+  };
+
+  let body = this.request.body;
+
+  this.checkBody('item_id')
+      .notEmpty('Cost List Item Reference is Empty');
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ITEM_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
+  try {
+
+    let item;
+
+    let groupedList = yield GroupedList.findOne(query).exec();
+    if(!groupedList) throw new Error('Grouped Item Does Not Exist');
+
+    item = yield CostListItemDal.delete({ _id: body.item_id });
+    if(!item || !item._id) throw new Error('Cost List Item Does Not Exist');
+
+    let items = groupedList.items.slice();
+
+    _.remove(items, item._id);
+
+    yield GroupedListDal.update({ _id: groupedList._id },{ items: items });
+
+    this.body = item;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ITEM_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
+
+/**
+ * Remove Grouped item.
+ *
+ * @desc Remove Grouped Item for costlist
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.removeGrouped = function* removeGrouped(next) {
+  debug(`removing item: ${this.params.id}`);
+
+
+  let query = {
+    _id: this.params.id
+  };
+
+  let body = this.request.body;
+
+  this.checkBody('item_id')
+      .notEmpty('Cost List Item Reference is Empty');
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ITEM_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
+  try {
+
+    let item;
+    let costList = yield CostList.findOne(query).exec();
+    if(!costList) throw new Error('Cost List Item Does Not Exist');
+
+    item = yield GroupedListDal.delete({ _id: body.item_id });
+    if(!item || !item._id) throw new Error('Cost List Item Does Not Exist');
+
+    for(let obj of item.items) {
+      yield CostListItemDal.delete({ _id: obj._id });
+    }
+
+    let groupedItems = costList.grouped.slice();
+
+    _.remove(groupedItems, item._id);
+
+    yield CostListDal.update({ _id: costList._id },{ grouped: groupedItems });
+
+    this.body = item;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ITEM_ERROR',
       message: ex.message
     }));
 

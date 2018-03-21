@@ -78,7 +78,13 @@ exports.initialize = function* initializeClientACAT(next) {
       client: client._id,
       branch: client.branch,
       created_by: this.state._user.account
-    })
+    });
+
+    if(body.crop_acats && Array.isArray(body.crop_acats)) {
+      for(let form of body.crop_acats) {
+        let acat = yield createCropACAT(form, this.state._user, clientACAT);
+      }
+    }
     
     this.body = clientACAT;
 
@@ -129,50 +135,7 @@ exports.addACAT = function* addACAT(next) {
     let clientACAT = yield ClientACAT.findOne({ _id: body.client_acat }).exec();
     if(!clientACAT) throw new Error('Client ACAT Does Not Exist');
 
-    let acatForm = yield FormDal.get({ _id: body.crop_acat });
-    if(!acatForm) throw new Error('Crop ACAT Does Not Exist');
-
-    acatForm = acatForm.toJSON();
-
-    let data = {
-      type: acatForm.type,
-      title: acatForm.title,
-      client: clientACAT.client,
-      subtitle: acatForm.subtitle,
-      purpose: acatForm.purpose,
-      layout: acatForm.layout,
-      crop: acatForm.crop,
-      estimated: acatForm.estimated,
-      achieved: acatForm.achieved,
-      first_expense_month: acatForm.first_expense_month,
-      status: 'new',
-      cropping_area_size: acatForm.cropping_area_size,
-      gps_location: acatForm.gps_location,
-      created_by: this.state._user._id
-    };
-
-    let acat = yield ACATDal.create(data);
-    let sections = [];
-
-    // TODO: Refactor for a better iterator
-    for(let section of acatForm.sections) {
-      let sect = yield createSection(section);
-
-      sections.push(sect._id);
-    }
-
-    acat = yield ACATDal.update({ _id: acat._id },{
-      sections: sections
-    });
-
-    clientACAT = clientACAT.toJSON();
-    let acats = clientACAT.ACATs.slice();
-
-    acats.push(acat._id);
-
-    yield ClientACATDal.update({ _id: clientACAT._id },{
-      ACATs: acats
-    })
+    let acat = yield createCropACAT(body.crop_acat, this.state._user, clientACAT);
 
     this.body = acat;
 
@@ -604,5 +567,57 @@ function createCostList(costList) {
     let list = yield CostListDal.create(costList);
 
     return list;
+  })
+}
+
+function createCropACAT(form, user, clientACAT) {
+  return co(function* () {
+    let acatForm = yield FormDal.get({ _id: form });
+    if(!acatForm) return null;
+
+    acatForm = acatForm.toJSON();
+
+    let data = {
+      type: acatForm.type,
+      title: acatForm.title,
+      client: clientACAT.client,
+      subtitle: acatForm.subtitle,
+      purpose: acatForm.purpose,
+      layout: acatForm.layout,
+      crop: acatForm.crop,
+      estimated: acatForm.estimated,
+      achieved: acatForm.achieved,
+      first_expense_month: acatForm.first_expense_month,
+      status: 'new',
+      cropping_area_size: acatForm.cropping_area_size,
+      gps_location: acatForm.gps_location,
+      created_by: user._id
+    };
+
+    let acat = yield ACATDal.create(data);
+    let sections = [];
+
+    // TODO: Refactor for a better iterator
+    for(let section of acatForm.sections) {
+      let sect = yield createSection(section);
+
+      sections.push(sect._id);
+    }
+
+    acat = yield ACATDal.update({ _id: acat._id },{
+      sections: sections
+    });
+
+    clientACAT = clientACAT.toJSON();
+    let acats = clientACAT.ACATs.slice();
+
+    acats.push(acat._id);
+
+    yield ClientACATDal.update({ _id: clientACAT._id },{
+      ACATs: acats
+    })
+
+    return acat;
+
   })
 }

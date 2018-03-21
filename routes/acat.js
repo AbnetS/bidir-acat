@@ -5,160 +5,20 @@
 const Router  = require('koa-router');
 const debug   = require('debug')('api:acat-router');
 
-const builderController  = require('../controllers/builder');
+const acatController  = require('../controllers/acat');
 const authController     = require('../controllers/auth');
 
 const acl               = authController.accessControl;
 var router  = Router();
 
-/**
- * @api {post} /acat/initialize Initialize Skeleton ACAT
- * @apiVersion 1.0.0
- * @apiName InitializeACAT
- * @apiGroup ACAT
- *
- * @apiDescription Initialize skeleton ACAT With defaults. Use _MULTIPART/FORMDATA_
- *
- * @apiParam {String} [subtitle] ACAT Subtitle
- * @apiParam {String} [purpose] ACAT Purpose
- * @apiParam {String} title ACAT Title
- * @apiParam {String} crop ACAT Crop
- * @apiParam {String} crop_category ACAT Crop Category
- * @apiParam {Object} crop_image ACAT Crop Image
- *
- * @apiParamExample Request Example:
- *  {
- *    subtitle: "This is a subtitle",
- *    title: "ACAT Form",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "<IMAGE_OBJECT>"
- *  }
- *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
- * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
- * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
- * @apiSuccess {String} created_by Officer Account registering this
- * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
- * @apiSuccess {Object} estimated Estimated ACAT Values
- * @apiSuccess {Object} achieved Estimated ACAT Achieved
- *
- * @apiSuccessExample Response Example:
- *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
- *  }
- *
- */
-router.post('/initialize', acl(['*']), builderController.initialize);
 
 /**
- * @api {post} /acat/create Create new ACAT
- * @apiVersion 1.0.0
- * @apiName CreateACAT
- * @apiGroup ACAT
- *
- * @apiDescription Create new ACAT. Use _MULTIPART/FORMDATA_
- *
- * @apiParam {String} subtitle ACAT Subtitle
- * @apiParam {String} purpose ACAT Purpose
- * @apiParam {String} title ACAT Title
- * @apiParam {String} crop ACAT Crop
- * @apiParam {String} crop_category ACAT Crop Category
- * @apiParam {Object} crop_image ACAT Crop Image
- *
- * @apiParamExample Request Example:
- *  {
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "<IMAGE_OBJECT>"
- *  }
- *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
- * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
- * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
- * @apiSuccess {String} created_by Officer Account registering this
- * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
- * @apiSuccess {Object} estimated Estimated ACAT Values
- * @apiSuccess {Object} achieved Estimated ACAT Achieved
- *
- * @apiSuccessExample Response Example:
- *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    process: "",
- *    sections: [{
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
- *  }
- *
- */
-router.post('/create', acl(['*']), builderController.create);
-
-
-/**
- * @api {get} /acat/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get builders collection
+ * @api {get} /acat/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get acats collection
  * @apiVersion 1.0.0
  * @apiName FetchPaginated
  * @apiGroup ACAT
  *
- * @apiDescription Get a collection of builders. The endpoint has pagination
+ * @apiDescription Get a collection of acats. The endpoint has pagination
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  *
@@ -209,15 +69,15 @@ router.post('/create', acl(['*']), builderController.create);
  *    }]
  *  }
  */
-router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
+router.get('/paginate', acl(['*']), acatController.fetchAllByPagination);
 
 /**
- * @api {get} /acat/:id Get ACAT ACAT
+ * @api {get} /acat/:id Get ACAT 
  * @apiVersion 1.0.0
  * @apiName Get
  * @apiGroup ACAT
  *
- * @apiDescription Get a user builder with the given id
+ * @apiDescription Get a user acat with the given id
  *
  * @apiSuccess {String} _id ACAT form id
  * @apiSuccess {String} type Form Type ACAT
@@ -263,7 +123,7 @@ router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
  *  }
  *
  */
-router.get('/:id', acl(['*']), builderController.fetchOne);
+router.get('/:id', acl(['*']), acatController.fetchOne);
 
 
 /**
@@ -272,7 +132,7 @@ router.get('/:id', acl(['*']), builderController.fetchOne);
  * @apiName Update
  * @apiGroup ACAT 
  *
- * @apiDescription Update a ACAT builder with the given id
+ * @apiDescription Update a ACAT acat with the given id
  *
  * @apiParam {Object} Data Update data
  *
@@ -324,7 +184,7 @@ router.get('/:id', acl(['*']), builderController.fetchOne);
  *    }
  *  }
  */
-router.put('/:id', acl(['*']), builderController.update);
+router.put('/:id', acl(['*']), acatController.update);
 
 // Expose ACAT Router
 module.exports = router;
