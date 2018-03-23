@@ -13,6 +13,7 @@ var Schema = mongoose.Schema;
 
 var LoanProductSchema = new Schema({
     type:           { type: String, enum: FORM.TYPES },
+    client:         { type: Schema.Types.ObjectId, ref: 'Client' },
     name:           { type: String, default: '' },
     purpose:        { type: String, default: '' },
     currency:       { type: String, default: '' },
@@ -64,6 +65,7 @@ LoanProductSchema.statics.attributes = {
   name: 1,
   created_by: 1,
   deductibles: 1,
+  client: 1,
   maximum_loan_amount: 1,
   purpose: 1,
   layout: 1,

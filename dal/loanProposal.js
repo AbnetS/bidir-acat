@@ -1,5 +1,5 @@
 'use strict';
-// Access Layer for ClientACAT Data.
+// Access Layer for LoanProposal Data.
 
 /**
  * Load Module Dependencies.
@@ -9,80 +9,12 @@ const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
 
-const ClientACAT        = require('../models/clientACAT');
-const ACAT              = require('../models/ACAT');
-const ACATSection       = require('../models/ACATSection');
-const CostList          = require('../models/costList');
-const CostListItem      = require('../models/costListItem');
-const GroupedList       = require('../models/groupedList');
-const LoanProduct       = require('../models/loanProduct');
+const LoanProposal          = require('../models/loanProposal');
 
 const mongoUpdate   = require('../lib/mongo-update');
 
-var returnFields = ClientACAT.attributes;
-var population = [{
-  path: 'ACATs',
-  select: ACAT.attributes,
-  populate: {
-  path: 'sections',
-  select: ACATSection.attributes,
-  populate: [{
-    path: 'sub_sections',
-    select: ACATSection.attributes,
-    options: {
-      sort: { number: '1' }
-    },
-    populate: [{
-      path: 'sub_sections',
-      select: ACATSection.attributes,
-      options: {
-        sort: { number: '1' }
-      },
-      populate: {
-        path: 'cost_list',
-        select: CostList.attributes,
-        populate: [{
-          path: 'linear',
-          select: CostListItem.attributes
-        },{
-          path: 'grouped',
-          select: GroupedList.attributes,
-          populate: {
-            path: 'items',
-            select: CostListItem.attributes
-          }
-        }]
-      }
-    },{
-      path: 'cost_list',
-      select: CostList.attributes,
-      populate: [{
-        path: 'linear',
-        select: CostListItem.attributes
-      },{
-         path: 'grouped',
-        select: GroupedList.attributes
-      }]
-    }]
-  },{
-    path: 'cost_list',
-    select: CostList.attributes,
-    populate: [{
-      path: 'linear',
-      select: CostListItem.attributes
-    },{
-       path: 'grouped',
-      select: GroupedList.attributes
-    }]
-  }],
-  options: {
-    sort: { number: '1' }
-  }
-}
-},{
-  path: 'loan_product',
-  select: LoanProduct.attributes
-}];
+var returnFields = LoanProposal.attributes;
+var population = [];
 
 /**
  * create a new form.
@@ -99,9 +31,9 @@ exports.create = function create(formData) {
 
   return co(function* () {
 
-    let unsavedClientACAT = new ClientACAT(formData);
-    let newClientACAT = yield unsavedClientACAT.save();
-    let form = yield exports.get({ _id: newClientACAT._id });
+    let unsavedLoanProposal = new LoanProposal(formData);
+    let newLoanProposal = yield unsavedLoanProposal.save();
+    let form = yield exports.get({ _id: newLoanProposal._id });
 
     return form;
 
@@ -120,7 +52,7 @@ exports.create = function create(formData) {
  *
  * @return {Promise}
  */
-exports.delete = function deleteClientACAT(query) {
+exports.delete = function deleteLoanProposal(query) {
   debug('deleting form: ', query);
 
   return co(function* () {
@@ -160,7 +92,7 @@ exports.update = function update(query, updates) {
 
   updates = mongoUpdate(updates);
 
-  return ClientACAT.findOneAndUpdate(query, updates, opts)
+  return LoanProposal.findOneAndUpdate(query, updates, opts)
       .populate(population)
       .exec();
 };
@@ -177,7 +109,7 @@ exports.update = function update(query, updates) {
 exports.get = function get(query, form) {
   debug('getting form ', query);
 
-  return ClientACAT.findOne(query, returnFields)
+  return LoanProposal.findOne(query, returnFields)
     .populate(population)
     .exec();
 
@@ -197,7 +129,7 @@ exports.getCollection = function getCollection(query, qs) {
 
   return new Promise((resolve, reject) => {
     resolve(
-     ClientACAT
+     LoanProposal
       .find(query, returnFields)
       .populate(population)
       .stream());
@@ -228,7 +160,7 @@ exports.getCollectionByPagination = function getCollection(query, qs) {
 
 
   return new Promise((resolve, reject) => {
-    ClientACAT.paginate(query, opts, function (err, docs) {
+    LoanProposal.paginate(query, opts, function (err, docs) {
       if(err) {
         return reject(err);
       }

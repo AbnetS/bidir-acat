@@ -6,7 +6,7 @@ const crypto  = require('crypto');
 const path    = require('path');
 const url     = require('url');
 
-const debug       = require('debug')('api:form-controller');
+const debug       = require('debug')('api:acat-controller');
 const moment      = require('moment');
 const jsonStream  = require('streaming-json-stringify');
 const _           = require('lodash');
@@ -31,14 +31,14 @@ let hasPermission = checkPermissions.isPermitted('ACAT');
 
 
 /**
- * Get a single form.
+ * Get a single acat.
  *
- * @desc Fetch a form with the given id from the database.
+ * @desc Fetch a acat with the given id from the database.
  *
  * @param {Function} next Middleware dispatcher
  */
 exports.fetchOne = function* fetchOneACAT(next) {
-  debug(`fetch form: ${this.params.id}`);
+  debug(`fetch acat: ${this.params.id}`);
 
   let isPermitted = yield hasPermission(this.state._user, 'VIEW');
   if(!isPermitted) {
@@ -54,6 +54,7 @@ exports.fetchOne = function* fetchOneACAT(next) {
 
   try {
     let ACAT = yield ACATDal.get(query);
+    if(!ACAT) throw new Error('ACAT Does Not Exist');
 
     yield LogDal.track({
       event: 'view_ACAT',
@@ -109,6 +110,7 @@ exports.update = function* updateACAT(next) {
   try {
 
     let ACAT = yield ACATDal.update(query, body);
+    if(!ACAT) throw new Error('ACAT Does Not Exist');
 
     yield LogDal.track({
       event: 'acat_update',
@@ -132,7 +134,7 @@ exports.update = function* updateACAT(next) {
 /**
  * Get a collection of ACATs by Pagination
  *
- * @desc Fetch a collection of forms
+ * @desc Fetch a collection of acats
  *
  * @param {Function} next Middleware dispatcher
  */
@@ -176,9 +178,9 @@ exports.fetchAllByPagination = function* fetchAllACATs(next) {
 };
 
 /**
- * Remove a single form.
+ * Remove a single acat.
  *
- * @desc Fetch a form with the given id from the database
+ * @desc Fetch a acat with the given id from the database
  *       and Remove their data
  *
  * @param {Function} next Middleware dispatcher
@@ -191,12 +193,12 @@ exports.remove = function* removeACAT(next) {
   };
 
   try {
-    let form = yield FormDal.delete(query);
-    if(!form._id) {
+    let acat = yield ACATDal.delete(query);
+    if(!acat._id) {
       throw new Error('ACATForm Does Not Exist!');
     }
 
-    for(let section of form.sections) {
+    for(let section of acat.sections) {
       section = yield SectionDal.delete({ _id: section._id });
       if(section.sub_section.length) {
         for(let _section of section.sub_sections) {
@@ -206,12 +208,12 @@ exports.remove = function* removeACAT(next) {
     }
 
     yield LogDal.track({
-      event: 'form_delete',
+      event: 'acat_delete',
       permission: this.state._user._id ,
-      message: `Delete Info for ${form._id}`
+      message: `Delete Info for ${acat._id}`
     });
 
-    this.body = form;
+    this.body = acat;
 
   } catch(ex) {
     return this.throw(new CustomError({
