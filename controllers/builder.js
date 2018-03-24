@@ -186,10 +186,11 @@ exports.fetchOne = function* fetchOneACATForm(next) {
 
   try {
     let form = yield FormDal.get(query);
+    if(!form) throw new Error('Form Does Not Exist')
 
     yield LogDal.track({
       event: 'view_form',
-      form: this.state._user._id ,
+      user: this.state._user._id ,
       message: `View form - ${form.title}`
     });
 
@@ -243,6 +244,7 @@ exports.update = function* updateACATForm(next) {
     delete body.type;
 
     let form = yield FormDal.update(query, body);
+    if(!form) throw new Error('Form Does Not Exist')
 
     yield LogDal.track({
       event: 'form_update',
