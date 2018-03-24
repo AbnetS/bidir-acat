@@ -225,4 +225,32 @@ exports.remove = function* removeACAT(next) {
 
 };
 
+/**
+ * Get a client  ACATs
+ *
+ * @desc Fetch a collection of acats for a given client
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.getClientACATs = function* getClientACATs(next) {
+  debug('get a collection of ACATs for a client');
+
+  let query = {
+    client: this.params.id
+  };
+
+
+  try {
+    let ACATs = yield ACATDal.getCollection(query);
+
+    this.body = ACATs;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'GET_CLIENT_ACATS_ERROR',
+      message: ex.message
+    }));
+  }
+};
+
 // Utilities

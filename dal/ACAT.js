@@ -190,13 +190,9 @@ exports.get = function get(query, form) {
 exports.getCollection = function getCollection(query, qs) {
   debug('fetching a collection of forms');
 
-  return new Promise((resolve, reject) => {
-    resolve(
-     ACAT
-      .find(query, returnFields)
-      .populate(population)
-      .stream());
-  });
+  return ACAT.find(query, returnFields)
+    .populate(population)
+    .exec();
 
 
 };
