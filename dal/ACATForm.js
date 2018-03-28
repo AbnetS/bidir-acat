@@ -10,6 +10,7 @@ const _       = require('lodash');
 const co      = require('co');
 
 const ACATForm          = require('../models/ACATForm');
+const Crop              = require('../models/crop');
 const ACATSection       = require('../models/ACATSection');
 const CostList          = require('../models/costList');
 const CostListItem      = require('../models/costListItem');
@@ -19,6 +20,9 @@ const mongoUpdate   = require('../lib/mongo-update');
 
 var returnFields = ACATForm.attributes;
 var population = [{
+  path: 'crop',
+  select: Crop.attributes,
+},{
   path: 'sections',
   select: ACATSection.attributes,
   populate: [{
