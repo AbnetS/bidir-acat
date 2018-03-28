@@ -306,7 +306,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'FETCH_ACAT_FORMS_COLLECTION_ERROR',
-      message: ex.stack
+      message: ex.message
     }));
   }
 };
