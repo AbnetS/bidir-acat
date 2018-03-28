@@ -303,6 +303,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     let forms = yield FormDal.getCollectionByPagination(query, opts);
 
     this.body = forms;
+    
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'FETCH_ACAT_FORMS_COLLECTION_ERROR',
