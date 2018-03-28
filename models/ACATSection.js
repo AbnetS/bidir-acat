@@ -12,6 +12,8 @@ var Schema = mongoose.Schema;
 var ACATSectionSchema = new Schema({       
     title:                { type: String, default: '' },
     estimated_sub_total:  { type: Number, default: 0 },
+    estimated_min_revenue:  { type: Number },
+    estimated_max_revenue:  { type: Number },
     achieved_sub_total:   { type: Number, default: 0 },
     estimated_cash_flow:       {
       jan:             { type: Number, default: 0 },
@@ -50,13 +52,13 @@ var ACATSectionSchema = new Schema({
         uofm_for_yield: { type: String },
         max:            { type: Number },
         min:            { type: Number },
-        avg:            { type: Number }
+        most_likely:    { type: Number }
       },
       price: {
         uofm_for_price: { type: String },
         max:            { type: Number },
         min:            { type: Number },
-        avg:            { type: Number }
+        most_likely:    { type: Number }
       }
     },
     achieved:       {
@@ -67,8 +69,7 @@ var ACATSectionSchema = new Schema({
     },
     marketable_yield: {
       own:          { type: Number },
-      seed_reserve: { type: Number },
-      for_market:   { type: Number }
+      seed_reserve: { type: Number }
     },
     number:          { type: Number, default: 1 },
     date_created:    { type: Date },
@@ -115,6 +116,8 @@ ACATSectionSchema.statics.attributes = {
   estimated:  1,
   achieved:   1,
   marketable_yield: 1,
+  estimated_max_revenue: 1,
+  estimated_max_revenue: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1

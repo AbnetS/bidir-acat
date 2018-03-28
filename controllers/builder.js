@@ -303,7 +303,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     let forms = yield FormDal.getCollectionByPagination(query, opts);
 
     this.body = forms;
-    
+
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'FETCH_ACAT_FORMS_COLLECTION_ERROR',
@@ -468,18 +468,20 @@ function createYield(form) {
     let mainSection = yield SectionDal.create({
       title:'Yield',
       number: 2,
+      estimated_max_revenue: 0,
+      estimated_min_revenue: 0,
       estimated: {
         yield: {
           uofm_for_yield: '',
           max: 0,
           min: 0,
-          avg: 0
+          most_likely: 0
         },
         price: {
           uofm_for_price: '',
           max: 0,
           min: 0,
-          avg: 0
+          most_likely: 0
         }
       },
       achieved: {
@@ -490,8 +492,7 @@ function createYield(form) {
       },
       marketable_yield: {
         own:          0,
-        seed_reserve: 0,
-        for_market:   0
+        seed_reserve: 0
       }
     });
 
