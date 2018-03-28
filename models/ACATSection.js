@@ -13,7 +13,21 @@ var ACATSectionSchema = new Schema({
     title:                { type: String, default: '' },
     estimated_sub_total:  { type: Number, default: 0 },
     achieved_sub_total:   { type: Number, default: 0 },
-    cash_flow:       {
+    estimated_cash_flow:       {
+      jan:             { type: Number, default: 0 },
+      feb:             { type: Number, default: 0 },
+      mar:             { type: Number, default: 0 },
+      apr:             { type: Number, default: 0 },
+      may:             { type: Number, default: 0 },
+      june:            { type: Number, default: 0 },
+      july:            { type: Number, default: 0 },
+      aug:             { type: Number, default: 0 },
+      sep:             { type: Number, default: 0 },
+      oct:             { type: Number, default: 0 },
+      nov:             { type: Number, default: 0 },
+      dec:             { type: Number, default: 0 }
+    },
+    achieved_cash_flow:       {
       jan:             { type: Number, default: 0 },
       feb:             { type: Number, default: 0 },
       mar:             { type: Number, default: 0 },
@@ -91,7 +105,8 @@ ACATSectionSchema.statics.attributes = {
   title:              1,
   estimated_sub_total:    1,
   achieved_sub_total: 1,
-  cash_flow:       1,
+  estimated_cash_flow:       1,
+  achieved_cash_flow:       1,
   cost_list:       1,
   variety:         1,
   seed_source:     1,

@@ -23,8 +23,14 @@ var ACATSchema = new Schema({
     crop:           { type: Schema.Types.ObjectId, ref: 'Crop' },
     cropping_area_size:  { type: String, default: '0x0' },
     gps_location:        { 
-      latitude:   { type: Number, default: 0 },
-      longitude:  { type: Number, default: 0 }
+      single_point: {
+        latitude: { type: String },
+        longtude: { type: String }
+      },
+      polygon: [{
+        latitude: { type: String },
+        longtude: { type: String }
+      }]
     },
     status:              { type: String, default: 'new' },
     first_expense_month: { type: String, default: 'None' }, 

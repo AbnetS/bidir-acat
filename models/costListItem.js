@@ -16,26 +16,40 @@ var CostListItemSchema = new Schema({
     estimated:       {
       value:            { type: Number, default: 0 },
       unit_price:       { type: Number, default: 0 },
-      total_price:      { type: Number, default: 0 }
+      total_price:      { type: Number, default: 0 },
+      cash_flow:       {
+        jan:             { type: Number, default: 0 },
+        feb:             { type: Number, default: 0 },
+        mar:             { type: Number, default: 0 },
+        apr:             { type: Number, default: 0 },
+        may:             { type: Number, default: 0 },
+        june:            { type: Number, default: 0 },
+        july:            { type: Number, default: 0 },
+        aug:             { type: Number, default: 0 },
+        sep:             { type: Number, default: 0 },
+        oct:             { type: Number, default: 0 },
+        nov:             { type: Number, default: 0 },
+        dec:             { type: Number, default: 0 }
+      }
     },
     achieved:       {
       value:          { type: Number, default: 0 },
       unit_price:     { type: Number, default: 0 },
-      total_price:    { type: Number, default: 0 }
-    },
-    cash_flow:       {
-      jan:             { type: Number, default: 0 },
-      feb:             { type: Number, default: 0 },
-      mar:             { type: Number, default: 0 },
-      apr:             { type: Number, default: 0 },
-      may:             { type: Number, default: 0 },
-      june:            { type: Number, default: 0 },
-      july:            { type: Number, default: 0 },
-      aug:             { type: Number, default: 0 },
-      sep:             { type: Number, default: 0 },
-      oct:             { type: Number, default: 0 },
-      nov:             { type: Number, default: 0 },
-      dec:             { type: Number, default: 0 }
+      total_price:    { type: Number, default: 0 },
+      cash_flow:       {
+        jan:             { type: Number, default: 0 },
+        feb:             { type: Number, default: 0 },
+        mar:             { type: Number, default: 0 },
+        apr:             { type: Number, default: 0 },
+        may:             { type: Number, default: 0 },
+        june:            { type: Number, default: 0 },
+        july:            { type: Number, default: 0 },
+        aug:             { type: Number, default: 0 },
+        sep:             { type: Number, default: 0 },
+        oct:             { type: Number, default: 0 },
+        nov:             { type: Number, default: 0 },
+        dec:             { type: Number, default: 0 }
+      }
     },
     date_created:    { type: Date },
     last_modified:   { type: Date }
@@ -72,7 +86,6 @@ CostListItemSchema.statics.attributes = {
   unit: 1,
   estimated: 1,
   achieved: 1,
-  cash_flow: 1,
   remark: 1,
   date_created: 1,
   last_modified: 1,

@@ -21,6 +21,8 @@ var ACATFormSchema = new Schema({
     sections:       [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
     crop:           { type: Schema.Types.ObjectId, ref: 'Crop' },
     cropping_area_size:  { type: String, default: '0x0' },
+    access_to_non_financial_resources: { type: Boolean, default: false },
+    non_financial_resources: [{ type: String }],
     gps_location:        { 
       latitude:   { type: Number, default: 0 },
       longitude:  { type: Number, default: 0 }
@@ -107,6 +109,8 @@ ACATFormSchema.statics.attributes = {
   achieved: 1,
   first_expense_month: 1,
   cropping_area_size: 1,
+  access_to_non_financial_resources: 1,
+  non_financial_resources: 1,
   gps_location: 1,
   date_created: 1,
   last_modified: 1,

@@ -425,7 +425,8 @@ function createCropACAT(form, user, client) {
       first_expense_month: acatForm.first_expense_month,
       status: 'new',
       cropping_area_size: acatForm.cropping_area_size,
-      gps_location: acatForm.gps_location,
+      access_to_non_financial_resources: acatForm.access_to_non_financial_resources,
+      non_financial_resources: acatForm.non_financial_resources,
       created_by: user._id
     };
 
