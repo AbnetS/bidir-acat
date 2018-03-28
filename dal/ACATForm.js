@@ -20,6 +20,9 @@ const mongoUpdate   = require('../lib/mongo-update');
 
 var returnFields = ACATForm.attributes;
 var population = [{
+  path: 'crop',
+  select: Crop.attributes,
+},{
   path: 'sections',
   select: ACATSection.attributes,
   populate: [{
