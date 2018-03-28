@@ -71,6 +71,7 @@ exports.initialize = function* initializeACATForm(next) {
 
     let form = yield FormDal.get({ crop: body.crop });
     if(form) {
+      console.log(form);
       throw new Error('ACAT For Crop already exists!!');
     }
 
@@ -140,7 +141,7 @@ exports.create = function* createACATForm(next) {
   try {
     body.type = 'ACAT';
 
-    let form = yield FormDal.get({ type: body.type });
+    let form = yield FormDal.get({ crop: body.crop });
     if(form) {
       throw new Error('ACAT Form already exists!!');
     }

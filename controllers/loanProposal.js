@@ -70,15 +70,21 @@ exports.create = function* createLoanProposal(next) {
 
     body.created_by = this.state._user._id;
 
-    let clientAcat = yield ClientACAT.findOne({ client: body.client });
-    if(!clientAcat) throw new Error('Client Has Not Client ACAT Yet!!')
+    let clientACAT = yield ClientACAT.findOne({ client: body.client });
+    if(!clientACAT) throw new Error('Client Has Not Client ACAT Yet!!')
 
-    body.client_acat = clientAcat._id;
+    body.client_acat = clientACAT._id;
 
     let loanProposal = yield LoanProposalDal.get({ client: body.client });
     if(loanProposal) {
       throw new Error('Client has a loan Proposal already!!');
     }
+ 
+    body.cumulative_cash_flow = clientACAT.cumulative_cash_flow;   //This is brought from the client ACAT
+    body.net_cash_flow = clientACAT.net_cash_flow;                //This is brought from the client ACAT
+    body.total_revenue =  clientACAT.total_revenue;        //This is brought from the client ACAT
+    body.total_cost =  clientACAT.total_cost;               //This is brought from the client ACAT
+
 
     loanProposal = yield LoanProposalDal.create(body);
 
@@ -110,6 +116,7 @@ exports.fetchOne = function* fetchOneLoanProposal(next) {
 
   try {
     let loanProposal = yield LoanProposalDal.get(query);
+    if(!loanProposal) throw new Error('Loan Proposal is not known!')
 
     yield LogDal.track({
       event: 'view_loanProposal',
@@ -144,6 +151,7 @@ exports.getClientLoanProposal = function* getClientLoanProposal(next) {
 
   try {
     let loanProposal = yield LoanProposalDal.get(query);
+    if(!loanProposal) throw new Error('Loan Proposal is not known!')
 
     yield LogDal.track({
       event: 'view_loanProposal',
@@ -188,10 +196,24 @@ exports.update = function* updateLoanProposal(next) {
 
   try {
     let loanProposal = yield LoanProposalDal.update(query, body);
+    if(!loanProposal) throw new Error('Loan Proposal Is Not Known!!');
+
+    let clientACAT = yield ClientACAT.findOne({ _id: loanProposal.client }).exec();
+
+
+    let update = {
+      repayable: loanProposal.loan_proposed - (loanProposal.loan_detail.total_deductibles + loanProposal.loan_detail.total_cost_of_loan),
+      cumulative_cash_flow: clientACAT.cumulative_cash_flow,   //This is brought from the client ACAT
+      net_cash_flow : clientACAT.net_cash_flow,                //This is brought from the client ACAT
+      total_revenue :  clientACAT.total_revenue,        //This is brought from the client ACAT
+      total_cost :  clientACAT.total_cost
+    };
+
+    loanProposal = yield LoanProposalDal.update(query, update);
 
     yield LogDal.track({
       event: 'loanProposal_update',
-      loanProposal: this.state._user._id ,
+      user: this.state._user._id ,
       message: `Update Info for ${loanProposal.name}`,
       diff: body
     });

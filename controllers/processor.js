@@ -77,7 +77,7 @@ exports.initialize = function* initializeClientACAT(next) {
     let client = yield Client.findOne({ _id: body.client }).exec();
     if(!client) throw new Error('Client Does Not Exist');
 
-    let clientACAT = yield ClientACAT.findOne({ client: client._id });
+    let clientACAT = yield ClientACAT.findOne({ client: client._id }).exec();
     if(clientACAT) throw new Error('Client Has an ACAT Processor Already!!');
 
     clientACAT = yield ClientACATDal.create({
@@ -86,13 +86,22 @@ exports.initialize = function* initializeClientACAT(next) {
       created_by: this.state._user.account
     });
 
-    clientACAT = yield ClientACAT.findOne({ client: client._id });
+    clientACAT = yield ClientACAT.findOne({ client: client._id }).exec();
 
     // ADD ACAT Items
     if(body.crop_acats && Array.isArray(body.crop_acats)) {
+      let acats = [];
+
       for(let form of body.crop_acats) {
-        let acat = yield createCropACAT(form, this.state._user, clientACAT);
+        
+        let acat = yield createCropACAT(form, this.state._user, client);
+
+        acats.push(acat._id);
       }
+
+      clientACAT = yield ClientACATDal.update({ _id: clientACAT._id },{
+        ACATs: acats
+      })
     }
 
     // ADD LOAN PRODUCT
@@ -109,6 +118,7 @@ exports.initialize = function* initializeClientACAT(next) {
     this.body = clientACAT;
 
   } catch(ex) {
+    console.log(ex);
     this.throw(new CustomError({
       type: 'INITIALIZE_CLIENT_ACAT_ERROR',
       message: ex.message
@@ -401,7 +411,7 @@ function createCostList(costList) {
   })
 }
 
-function createCropACAT(form, user, clientACAT) {
+function createCropACAT(form, user, client) {
   return co(function* () {
     let acatForm = yield FormDal.get({ _id: form });
     if(!acatForm) return null;
@@ -411,7 +421,7 @@ function createCropACAT(form, user, clientACAT) {
     let data = {
       type: acatForm.type,
       title: acatForm.title,
-      client: clientACAT.client,
+      client: client,
       subtitle: acatForm.subtitle,
       purpose: acatForm.purpose,
       layout: acatForm.layout,
@@ -439,14 +449,7 @@ function createCropACAT(form, user, clientACAT) {
       sections: sections
     });
 
-    clientACAT = clientACAT.toJSON();
-    let acats = clientACAT.ACATs.slice();
-
-    acats.push(acat._id);
-
-    yield ClientACATDal.update({ _id: clientACAT._id },{
-      ACATs: acats
-    })
+    console.log(acat)
 
     return acat;
 
