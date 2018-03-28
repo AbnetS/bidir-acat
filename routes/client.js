@@ -20,11 +20,14 @@ var router  = Router();
  * @apiDescription Initialize Client ACAT.
  *
  * @apiParam {String} client ACAT Title
- * @apiParam {Array} [crop_acats] Crop ACAT Forms
+ * @apiParam {Array} crop_acats Crop ACAT Forms
+ * @apiParam {String} loan_product Loan Product Reference
  *
  * @apiParamExample Request Example:
  *  {
  *    client: "556e1174a8952c9521286a60",
+ *    loan_product: "556e1174a8952c9521286a60",
+ *    crop_acats: ["556e1174a8952c9521286a60"]
  *  }
  *
  * @apiSuccess {String} _id Client ACAT  id

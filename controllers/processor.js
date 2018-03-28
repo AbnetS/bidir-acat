@@ -60,8 +60,8 @@ exports.initialize = function* initializeClientACAT(next) {
 
   this.checkBody('client')
       .notEmpty('Client Reference is Empty');
-  this.checkBody('loan_product_name')
-      .notEmpty('Loan Product Name is Empty');
+  this.checkBody('loan_product')
+      .notEmpty('Loan Product Reference is Empty');
 
   if(this.errors) {
     return this.throw(new CustomError({
@@ -104,15 +104,9 @@ exports.initialize = function* initializeClientACAT(next) {
       })
     }
 
-    // ADD LOAN PRODUCT
-    let loanProduct = yield LoanProductDal.create({
-      client: client._id,
-      created_by: this.state._user.account,
-      name: body.loan_product_name
-    });
 
     clientACAT = yield ClientACATDal.update({ _id: clientACAT._id },{
-      loan_product: loanProduct._id
+      loan_product: body.loan_product
     });
     
     this.body = clientACAT;
