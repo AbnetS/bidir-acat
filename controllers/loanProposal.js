@@ -70,7 +70,7 @@ exports.create = function* createLoanProposal(next) {
 
     body.created_by = this.state._user._id;
 
-    let clientACAT = yield ClientACAT.findOne({ client: body.client });
+    let clientACAT = yield ClientACAT.findOne({ client: body.client }).exec();
     if(!clientACAT) throw new Error('Client Has Not Client ACAT Yet!!')
 
     body.client_acat = clientACAT._id;
@@ -79,11 +79,15 @@ exports.create = function* createLoanProposal(next) {
     if(loanProposal) {
       throw new Error('Client has a loan Proposal already!!');
     }
+
+    let loanProduct = yield LoanProductDal.get({ _id: clientACAT.loan_product });
  
     body.cumulative_cash_flow = clientACAT.cumulative_cash_flow;   //This is brought from the client ACAT
     body.net_cash_flow = clientACAT.net_cash_flow;                //This is brought from the client ACAT
     body.total_revenue =  clientACAT.total_revenue;        //This is brought from the client ACAT
     body.total_cost =  clientACAT.total_cost;               //This is brought from the client ACAT
+    body.loan_details.deductibles = loanProduct.deductibles.slice();
+     body.loan_details.cost_of_loan = loanProduct.cost_of_loan.slice();
 
 
     loanProposal = yield LoanProposalDal.create(body);
