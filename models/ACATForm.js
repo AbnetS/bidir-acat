@@ -23,10 +23,6 @@ var ACATFormSchema = new Schema({
     cropping_area_size:  { type: String, default: '0x0' },
     access_to_non_financial_resources: { type: Boolean, default: false },
     non_financial_resources: [{ type: String }],
-    gps_location:        { 
-      latitude:   { type: Number, default: 0 },
-      longitude:  { type: Number, default: 0 }
-    },
     first_expense_month: { type: String, default: 'None' }, 
     estimated:      {
       total_cost:     { type: Number, default: 0 },
@@ -111,7 +107,6 @@ ACATFormSchema.statics.attributes = {
   cropping_area_size: 1,
   access_to_non_financial_resources: 1,
   non_financial_resources: 1,
-  gps_location: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1
