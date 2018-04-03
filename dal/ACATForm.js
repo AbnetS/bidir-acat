@@ -57,10 +57,18 @@ var population = [{
       select: CostList.attributes,
       populate: [{
         path: 'linear',
-        select: CostListItem.attributes
+        select: CostListItem.attributes,
+        populate: {
+          path: 'items',
+          select: CostListItem.attributes
+        }
       },{
          path: 'grouped',
-        select: GroupedList.attributes
+        select: GroupedList.attributes,
+        populate: {
+          path: 'items',
+          select: CostListItem.attributes
+        }
       }]
     }]
   },{
@@ -68,10 +76,18 @@ var population = [{
     select: CostList.attributes,
     populate: [{
       path: 'linear',
-      select: CostListItem.attributes
+      select: CostListItem.attributes,
+      populate: {
+          path: 'items',
+          select: CostListItem.attributes
+        }
     },{
-       path: 'grouped',
-      select: GroupedList.attributes
+      path: 'grouped',
+      select: GroupedList.attributes,
+      populate: {
+          path: 'items',
+          select: CostListItem.attributes
+        }
     }]
   }],
   options: {
