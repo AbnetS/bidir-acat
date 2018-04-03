@@ -23,7 +23,8 @@ const TokenDal          = require('../dal/token');
 const CropDal        = require('../dal/crop');
 const LogDal            = require('../dal/log');
 
-let hasPermission = checkPermissions.isPermitted('ACAT');
+// ARCHIVE
+let hasPermission = checkPermissions.isPermitted('CROP');
 
 /**
  * Create a crop.
@@ -121,6 +122,14 @@ exports.create = function* createCrop(next) {
 exports.fetchOne = function* fetchOneCrop(next) {
   debug(`fetch crop: ${this.params.id}`);
 
+  let isPermitted = yield hasPermission(this.state._user, 'VIEW');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'VIEW_CROP_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
   let query = {
     _id: this.params.id
   };
@@ -138,7 +147,7 @@ exports.fetchOne = function* fetchOneCrop(next) {
 
   } catch(ex) {
     return this.throw(new CustomError({
-      type: 'GET_CROP_ERROR',
+      type: 'VIEW_CROP_ERROR',
       message: ex.message
     }));
   }

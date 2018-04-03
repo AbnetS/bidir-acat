@@ -24,12 +24,12 @@ var ACATSchema = new Schema({
     cropping_area_size:  { type: String, default: '0x0' },
     gps_location:        { 
       single_point: {
-        latitude: { type: String },
-        longtude: { type: String }
+        latitude: { type: Number, default: 0 },
+        longtude: { type: Number, default: 0 }
       },
       polygon: [{
-        latitude: { type: String },
-        longtude: { type: String }
+        latitude: { type: Number },
+        longtude: { type: Number }
       }]
     },
     status:              { type: String, default: 'new' },

@@ -19,7 +19,7 @@ const TokenDal          = require('../dal/token');
 const LoanProductDal        = require('../dal/loanProduct');
 const LogDal            = require('../dal/log');
 
-let hasPermission = checkPermissions.isPermitted('ACAT');
+let hasPermission = checkPermissions.isPermitted('LOAN_PRODUCT');
 
 /**
  * Create a loanProduct.
@@ -87,6 +87,14 @@ exports.create = function* createLoanProduct(next) {
 exports.fetchOne = function* fetchOneLoanProduct(next) {
   debug(`fetch loanProduct: ${this.params.id}`);
 
+  let isPermitted = yield hasPermission(this.state._user, 'VIEW');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'VIEW_LOAN_PRODUCT_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
   let query = {
     _id: this.params.id
   };
@@ -104,7 +112,7 @@ exports.fetchOne = function* fetchOneLoanProduct(next) {
 
   } catch(ex) {
     return this.throw(new CustomError({
-      type: 'GET_LOAN_PRODUCT_ERROR',
+      type: 'VIEW_LOAN_PRODUCT_ERROR',
       message: ex.message
     }));
   }

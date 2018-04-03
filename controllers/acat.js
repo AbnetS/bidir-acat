@@ -43,7 +43,7 @@ exports.fetchOne = function* fetchOneACAT(next) {
   let isPermitted = yield hasPermission(this.state._user, 'VIEW');
   if(!isPermitted) {
     return this.throw(new CustomError({
-      type: 'GET_ACAT_ERROR',
+      type: 'VIEW_ACAT_ERROR',
       message: "You Don't have enough permissions to complete this action"
     }));
   }
@@ -66,7 +66,7 @@ exports.fetchOne = function* fetchOneACAT(next) {
 
   } catch(ex) {
     return this.throw(new CustomError({
-      type: 'GET_ACAT_ERROR',
+      type: 'VIEW_ACAT_ERROR',
       message: ex.message
     }));
   }
