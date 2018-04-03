@@ -71,7 +71,7 @@ exports.addItem = function* addtem(next) {
         for(let groupItem of groupItems) {
           let gItem = yield CostListItemDal.get({ _id: groupItem });
 
-          if(gItem.item == body.item) isDuplicate = true;
+          if(gItem.item.toLowerCase() == body.item.toLowerCase()) isDuplicate = true;
         }
 
         if(isDuplicate) {
@@ -100,7 +100,7 @@ exports.addItem = function* addtem(next) {
       for(let linear of linearItems) {
         let lItem = yield CostListItemDal.get({ _id: linear });
 
-        if(lItem.item == body.item) isDuplicate = true;
+        if(lItem.item.toLowerCase() == body.item.toLowerCase()) isDuplicate = true;
       }
 
       if(isDuplicate) {
