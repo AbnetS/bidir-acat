@@ -50,6 +50,7 @@ exports.addItem = function* addtem(next) {
 
   let body = this.request.body;
 
+
   try {
 
     if(!body.parent_grouped_list && !body.parent_cost_list) {
@@ -61,6 +62,19 @@ exports.addItem = function* addtem(next) {
       groupedList = yield GroupedList.findOne({ _id: body.parent_grouped_list }).exec();
       if(!groupedList) {
         throw new Error('Grouped List Does Not Exist')
+      } else {
+        let groupItems = groupedList.items.slice();
+        let isDuplicate = false;
+
+        for(let groupItem of groupItems) {
+          let gItem = yield CostListItemDal.get({ _id: groupItem });
+
+          if(gItem.item == body.item) isDuplicate = true;
+        }
+
+        if(isDuplicate) {
+          throw new Error('Grouped List Has A Duplicate Item');
+        }
       }
     }
 
@@ -74,8 +88,24 @@ exports.addItem = function* addtem(next) {
 
     body.type = body.type ? body.type.toLowerCase() : 'none';
 
+    costList = costList.toJSON();
+
+
     let item;
     if(body.type == 'linear') {
+      let linearItems = costList.linear.slice();
+      let isDuplicate = false;
+
+      for(let linear of linearItems) {
+        let lItem = yield CostListItemDal.get({ _id: linear });
+
+        if(lItem.item == body.item) isDuplicate = true;
+      }
+
+      if(isDuplicate) {
+        throw new Error('Linear List Has A Duplicate Item');
+      }
+
       item = yield CostListItemDal.create(body);
 
     } else if(body.type == 'grouped') {
@@ -87,8 +117,7 @@ exports.addItem = function* addtem(next) {
     }
 
     if(body.parent_cost_list) {
-      costList = costList.toJSON();
-
+      
       if(body.type == 'linear') {
         let linear = costList.linear.slice();
 
@@ -200,6 +229,73 @@ exports.update = function* updateItem(next) {
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'UPDATE_COST_LIST_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
+/**
+ * Reset cost list
+ *
+ * @desc Fetch a cost list with the given id from the database
+ *       and update their data
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.reset = function* resetList(next) {
+  debug(`Reset item: ${this.params.id}`);
+
+  let isPermitted = yield hasPermission(this.state._user, 'UPDATE');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'UPDATE_COST_LIST_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
+  let query = {
+    _id: this.params.id
+  };
+  let body = {
+    linear: [],
+    grouped: []
+  }
+
+  try {
+    let costList = yield CostListDal.get(query);
+    if(!costlist) throw new Error('Cost List Does Not Exist!!')
+
+    // remove linear items
+    for(let linear of costList.linear) {
+      yield CostListItemDal.delete({ _id: linear._id });
+    }
+
+    // remove grouped items
+    for(let grouped of costList.grouped) {
+      for(let item of grouped.items) {
+        yield CostListItemDal.delete({ _id: item._id });
+      }
+
+      yield GroupedListDal.delete({ _id: grouped._id });
+
+    }
+
+    costList = yield CostListDal.update(query, body);
+
+    yield LogDal.track({
+      event: 'list_update',
+      section: this.state._user._id ,
+      message: `Update Info for ${costListItem._id}`,
+      diff: body
+    });
+
+    this.body = costList;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'RESET_COST_LIST_ERROR',
       message: ex.message
     }));
 

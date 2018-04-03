@@ -64,6 +64,30 @@ var router  = Router();
  */
 router.post('/add', acl(['*']), costListController.addItem);
 
+/**
+ * @api {put} /acat/costLists/:id/reset Reset Cost List
+ * @apiVersion 1.0.0
+ * @apiName ResetCostList
+ * @apiGroup CostList 
+ *
+ * @apiDescription Reset the cost list
+ *
+ * @apiSuccess {String} _id costList Item id
+ * @apiSuccess {String} item Item Name
+ * @apiSuccess {String} unit Item Unit
+ * @apiSuccess {Object} estimated Unit Estimated Values
+ * @apiSuccess {Object} achieved Unit Achieved Values
+ * @apiSuccess {Object} cash_flow Cash Flow Values
+ *
+ * @apiSuccessExample Response Example:
+ *  {
+ *    _id : "556e1174a8952c9521286a60",
+ *    linear: [],
+ *    grouped: []
+ *  }
+ */
+router.put('/:id/reset', acl(['*']), costListController.reset);
+
 
 /**
  * @api {put} /acat/costLists/:id/linear Remove Linear List
