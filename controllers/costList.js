@@ -288,7 +288,7 @@ exports.reset = function* resetList(next) {
     yield LogDal.track({
       event: 'list_update',
       section: this.state._user._id ,
-      message: `Update Info for ${costListItem._id}`,
+      message: `Update Info for ${costList._id}`,
       diff: body
     });
 
