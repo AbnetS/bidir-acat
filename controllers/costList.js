@@ -138,7 +138,6 @@ exports.addItem = function* addtem(next) {
       }
 
     } else if(body.parent_grouped_list) {
-      groupedList = groupedList.toJSON();
 
       let items = groupedList.items.slice();
 
