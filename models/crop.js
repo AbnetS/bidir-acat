@@ -13,6 +13,7 @@ var CropSchema = new Schema({
     name:           { type: String, default: '' },
     image:          { type: String, default: '' },
     category:       { type: String, default: '' },
+    has_acat:       { type: Boolean, default: false },
     date_created:   { type: Date },
     last_modified:  { type: Date }
 });
@@ -47,6 +48,7 @@ CropSchema.statics.attributes = {
   category: 1,
   name: 1,
   image: 1,
+  has_acat: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1

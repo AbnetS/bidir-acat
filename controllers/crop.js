@@ -19,12 +19,24 @@ const CustomError        = require('../lib/custom-error');
 const checkPermissions   = require('../lib/permissions');
 const googleBuckets      = require('../lib/google-buckets');
 
+const Form            = require('../models/ACATForm');
+
 const TokenDal          = require('../dal/token');
 const CropDal        = require('../dal/crop');
 const LogDal            = require('../dal/log');
 
 // ARCHIVE
 let hasPermission = checkPermissions.isPermitted('CROP');
+
+co(function* () {
+  let forms = yield Form.find({}).exec();
+
+  for(let form of forms) {
+    yield CropDal.update({ _id: form.crop },{
+      has_acat: true
+    })
+  }
+});
 
 /**
  * Create a crop.
