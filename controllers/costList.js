@@ -63,6 +63,8 @@ exports.addItem = function* addtem(next) {
       if(!groupedList) {
         throw new Error('Grouped List Does Not Exist')
       } else {
+        groupedList = groupedList.toJSON();
+
         let groupItems = groupedList.items.slice();
         let isDuplicate = false;
 
@@ -88,11 +90,10 @@ exports.addItem = function* addtem(next) {
 
     body.type = body.type ? body.type.toLowerCase() : 'none';
 
-    costList = costList.toJSON();
-
-
     let item;
     if(body.type == 'linear') {
+      costList = costList.toJSON();
+
       let linearItems = costList.linear.slice();
       let isDuplicate = false;
 
@@ -265,7 +266,7 @@ exports.reset = function* resetList(next) {
 
   try {
     let costList = yield CostListDal.get(query);
-    if(!costlist) throw new Error('Cost List Does Not Exist!!')
+    if(!costList) throw new Error('Cost List Does Not Exist!!')
 
     // remove linear items
     for(let linear of costList.linear) {

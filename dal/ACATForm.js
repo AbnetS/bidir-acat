@@ -16,7 +16,7 @@ const CostList          = require('../models/costList');
 const CostListItem      = require('../models/costListItem');
 const GroupedList       = require('../models/groupedList');
 
-const mongoUpdate   = require('../lib/mongo-update');
+const mongoUpdate       = require('../lib/mongo-update');
 
 var returnFields = ACATForm.attributes;
 var population = [{
