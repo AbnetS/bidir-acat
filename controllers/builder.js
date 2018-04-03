@@ -25,6 +25,7 @@ const Form            = require('../models/ACATForm');
 const TokenDal         = require('../dal/token');
 const FormDal          = require('../dal/ACATForm');
 const LogDal           = require('../dal/log');
+const CropDal        = require('../dal/crop');
 const SectionDal      = require('../dal/ACATSection');
 const CostListDal       = require('../dal/costList');
 
@@ -93,6 +94,8 @@ exports.initialize = function* initializeACATForm(next) {
 
       }
     }
+
+    yield CropDal.update({ _id: body.crop }, { has_acat: true });
 
     this.body = form;
 
