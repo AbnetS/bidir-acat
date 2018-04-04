@@ -191,6 +191,39 @@ exports.fetchOne = function* fetchOne(next) {
 };
 
 /**
+ * Update grouped List.
+ *
+ * @desc Fetch a section with the given id from the database
+ *       and update their data
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.updateGroupedList = function* updateGroupedList(next) {
+  debug(`updating item: ${this.params.id}`);
+
+  let query = {
+    _id: this.params.id
+  };
+
+  let body = this.request.body;
+
+  try {
+    let groupedList = yield GroupedListDal.update(query, body);
+    if(!groupedList || !groupedList._id) throw new Error('Grouped List Does Not Exist')
+
+    this.body = groupedList;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'UPDATE_GROUPED_LIST_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
+/**
  * Update a single item.
  *
  * @desc Fetch a section with the given id from the database

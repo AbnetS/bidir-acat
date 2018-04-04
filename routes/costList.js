@@ -237,6 +237,38 @@ router.put('/:id/group', acl(['*']), costListController.removeGrouped);
 router.put('/groups/:id/items', acl(['*']), costListController.removeGroupedItem);
 
 /**
+ * @api {put} /acat/costLists/grouped/:id Update Grouped List
+ * @apiVersion 1.0.0
+ * @apiName UpdateGroupedList
+ * @apiGroup CostList 
+ *
+ * @apiDescription Update Grouped List
+ *
+ * @apiParam {String} title Grouped List Title
+ *
+ * @apiParamExample Request example:
+ * {
+ *    title: "another title"
+ * }
+ *
+ * @apiSuccess {String} _id costList Item id
+ * @apiSuccess {String} item Item Name
+ * @apiSuccess {String} unit Item Unit
+ * @apiSuccess {Object} estimated Unit Estimated Values
+ * @apiSuccess {Object} achieved Unit Achieved Values
+ * @apiSuccess {Object} cash_flow Cash Flow Values
+ *
+ * @apiSuccessExample Response Example:
+ *  {
+ *    _id : "556e1174a8952c9521286a60",
+ *    title: "Another Title",
+ *    items: [...]
+ *  }
+ */
+router.put('/grouped/:id', acl(['*']), costListController.updateGroupedList);
+
+
+/**
  * @api {put} /acat/costLists/:id Update CostList CostList
  * @apiVersion 1.0.0
  * @apiName Update
