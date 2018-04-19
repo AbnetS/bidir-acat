@@ -9,14 +9,28 @@ const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
 
-const ACATSection    = require('../models/ACATSection');
-const CostList    = require('../models/costList');
-const CostListItem  = require('../models/costListItem');
-const GroupedList   = require('../models/groupedList');
-const mongoUpdate   = require('../lib/mongo-update');
+const ACATSection     = require('../models/ACATSection');
+const CostList        = require('../models/costList');
+const CostListItem    = require('../models/costListItem');
+const GroupedList     = require('../models/groupedList');
+const YieldConsumption = require('../models/yieldConsumption');
+const CashFlow        = require('../models/cashFlow');
+const mongoUpdate     = require('../lib/mongo-update');
 
 var returnFields = ACATSection.attributes;
 var population = [{
+  path: 'yield_consumption',
+  select: YieldConsumption.attributes
+},{
+  path: 'yield',
+  select: CostListItem.attributes
+},{
+  path: 'achieved_cash_flow',
+  select: CashFlow.attributes
+},{
+  path: 'estimated_cash_flow',
+  select: CashFlow.attributes
+},{
   path: 'cost_list',
   select: CostList.attributes,
   populate: [{

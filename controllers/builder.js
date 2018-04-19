@@ -22,12 +22,14 @@ const FORM                = require ('../lib/enums').FORM;
 const Section         = require('../models/ACATSection');
 const Form            = require('../models/ACATForm');
 
-const TokenDal         = require('../dal/token');
-const FormDal          = require('../dal/ACATForm');
-const LogDal           = require('../dal/log');
-const CropDal        = require('../dal/crop');
-const SectionDal      = require('../dal/ACATSection');
-const CostListDal       = require('../dal/costList');
+const TokenDal            = require('../dal/token');
+const FormDal             = require('../dal/ACATForm');
+const LogDal              = require('../dal/log');
+const CropDal             = require('../dal/crop');
+const SectionDal          = require('../dal/ACATSection');
+const CostListDal         = require('../dal/costList');
+const CashFlowDal         = require('../dal/cashFlow');
+const YieldConsumptionDal  = require('../dal/yieldConsumption');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -89,8 +91,8 @@ exports.initialize = function* initializeACATForm(next) {
       if(section.name == 'Inputs And Activity Costs') {
         form = yield createIAC(form);
 
-      } else if(section.name == 'Yield') {
-        form = yield createYield(form);
+      } else if(section.name == 'Revenue') {
+        form = yield createRevenue(form);
 
       }
     }
@@ -364,11 +366,19 @@ exports.remove = function* removeACATForm(next) {
 };
 
 // Utilities
+
 function createIAC(form) {
   return co(function* () {
     // create Main Section
+    let estimatedCashFlow = yield CashFlowDal.create({});
+    let achievedCashFlow = yield CashFlowDal.create({});
+
     let mainSection = yield SectionDal.create({
       title:'Inputs And Activity Costs',
+      estimated_sub_total:    0,
+      achieved_sub_total:     0,
+      estimated_cash_flow:    estimatedCashFlow,
+      achieved_cash_flow:     achievedCashFlow,
       number: 1
     });
 
@@ -392,10 +402,16 @@ function createIAC(form) {
       switch(sub) {
         case 'Labour Cost':
           costList = yield CostListDal.create({});
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
 
           sect = yield SectionDal.create({
             number: 2,
             cost_list: costList._id,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
             title:'Labour Cost'
           });
 
@@ -404,9 +420,15 @@ function createIAC(form) {
         break;
         case 'Other Costs':
           costList = yield CostListDal.create({});
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
 
           sect = yield SectionDal.create({
             number: 3,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
             cost_list: costList._id,
             title: 'Other Costs'
           });
@@ -419,10 +441,17 @@ function createIAC(form) {
 
           // create Seed Section
           costList = yield CostListDal.create({});
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
           let seedSection = yield SectionDal.create({
             variety: '',
             seed_source: ['ESE', 'Union', 'Private'],
             title: 'Seed',
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
             number: 1,
             cost_list: costList._id
           });
@@ -430,25 +459,46 @@ function createIAC(form) {
 
           // create Fertilizers Section
           costList = yield CostListDal.create({});
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
           let fertilizersSection = yield SectionDal.create({
             title: 'Fertilizers',
             number: 2,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
             cost_list: costList._id
           })
           subs.push(fertilizersSection._id)
 
           // create Chemicals Section
           costList = yield CostListDal.create({});
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
           let chemicalsSection = yield SectionDal.create({
             title: 'Chemicals',
             number: 3,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
             cost_list: costList._id
           });
           subs.push(chemicalsSection._id);
 
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
           sect = yield SectionDal.create({
             number: 1,
             title: 'Input',
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
             sub_sections: subs
           });
 
@@ -465,38 +515,21 @@ function createIAC(form) {
   });
 }
 
-function createYield(form) {
+function createRevenue(form) {
   return co(function* () {
     // create Main Section
+    let estimatedCashFlow = yield CashFlowDal.create({});
+    let achievedCashFlow = yield CashFlowDal.create({});
+
     let mainSection = yield SectionDal.create({
-      title:'Yield',
-      number: 2,
-      estimated_max_revenue: 0,
-      estimated_min_revenue: 0,
-      estimated: {
-        yield: {
-          uofm_for_yield: '',
-          max: 0,
-          min: 0,
-          most_likely: 0
-        },
-        price: {
-          uofm_for_price: '',
-          max: 0,
-          min: 0,
-          most_likely: 0
-        }
-      },
-      achieved: {
-        uofm_for_price: '',
-        price: 0,
-        uofm_for_yield: '',
-        yield: 0
-      },
-      marketable_yield: {
-        own:          0,
-        seed_reserve: 0
-      }
+      title:'Revenue',
+      estimated_min_revenue:  0,
+      estimated_max_revenue:  0,
+      estimated_probable_revenue: 0,
+      achieved_revenue:           0,
+      estimated_cash_flow:    estimatedCashFlow,
+      achieved_cash_flow:     achievedCashFlow,
+      number: 2
     });
 
     // Add Main Section to Form
@@ -504,6 +537,74 @@ function createYield(form) {
     formSections.push(mainSection._id)
     form = yield FormDal.update({ _id: form._id },{
       sections: formSections
+    });
+
+
+    // Create Sub Sections
+    let subSections = ['Probable Yield', 'Maximum Yield', 'Minimum Yield'];
+    let _sections = [];
+    
+
+    for(let sub of subSections) {
+      let sect;
+
+      switch(sub) {
+        case 'Probable Yield':
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
+          sect = yield SectionDal.create({
+            number: 1,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
+            yield: [],
+            yield_consumption: [],
+            title:'Probable Yield'
+          });
+
+          _sections.push(sect._id);
+
+        break;
+        case 'Maximum Yield':
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
+          sect = yield SectionDal.create({
+            number: 2,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
+            yield: [],
+            title: 'Maximum Yield'
+          });
+
+          _sections.push(sect._id);
+
+        break;
+        case 'Minimum Yield':
+          estimatedCashFlow = yield CashFlowDal.create({});
+          achievedCashFlow = yield CashFlowDal.create({});
+
+          sect = yield SectionDal.create({
+            number: 3,
+            estimated_sub_total:    0,
+            achieved_sub_total:     0,
+            estimated_cash_flow:    estimatedCashFlow,
+            achieved_cash_flow:     achievedCashFlow,
+            yield: [],
+            title: 'Minimum Yield'
+          });
+
+          _sections.push(sect._id);
+        break;
+      }
+    }
+
+    yield SectionDal.update({ _id: mainSection._id },{
+      sub_sections: _sections.slice()
     });
 
     return form;

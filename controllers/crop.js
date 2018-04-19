@@ -28,16 +28,6 @@ const LogDal            = require('../dal/log');
 // ARCHIVE
 let hasPermission = checkPermissions.isPermitted('CROP');
 
-co(function* () {
-  let forms = yield Form.find({}).exec();
-
-  for(let form of forms) {
-    yield CropDal.update({ _id: form.crop },{
-      has_acat: true
-    })
-  }
-});
-
 /**
  * Create a crop.
  *

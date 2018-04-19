@@ -10,67 +10,21 @@ var paginator = require('mongoose-paginate');
 var Schema = mongoose.Schema;
 
 var ACATSectionSchema = new Schema({       
-    title:                { type: String, default: '' },
-    estimated_sub_total:  { type: Number, default: 0 },
+    title:                  { type: String, default: '' },
+    estimated_sub_total:    { type: Number },
     estimated_min_revenue:  { type: Number },
     estimated_max_revenue:  { type: Number },
-    achieved_sub_total:   { type: Number, default: 0 },
-    estimated_cash_flow:       {
-      jan:             { type: Number, default: 0 },
-      feb:             { type: Number, default: 0 },
-      mar:             { type: Number, default: 0 },
-      apr:             { type: Number, default: 0 },
-      may:             { type: Number, default: 0 },
-      june:            { type: Number, default: 0 },
-      july:            { type: Number, default: 0 },
-      aug:             { type: Number, default: 0 },
-      sep:             { type: Number, default: 0 },
-      oct:             { type: Number, default: 0 },
-      nov:             { type: Number, default: 0 },
-      dec:             { type: Number, default: 0 }
-    },
-    achieved_cash_flow:       {
-      jan:             { type: Number, default: 0 },
-      feb:             { type: Number, default: 0 },
-      mar:             { type: Number, default: 0 },
-      apr:             { type: Number, default: 0 },
-      may:             { type: Number, default: 0 },
-      june:            { type: Number, default: 0 },
-      july:            { type: Number, default: 0 },
-      aug:             { type: Number, default: 0 },
-      sep:             { type: Number, default: 0 },
-      oct:             { type: Number, default: 0 },
-      nov:             { type: Number, default: 0 },
-      dec:             { type: Number, default: 0 }
-    },
+    achieved_sub_total:     { type: Number },
+    estimated_probable_revenue: { type: Number },
+    achieved_revenue:           { type: Number },
+    estimated_cash_flow:    { type: Schema.Types.ObjectId, ref: 'CashFlow' }, // cash flow type
+    achieved_cash_flow:     { type: Schema.Types.ObjectId, ref: 'CashFlow' }, // cash flow type
     cost_list:       { type: Schema.Types.ObjectId, ref: 'CostList' },
     variety:         { type: String },
-    seed_source:     [{ type: String }],
+    seed_source:     { type: Schema.Types.Mixed },
     sub_sections:    [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
-    estimated:       {
-      yield: {
-        uofm_for_yield: { type: String },
-        max:            { type: Number },
-        min:            { type: Number },
-        most_likely:    { type: Number }
-      },
-      price: {
-        uofm_for_price: { type: String },
-        max:            { type: Number },
-        min:            { type: Number },
-        most_likely:    { type: Number }
-      }
-    },
-    achieved:       {
-      uofm_for_yield:   { type: String },
-      yield:            { type: Number },
-      uofm_for_price:   { type: String },
-      price:            { type: Number }
-    },
-    marketable_yield: {
-      own:          { type: Number },
-      seed_reserve: { type: Number }
-    },
+    yield:           { type: Schema.Types.Mixed },
+    yield_consumption: { type: Schema.Types.Mixed },
     number:          { type: Number, default: 1 },
     date_created:    { type: Date },
     last_modified:   { type: Date }
@@ -103,21 +57,22 @@ ACATSectionSchema.pre('save', function preSaveMiddleware(next) {
  * Filter ACATSection Attributes to expose
  */
 ACATSectionSchema.statics.attributes = {      
-  title:              1,
+  title:                  1,
   estimated_sub_total:    1,
-  achieved_sub_total: 1,
-  estimated_cash_flow:       1,
-  achieved_cash_flow:       1,
+  estimated_min_revenue:  1,
+  estimated_max_revenue:  1,
+  achieved_sub_total:     1,
+  estimated_cash_flow:    1, // cash flow type
+  achieved_cash_flow:     1, // cash flow type
   cost_list:       1,
   variety:         1,
   seed_source:     1,
   sub_sections:    1,
+  estimated_probable_revenue: 1,
+  achieved_revenue:           1,
+  yield:           1,
+  yield_consumption: 1,
   number:          1,
-  estimated:  1,
-  achieved:   1,
-  marketable_yield: 1,
-  estimated_max_revenue: 1,
-  estimated_max_revenue: 1,
   date_created: 1,
   last_modified: 1,
   _id: 1

@@ -14,6 +14,8 @@ const ACATSection       = require('../models/ACATSection');
 const CostList          = require('../models/costList');
 const CostListItem      = require('../models/costListItem');
 const Crop              = require('../models/crop');
+const YieldConsumption = require('../models/yieldConsumption');
+const CashFlow        = require('../models/cashFlow');
 const GroupedList       = require('../models/groupedList');
 
 const mongoUpdate   = require('../lib/mongo-update');
@@ -70,6 +72,18 @@ var population = [{
        path: 'grouped',
       select: GroupedList.attributes
     }]
+  },{
+    path: 'yield_consumption',
+    select: YieldConsumption.attributes
+  },{
+    path: 'yield',
+    select: CostListItem.attributes
+  },{
+    path: 'achieved_cash_flow',
+    select: CashFlow.attributes
+  },{
+    path: 'estimated_cash_flow',
+    select: CashFlow.attributes
   }],
   options: {
     sort: { number: '1' }
