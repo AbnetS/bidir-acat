@@ -23,8 +23,8 @@ var ACATSectionSchema = new Schema({
     variety:         { type: String },
     seed_source:     { type: Schema.Types.Mixed },
     sub_sections:    [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
-    yield:           { type: Schema.Types.Mixed },
-    yield_consumption: { type: Schema.Types.Mixed },
+    yield:           { type: Schema.Types.ObjectId, ref: 'CostListItem' },
+    yield_consumption: { type: Schema.Types.ObjectId, ref: 'YieldConsumption' },
     number:          { type: Number, default: 1 },
     date_created:    { type: Date },
     last_modified:   { type: Date }

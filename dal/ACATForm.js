@@ -34,6 +34,18 @@ var population = [{
       sort: { number: '1' }
     },
     populate: [{
+      path: 'yield_consumption',
+      select: YieldConsumption.attributes
+    },{
+      path: 'yield',
+      select: CostListItem.attributes
+    },{
+      path: 'achieved_cash_flow',
+      select: CashFlow.attributes
+    },{
+      path: 'estimated_cash_flow',
+      select: CashFlow.attributes
+    },{
       path: 'sub_sections',
       select: ACATSection.attributes,
       options: {

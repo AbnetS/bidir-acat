@@ -28,6 +28,7 @@ const LogDal              = require('../dal/log');
 const CropDal             = require('../dal/crop');
 const SectionDal          = require('../dal/ACATSection');
 const CostListDal         = require('../dal/costList');
+const CostListItemDal         = require('../dal/costListItem');
 const CashFlowDal         = require('../dal/cashFlow');
 const YieldConsumptionDal  = require('../dal/yieldConsumption');
 
@@ -96,6 +97,8 @@ exports.initialize = function* initializeACATForm(next) {
 
       }
     }
+
+    form = yield FormDal.get({ _id: form._id });
 
     yield CropDal.update({ _id: body.crop }, { has_acat: true });
 
@@ -547,11 +550,15 @@ function createRevenue(form) {
 
     for(let sub of subSections) {
       let sect;
+      let yieldConsumption;
+      let costListItem;
 
       switch(sub) {
         case 'Probable Yield':
           estimatedCashFlow = yield CashFlowDal.create({});
           achievedCashFlow = yield CashFlowDal.create({});
+          yieldConsumption = yield YieldConsumptionDal.create({});
+          costListItem = yield CostListItemDal.create({});
 
           sect = yield SectionDal.create({
             number: 1,
@@ -559,8 +566,8 @@ function createRevenue(form) {
             achieved_sub_total:     0,
             estimated_cash_flow:    estimatedCashFlow,
             achieved_cash_flow:     achievedCashFlow,
-            yield: [],
-            yield_consumption: [],
+            yield: costListItem,
+            yield_consumption: yieldConsumption,
             title:'Probable Yield'
           });
 
@@ -570,6 +577,7 @@ function createRevenue(form) {
         case 'Maximum Yield':
           estimatedCashFlow = yield CashFlowDal.create({});
           achievedCashFlow = yield CashFlowDal.create({});
+          costListItem = yield CostListItemDal.create({});
 
           sect = yield SectionDal.create({
             number: 2,
@@ -577,7 +585,7 @@ function createRevenue(form) {
             achieved_sub_total:     0,
             estimated_cash_flow:    estimatedCashFlow,
             achieved_cash_flow:     achievedCashFlow,
-            yield: [],
+            yield: costListItem,
             title: 'Maximum Yield'
           });
 
@@ -587,6 +595,7 @@ function createRevenue(form) {
         case 'Minimum Yield':
           estimatedCashFlow = yield CashFlowDal.create({});
           achievedCashFlow = yield CashFlowDal.create({});
+          costListItem = yield CostListItemDal.create({});
 
           sect = yield SectionDal.create({
             number: 3,
@@ -594,7 +603,7 @@ function createRevenue(form) {
             achieved_sub_total:     0,
             estimated_cash_flow:    estimatedCashFlow,
             achieved_cash_flow:     achievedCashFlow,
-            yield: [],
+            yield: costListItem,
             title: 'Minimum Yield'
           });
 
