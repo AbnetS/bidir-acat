@@ -18,6 +18,7 @@ const checkPermissions   = require('../lib/permissions');
 const ACATForm       = require('../models/ACATForm');
 const CostList       = require('../models/costList');
 const GroupedList    = require('../models/groupedList');
+const Section        = require('../models/ACATSection');
 
 const TokenDal          = require('../dal/token');
 const SectionDal        = require('../dal/ACATSection');
@@ -54,8 +55,8 @@ exports.addItem = function* addtem(next) {
 
   try {
 
-    if(!body.parent_grouped_list && !body.parent_cost_list) {
-      throw new Error('Provide Reference for parent_grouped_list or parent_cost_list');
+    if(!body.parent_grouped_list && !body.parent_cost_list && !body.yield_section) {
+      throw new Error('Provide Reference for parent_grouped_list ,parent_cost_list or yield section');
     }
 
     let groupedList;
@@ -86,6 +87,14 @@ exports.addItem = function* addtem(next) {
       costList = yield CostList.findOne({ _id: body.parent_cost_list }).exec();
       if(!costList) {
         throw new Error('Cost List Does Not Exist')
+      }
+    }
+
+    let yieldSection;
+    if(body.yield_section) {
+      yieldSection = yield Section.findOne({ _id: body.yield_section }).exec();
+      if(!yieldSection) {
+        throw new Error('Yield Section Does Not Exist!');
       }
     }
 
@@ -147,6 +156,10 @@ exports.addItem = function* addtem(next) {
       yield GroupedListDal.update({ _id: groupedList._id },{
         items: items
       });
+    } else if(body.yield_section) {
+      yield SectionDal.update({ _id: yieldSection._id },{
+        yield: item
+      })
     }
 
     this.body = item;

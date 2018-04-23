@@ -22,6 +22,7 @@ var router  = Router();
  * @apiParam {String} type Linear or Grouped
  * @apiParam {String} [parent_cost_list] If adding to Parent CostList Reference
  * @apiParam {String} [parent_grouped_list] If adding to Parent Grouped CostList Reference
+ * @apiParam {String} [yield_section] If adding to Yield Section Type Reference
  *
  * @apiParamExample Request Example:
  *  {

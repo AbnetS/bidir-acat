@@ -15,6 +15,7 @@ const loanProductRouter   = require('./loanProduct');
 const loanProposalRouter   = require('./loanProposal');
 const clientRouter        = require('./client');
 const formRouter          = require('./form');
+const yieldConsumptionRouter = require('./yieldConsumption');
 
 var appRouter = new Router();
 
@@ -44,6 +45,8 @@ composeRoute('acat/forms', formRouter);
 composeRoute('acat/loanProducts', loanProductRouter);
 //Add Loan Proposal Router
 composeRoute('acat/loanProposals', loanProposalRouter);
+//Add Yield Consumption Router
+composeRoute('acat/yieldConsumptions', yieldConsumptionRouter);
 
 function composeRoute(endpoint, router){
   appRouter.use(`/${endpoint}`, router.routes(), router.allowedMethods());
