@@ -387,8 +387,6 @@ function computeValues(acat) {
 
     }
 
-    console.log(iac, inputAchievedSubTotal)
-
     yield SectionDal.update({ _id: iac },{
       achieved_sub_total: inputAchievedSubTotal,
       estimated_sub_total: inputEstimatedSubTotal
