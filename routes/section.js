@@ -126,10 +126,14 @@ router.get('/:id', acl(['*']), sectionController.fetchOne);
  * @apiDescription Update a Section section with the given id
  *
  * @apiParam {Object} Data Update data
+ * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {
- *    title: "Crop Fertiliser and Chemicals Distribution "
+ *    title: "Crop Fertiliser and Chemicals Distribution",
+ *    is_client_acat: true,
+ *    client_acat: "556e1174a8952c9521286a60"
  * }
  *
  * @apiSuccess {String} _id section id

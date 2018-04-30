@@ -254,17 +254,20 @@ exports.update = function* updateACATForm(next) {
     delete body.signatures;
     delete body.type;
 
+
     let clientACAT = yield ClientACATDal.update(query, body);
     if(!clientACAT) throw new Error('Client ACAT doesnt exist!!');
+
+    clientACAT = yield computeValues(clientACAT);
 
     yield LogDal.track({
       event: 'form_update',
       user: this.state._user._id ,
-      message: `Update Info for ${form.title}`,
+      message: `Update Info for ${clientACAT._id}`,
       diff: body
     });
 
-    this.body = form;
+    this.body = clientACAT;
 
   } catch(ex) {
     return this.throw(new CustomError({

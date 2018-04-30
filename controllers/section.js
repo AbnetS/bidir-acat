@@ -16,6 +16,7 @@ const checkPermissions   = require('../lib/permissions');
 
 const ACATForm       = require('../models/ACATForm');
 const Section        = require('../models/ACATSection');
+const ClientACAT     = require('../models/clientACAT');
 
 const TokenDal          = require('../dal/token');
 const SectionDal        = require('../dal/ACATSection');
@@ -23,6 +24,7 @@ const LogDal            = require('../dal/log');
 const QuestionDal       = require('../dal/question');
 const ACATFormDal           = require('../dal/ACATForm');
 const CostListDal       = require('../dal/costList');
+const ACATDal          = require('../dal/ACAT');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -217,19 +219,52 @@ exports.update = function* updateSection(next) {
   };
   let body = this.request.body;
 
+  this.checkBody('is_client_acat')
+      .notEmpty('Client ACAT Checker is empty');
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'UPDATE_SECTION_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
   try {
-    let section = yield SectionDal.update(query, body);
+    let clientACAT;
+
+    if(body.is_client_acat && !body.client_acat) {
+      throw new Error('Please provide Client ACAT reference!');
+    } else {
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      if(!clientACAT) {
+        throw new Error('Client ACAT Does Not Exist')
+      }
+    }
+
+    let section = yield SectionDal.get(query);
+    if(!section) {
+      throw new Error('Section Does Not Exist')
+    }
+
+    section = yield SectionDal.update(query, body);
+
+    if(body.is_client_acat) {
+      for(let acat of clientACAT.ACATs){
+        yield computeValues(acat);
+      }
+    }
 
     yield LogDal.track({
       event: 'section_update',
-      section: this.state._user._id ,
-      message: `Update Info for ${section.title}`,
+      user: this.state._user._id ,
+      message: `Update Info for ${section._id}`,
       diff: body
     });
 
     this.body = section;
 
   } catch(ex) {
+    console.log(ex)
     return this.throw(new CustomError({
       type: 'UPDATE_SECTION_ERROR',
       message: ex.message
@@ -284,3 +319,80 @@ exports.fetchAllByPagination = function* fetchAllSections(next) {
     }));
   }
 };
+
+// Utilities
+function computeValues(acat) {
+  return co(function* () {
+    let inputEstimatedSubTotal = 0;
+    let inputAchievedSubTotal = 0;
+    let iac = null;
+    console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+
+    acat = yield ACATDal.get({ _id: acat });
+
+    // compute input totals
+    for(let section of acat.sections) {
+      section = yield SectionDal.get({ _id: section._id });
+
+      if(section.title == 'Inputs And Activity Costs') {
+        iac = section._id;
+        for(let sub of section.sub_sections) {
+          switch(sub.title) {
+              case 'Labour Cost':
+                inputAchievedSubTotal += sub.achieved_sub_total;
+                inputEstimatedSubTotal += sub.estimated_sub_total;
+                console.log(sub.title, sub.estimated_sub_total)
+                 console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+              break;
+              case 'Other Costs':
+                inputAchievedSubTotal += sub.achieved_sub_total;
+                inputEstimatedSubTotal += sub.estimated_sub_total;
+                console.log(sub.title, sub.estimated_sub_total)
+                 console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+
+              break;
+              case 'Input':
+                let achievedSubtotal = 0;
+                let estimatedSubtotal = 0;
+
+                for(let ssub of sub.sub_sections) {
+                  console.log(ssub.title, ssub.estimated_sub_total)
+                  achievedSubtotal += ssub.achieved_sub_total;
+                  estimatedSubtotal += ssub.estimated_sub_total;
+                }
+
+                inputAchievedSubTotal += achievedSubtotal;
+                inputEstimatedSubTotal += estimatedSubtotal;
+                console.log(sub.title, sub.estimated_sub_total)
+                 console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+              break;
+            }
+        }
+      } // IAC
+
+      if(section.title == 'Revenue') {
+        for(let _sub of section.sub_sections) {
+          _sub = yield SectionDal.get({ _id: _sub._id });
+          for(let sub of _sub.sub_sections) {
+             if(sub.title == 'Probable Yield') {
+              inputAchievedSubTotal += sub.achieved_sub_total;
+             }
+
+             inputEstimatedSubTotal += sub.estimated_sub_total;
+             console.log(sub.title)
+              console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+          }
+        }
+      }
+
+    }
+
+    console.log(iac, inputAchievedSubTotal)
+
+    yield SectionDal.update({ _id: iac },{
+      achieved_sub_total: inputAchievedSubTotal,
+      estimated_sub_total: inputEstimatedSubTotal
+    })
+
+  });
+}
