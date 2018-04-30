@@ -341,14 +341,11 @@ function computeValues(acat) {
               case 'Labour Cost':
                 inputAchievedSubTotal += sub.achieved_sub_total;
                 inputEstimatedSubTotal += sub.estimated_sub_total;
-                console.log(sub.title, sub.estimated_sub_total)
-                 console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+
               break;
               case 'Other Costs':
                 inputAchievedSubTotal += sub.achieved_sub_total;
                 inputEstimatedSubTotal += sub.estimated_sub_total;
-                console.log(sub.title, sub.estimated_sub_total)
-                 console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
 
               break;
               case 'Input':
@@ -363,8 +360,7 @@ function computeValues(acat) {
 
                 inputAchievedSubTotal += achievedSubtotal;
                 inputEstimatedSubTotal += estimatedSubtotal;
-                console.log(sub.title, sub.estimated_sub_total)
-                 console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+
               break;
             }
         }
@@ -379,8 +375,6 @@ function computeValues(acat) {
              }
 
              inputEstimatedSubTotal += sub.estimated_sub_total;
-             console.log(sub.title)
-              console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
           }
         }
       }
