@@ -99,10 +99,14 @@ router.put('/:id/reset', acl(['*']), costListController.reset);
  * @apiDescription Remove Linear Item from the cost list
  *
  * @apiParam {String} item_id Linear Item Reference
+ * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {
- *    item_id: "556e1174a8952c9521286a60"
+ *    item_id: "556e1174a8952c9521286a60",
+ *    is_client_acat: true,
+ *    client_acat: "556e1174a8952c9521286a60"
  * }
  *
  * @apiSuccess {String} _id costList Item id
@@ -148,6 +152,8 @@ router.put('/:id/linear', acl(['*']), costListController.removeLinear);
  * @apiDescription Remove Grouped Item from the cost list
  *
  * @apiParam {String} item_id Grouped Item Reference
+ * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {
@@ -197,6 +203,8 @@ router.put('/:id/group', acl(['*']), costListController.removeGrouped);
  * @apiDescription Remove  Item from the grouped list
  *
  * @apiParam {String} item_id Grouped Item Reference
+ * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {
@@ -246,6 +254,8 @@ router.put('/groups/:id/items', acl(['*']), costListController.removeGroupedItem
  * @apiDescription Update Grouped List
  *
  * @apiParam {String} title Grouped List Title
+ * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {
@@ -278,6 +288,8 @@ router.put('/grouped/:id', acl(['*']), costListController.updateGroupedList);
  * @apiDescription Update a CostList costList with the given id
  *
  * @apiParam {Object} Data Update data
+ * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {

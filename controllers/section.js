@@ -219,16 +219,6 @@ exports.update = function* updateSection(next) {
   };
   let body = this.request.body;
 
-  this.checkBody('is_client_acat')
-      .notEmpty('Client ACAT Checker is empty');
-
-  if(this.errors) {
-    return this.throw(new CustomError({
-      type: 'UPDATE_SECTION_ERROR',
-      message: JSON.stringify(this.errors)
-    }));
-  }
-
   try {
     let clientACAT;
 
@@ -264,7 +254,6 @@ exports.update = function* updateSection(next) {
     this.body = section;
 
   } catch(ex) {
-    console.log(ex)
     return this.throw(new CustomError({
       type: 'UPDATE_SECTION_ERROR',
       message: ex.message

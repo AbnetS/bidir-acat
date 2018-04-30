@@ -223,7 +223,15 @@ exports.updateGroupedList = function* updateGroupedList(next) {
 
   let body = this.request.body;
 
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'UPDATE_GROUPED_LIST_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
   try {
+  
     let groupedList = yield GroupedListDal.update(query, body);
     if(!groupedList || !groupedList._id) throw new Error('Grouped List Does Not Exist')
 
@@ -264,7 +272,25 @@ exports.update = function* updateItem(next) {
   let body = this.request.body;
 
   try {
+    let clientACAT;
+
+    if(body.is_client_acat && !body.client_acat) {
+      throw new Error('Please provide Client ACAT reference!');
+    } else {
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      if(!clientACAT) {
+        throw new Error('Client ACAT Does Not Exist')
+      }
+    }
+
     let costListItem = yield CostListItemDal.update(query, body);
+    if(!costListItem) throw new Error('Cost List Item Does Not Exist')
+
+    if(body.is_client_acat) {
+      for(let acat of clientACAT.ACATs){
+        yield computeValues(acat);
+      }
+    }
 
     yield LogDal.track({
       event: 'section_update',
@@ -381,6 +407,18 @@ exports.removeLinear = function* removeLinear(next) {
 
   try {
 
+    let clientACAT;
+
+    if(body.is_client_acat && !body.client_acat) {
+      throw new Error('Please provide Client ACAT reference!');
+    } else {
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      if(!clientACAT) {
+        throw new Error('Client ACAT Does Not Exist')
+      }
+    }
+
+
     let item;
     let costList = yield CostList.findOne(query).exec();
     if(!costList) throw new Error('Cost List Item Does Not Exist');
@@ -393,6 +431,12 @@ exports.removeLinear = function* removeLinear(next) {
     _.remove(linearItems, item._id);
 
     yield CostListDal.update({ _id: costList._id },{ linear: linearItems });
+
+    if(body.is_client_acat) {
+      for(let acat of clientACAT.ACATs){
+        yield computeValues(acat);
+      }
+    }
 
     this.body = item;
 
@@ -435,6 +479,17 @@ exports.removeGroupedItem = function* removeGroupedItem(next) {
 
   try {
 
+    let clientACAT;
+
+    if(body.is_client_acat && !body.client_acat) {
+      throw new Error('Please provide Client ACAT reference!');
+    } else {
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      if(!clientACAT) {
+        throw new Error('Client ACAT Does Not Exist')
+      }
+    }
+
     let item;
 
     let groupedList = yield GroupedList.findOne(query).exec();
@@ -448,6 +503,12 @@ exports.removeGroupedItem = function* removeGroupedItem(next) {
     _.remove(items, item._id);
 
     yield GroupedListDal.update({ _id: groupedList._id },{ items: items });
+
+    if(body.is_client_acat) {
+      for(let acat of clientACAT.ACATs){
+        yield computeValues(acat);
+      }
+    }
 
     this.body = item;
 
@@ -491,6 +552,17 @@ exports.removeGrouped = function* removeGrouped(next) {
 
   try {
 
+    let clientACAT;
+
+    if(body.is_client_acat && !body.client_acat) {
+      throw new Error('Please provide Client ACAT reference!');
+    } else {
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      if(!clientACAT) {
+        throw new Error('Client ACAT Does Not Exist')
+      }
+    }
+
     let item;
     let costList = yield CostList.findOne(query).exec();
     if(!costList) throw new Error('Cost List Item Does Not Exist');
@@ -507,6 +579,12 @@ exports.removeGrouped = function* removeGrouped(next) {
     _.remove(groupedItems, item._id);
 
     yield CostListDal.update({ _id: costList._id },{ grouped: groupedItems });
+
+     if(body.is_client_acat) {
+      for(let acat of clientACAT.ACATs){
+        yield computeValues(acat);
+      }
+    }
 
     this.body = item;
 
@@ -577,6 +655,75 @@ function computeValues(acat) {
 
              inputEstimatedSubTotal += sub.estimated_sub_total;
              
+          }
+        }
+      }
+
+    }
+
+    yield SectionDal.update({ _id: iac },{
+      achieved_sub_total: inputAchievedSubTotal,
+      estimated_sub_total: inputEstimatedSubTotal
+    })
+
+  });
+}
+
+// Utilities
+function computeValues(acat) {
+  return co(function* () {
+    let inputEstimatedSubTotal = 0;
+    let inputAchievedSubTotal = 0;
+    let iac = null;
+    console.log(inputAchievedSubTotal, inputEstimatedSubTotal)
+
+    acat = yield ACATDal.get({ _id: acat });
+
+    // compute input totals
+    for(let section of acat.sections) {
+      section = yield SectionDal.get({ _id: section._id });
+
+      if(section.title == 'Inputs And Activity Costs') {
+        iac = section._id;
+        for(let sub of section.sub_sections) {
+          switch(sub.title) {
+              case 'Labour Cost':
+                inputAchievedSubTotal += sub.achieved_sub_total;
+                inputEstimatedSubTotal += sub.estimated_sub_total;
+
+              break;
+              case 'Other Costs':
+                inputAchievedSubTotal += sub.achieved_sub_total;
+                inputEstimatedSubTotal += sub.estimated_sub_total;
+
+              break;
+              case 'Input':
+                let achievedSubtotal = 0;
+                let estimatedSubtotal = 0;
+
+                for(let ssub of sub.sub_sections) {
+                  console.log(ssub.title, ssub.estimated_sub_total)
+                  achievedSubtotal += ssub.achieved_sub_total;
+                  estimatedSubtotal += ssub.estimated_sub_total;
+                }
+
+                inputAchievedSubTotal += achievedSubtotal;
+                inputEstimatedSubTotal += estimatedSubtotal;
+
+              break;
+            }
+        }
+      } // IAC
+
+      if(section.title == 'Revenue') {
+        for(let _sub of section.sub_sections) {
+          _sub = yield SectionDal.get({ _id: _sub._id });
+          for(let sub of _sub.sub_sections) {
+             if(sub.title == 'Probable Yield') {
+              inputAchievedSubTotal += sub.achieved_sub_total;
+             }
+
+             inputEstimatedSubTotal += sub.estimated_sub_total;
           }
         }
       }
