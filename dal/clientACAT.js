@@ -36,12 +36,6 @@ var population = [{
       path: 'crop',
       select: Crop.attributes
     },{
-      path: 'achieved_cash_flow',
-      select: CashFlow.attributes
-    },{
-      path: 'estimated_cash_flow',
-      select: CashFlow.attributes
-    },{
       path: 'sub_sections',
       select: ACATSection.attributes,
       options: {
@@ -73,12 +67,6 @@ var population = [{
         },{
           path: 'yield',
           select: CostListItem.attributes
-        },{
-          path: 'achieved_cash_flow',
-          select: CashFlow.attributes
-        },{
-          path: 'estimated_cash_flow',
-          select: CashFlow.attributes
         }]
       },{
         path: 'cost_list',
@@ -90,12 +78,6 @@ var population = [{
            path: 'grouped',
           select: GroupedList.attributes
         }]
-      },{
-        path: 'achieved_cash_flow',
-        select: CashFlow.attributes
-      },{
-        path: 'estimated_cash_flow',
-        select: CashFlow.attributes
       },{
         path: 'yield_consumption',
         select: YieldConsumption.attributes
@@ -119,12 +101,6 @@ var population = [{
     },{
       path: 'yield',
       select: CostListItem.attributes
-    },{
-      path: 'achieved_cash_flow',
-      select: CashFlow.attributes
-    },{
-      path: 'estimated_cash_flow',
-      select: CashFlow.attributes
     }]
   }
 },{

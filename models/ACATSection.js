@@ -17,8 +17,8 @@ var ACATSectionSchema = new Schema({
     achieved_sub_total:     { type: Number },
     estimated_probable_revenue: { type: Number },
     achieved_revenue:           { type: Number },
-    estimated_cash_flow:    { type: Schema.Types.ObjectId, ref: 'CashFlow' }, // cash flow type
-    achieved_cash_flow:     { type: Schema.Types.ObjectId, ref: 'CashFlow' }, // cash flow type
+    estimated_cash_flow:    { type: Schema.Types.Mixed }, // cash flow type
+    achieved_cash_flow:     { type: Schema.Types.Mixed }, // cash flow type
     cost_list:       { type: Schema.Types.ObjectId, ref: 'CostList' },
     variety:         { type: String },
     seed_source:     { type: Schema.Types.Mixed },

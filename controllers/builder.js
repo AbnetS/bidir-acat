@@ -29,8 +29,22 @@ const CropDal             = require('../dal/crop');
 const SectionDal          = require('../dal/ACATSection');
 const CostListDal         = require('../dal/costList');
 const CostListItemDal         = require('../dal/costListItem');
-const CashFlowDal         = require('../dal/cashFlow');
 const YieldConsumptionDal  = require('../dal/yieldConsumption');
+
+let cashFlow = {
+      "dec": 0,
+      "nov": 0,
+      "oct": 0,
+      "sep": 0,
+      "aug": 0,
+      "july": 0,
+      "june": 0,
+      "may": 0,
+      "apr": 0,
+      "mar": 0,
+      "feb": 0,
+      "jan": 0
+    };
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -105,6 +119,7 @@ exports.initialize = function* initializeACATForm(next) {
     this.body = form;
 
   } catch(ex) {
+    console.log(ex)
     this.throw(new CustomError({
       type: 'INITIALIZE_ACAT_FORM_ERROR',
       message: ex.message
@@ -372,9 +387,10 @@ exports.remove = function* removeACATForm(next) {
 
 function createIAC(form) {
   return co(function* () {
+    
     // create Main Section
-    let estimatedCashFlow = yield CashFlowDal.create({});
-    let achievedCashFlow = yield CashFlowDal.create({});
+    let estimatedCashFlow = _.clone(cashFlow);
+    let achievedCashFlow = _.clone(cashFlow);
 
     let mainSection = yield SectionDal.create({
       title:'Inputs And Activity Costs',
@@ -405,8 +421,8 @@ function createIAC(form) {
       switch(sub) {
         case 'Labour Cost':
           costList = yield CostListDal.create({});
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
 
           sect = yield SectionDal.create({
             number: 2,
@@ -423,8 +439,8 @@ function createIAC(form) {
         break;
         case 'Other Costs':
           costList = yield CostListDal.create({});
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
 
           sect = yield SectionDal.create({
             number: 3,
@@ -444,8 +460,8 @@ function createIAC(form) {
 
           // create Seed Section
           costList = yield CostListDal.create({});
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
 
           let seedSection = yield SectionDal.create({
             variety: '',
@@ -462,8 +478,8 @@ function createIAC(form) {
 
           // create Fertilizers Section
           costList = yield CostListDal.create({});
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
 
           let fertilizersSection = yield SectionDal.create({
             title: 'Fertilizers',
@@ -478,8 +494,8 @@ function createIAC(form) {
 
           // create Chemicals Section
           costList = yield CostListDal.create({});
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
 
           let chemicalsSection = yield SectionDal.create({
             title: 'Chemicals',
@@ -492,8 +508,8 @@ function createIAC(form) {
           });
           subs.push(chemicalsSection._id);
 
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
 
           sect = yield SectionDal.create({
             number: 1,
@@ -521,8 +537,8 @@ function createIAC(form) {
 function createRevenue(form) {
   return co(function* () {
     // create Main Section
-    let estimatedCashFlow = yield CashFlowDal.create({});
-    let achievedCashFlow = yield CashFlowDal.create({});
+    let estimatedCashFlow = _.clone(cashFlow);
+    let achievedCashFlow = _.clone(cashFlow);
 
     let mainSection = yield SectionDal.create({
       title:'Revenue',
@@ -555,8 +571,8 @@ function createRevenue(form) {
 
       switch(sub) {
         case 'Probable Yield':
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
           yieldConsumption = yield YieldConsumptionDal.create({});
           costListItem = yield CostListItemDal.create({});
 
@@ -575,8 +591,8 @@ function createRevenue(form) {
 
         break;
         case 'Maximum Yield':
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
           costListItem = yield CostListItemDal.create({});
 
           sect = yield SectionDal.create({
@@ -593,8 +609,8 @@ function createRevenue(form) {
 
         break;
         case 'Minimum Yield':
-          estimatedCashFlow = yield CashFlowDal.create({});
-          achievedCashFlow = yield CashFlowDal.create({});
+          estimatedCashFlow = _.clone(cashFlow);
+          achievedCashFlow = _.clone(cashFlow);
           costListItem = yield CostListItemDal.create({});
 
           sect = yield SectionDal.create({
