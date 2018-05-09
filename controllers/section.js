@@ -25,6 +25,7 @@ const QuestionDal       = require('../dal/question');
 const ACATFormDal           = require('../dal/ACATForm');
 const CostListDal       = require('../dal/costList');
 const ACATDal          = require('../dal/ACAT');
+const CashFlowDal      = require('../dal/cashFlow');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -234,6 +235,28 @@ exports.update = function* updateSection(next) {
     let section = yield SectionDal.get(query);
     if(!section) {
       throw new Error('Section Does Not Exist')
+    }
+
+    if(body.estimated_cash_flow) {
+      let ref = body.estimated_cash_flow._id;
+      delete body.estimated_cash_flow._id;
+
+      body.estimated_cash_flow.last_updated = moment().toISOString();
+
+      yield CashFlowDal.update({ _id: ref }, body.estimated_cash_flow);
+
+      delete body.estimated_cash_flow
+    }
+
+    if(body.achieved_cash_flow) {
+      let ref = body.achieved_cash_flow._id;
+      delete body.achieved_cash_flow._id;
+
+      body.achieved_cash_flow.last_updated = moment().toISOString();
+
+      yield CashFlowDal.update({ _id: ref }, body.achieved_cash_flow);
+
+      delete body.achieved_cash_flow
     }
 
     section = yield SectionDal.update(query, body);

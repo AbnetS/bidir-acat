@@ -23,34 +23,81 @@ const mongoUpdate   = require('../lib/mongo-update');
 var returnFields = ACAT.attributes;
 var population = [{
   path: 'sections',
-  select: ACATSection.attributes,
-  populate: [{
-    path: 'sub_sections',
     select: ACATSection.attributes,
     options: {
-      sort: { number: '1' }
+        sort: { number: '1' }
     },
     populate: [{
+      path: 'crop',
+      select: Crop.attributes
+    },{
+      path: 'achieved_cash_flow',
+      select: CashFlow.attributes
+    },{
+      path: 'estimated_cash_flow',
+      select: CashFlow.attributes
+    },{
       path: 'sub_sections',
       select: ACATSection.attributes,
       options: {
         sort: { number: '1' }
       },
-      populate: {
+      populate: [{
+        path: 'sub_sections',
+        select: ACATSection.attributes,
+        options: {
+          sort: { number: '1' }
+        },
+        populate: [{
+          path: 'cost_list',
+          select: CostList.attributes,
+          populate: [{
+            path: 'linear',
+            select: CostListItem.attributes
+          },{
+            path: 'grouped',
+            select: GroupedList.attributes,
+            populate: {
+              path: 'items',
+              select: CostListItem.attributes
+            }
+          }]
+        },{
+          path: 'yield_consumption',
+          select: YieldConsumption.attributes
+        },{
+          path: 'yield',
+          select: CostListItem.attributes
+        },{
+          path: 'achieved_cash_flow',
+          select: CashFlow.attributes
+        },{
+          path: 'estimated_cash_flow',
+          select: CashFlow.attributes
+        }]
+      },{
         path: 'cost_list',
         select: CostList.attributes,
         populate: [{
           path: 'linear',
           select: CostListItem.attributes
         },{
-          path: 'grouped',
-          select: GroupedList.attributes,
-          populate: {
-            path: 'items',
-            select: CostListItem.attributes
-          }
+           path: 'grouped',
+          select: GroupedList.attributes
         }]
-      }
+      },{
+        path: 'achieved_cash_flow',
+        select: CashFlow.attributes
+      },{
+        path: 'estimated_cash_flow',
+        select: CashFlow.attributes
+      },{
+        path: 'yield_consumption',
+        select: YieldConsumption.attributes
+      },{
+        path: 'yield',
+        select: CostListItem.attributes
+      }]
     },{
       path: 'cost_list',
       select: CostList.attributes,
@@ -62,48 +109,19 @@ var population = [{
         select: GroupedList.attributes
       }]
     },{
+      path: 'yield_consumption',
+      select: YieldConsumption.attributes
+    },{
+      path: 'yield',
+      select: CostListItem.attributes
+    },{
       path: 'achieved_cash_flow',
       select: CashFlow.attributes
     },{
       path: 'estimated_cash_flow',
       select: CashFlow.attributes
     }]
-  },{
-    path: 'cost_list',
-    select: CostList.attributes,
-    populate: [{
-      path: 'linear',
-      select: CostListItem.attributes
-    },{
-       path: 'grouped',
-      select: GroupedList.attributes
-    }]
-  },{
-    path: 'yield_consumption',
-    select: YieldConsumption.attributes
-  },{
-    path: 'yield',
-    select: CostListItem.attributes
-  },{
-    path: 'achieved_cash_flow',
-    select: CashFlow.attributes
-  },{
-    path: 'estimated_cash_flow',
-    select: CashFlow.attributes
-  }],
-  options: {
-    sort: { number: '1' }
-  }
-},{
-  path: 'crop',
-  select: Crop.attributes
-},{
-  path: 'achieved_cash_flow',
-  select: CashFlow.attributes
-},{
-  path: 'estimated_cash_flow',
-  select: CashFlow.attributes
-}];
+  }];
 
 /**
  * create a new form.
