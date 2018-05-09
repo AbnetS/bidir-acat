@@ -61,6 +61,12 @@ var population = [{
          path: 'grouped',
         select: GroupedList.attributes
       }]
+    },{
+      path: 'achieved_cash_flow',
+      select: CashFlow.attributes
+    },{
+      path: 'estimated_cash_flow',
+      select: CashFlow.attributes
     }]
   },{
     path: 'cost_list',
@@ -91,6 +97,12 @@ var population = [{
 },{
   path: 'crop',
   select: Crop.attributes
+},{
+  path: 'achieved_cash_flow',
+  select: CashFlow.attributes
+},{
+  path: 'estimated_cash_flow',
+  select: CashFlow.attributes
 }];
 
 /**

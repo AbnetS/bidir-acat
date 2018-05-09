@@ -230,10 +230,12 @@ exports.update = function* updateACATForm(next) {
   let isPermitted = yield hasPermission(this.state._user, 'UPDATE');
   if(!isPermitted) {
     return this.throw(new CustomError({
-      type: 'UPDATE_ACAT_FORM_ERROR',
+      type: 'UPDATE_CLIENT_ACAT_ERROR',
       message: "You Don't have enough permissions to complete this action"
     }));
   }
+
+  let canApprove = yield hasPermission(this.state._user, 'AUTHORIZE');
 
 
   let query = {
@@ -241,10 +243,13 @@ exports.update = function* updateACATForm(next) {
   };
   let body = this.request.body;
 
+  this.checkBody('status')
+      .notEmpty('Status should not be empty')
+      .isIn(['inprogress','submitted', 'declined_final', 'declined_under_review'], 'Correct Status is either inprogress, declined_final, submitted or declined_under_review');
 
   if(this.errors) {
     return this.throw(new CustomError({
-      type: 'UPDATE_ACAT_FORM_ERROR',
+      type: 'UPDATE_CLIENT_ACAT_ERROR',
       message: JSON.stringify(this.errors)
     }));
   }
@@ -255,10 +260,32 @@ exports.update = function* updateACATForm(next) {
     delete body.type;
 
 
-    let clientACAT = yield ClientACATDal.update(query, body);
+    let clientACAT = yield ClientACATDal.get(query);
     if(!clientACAT) throw new Error('Client ACAT doesnt exist!!');
 
-    clientACAT = yield computeValues(clientACAT);
+    clientACAT = yield ClientACATDal.update(query, body);
+
+    // update client status
+    if(body.status == 'submitted'){
+      let client = yield ClientDal.update({ _id: clientACAT.client }, { status: 'ACAT-Submitted' });
+
+      // Create Task
+      yield TaskDal.create({
+        task: `Approve Client ACAT of ${client.first_name} ${client.last_name}`,
+        task_type: 'approve',
+        entity_ref: clientACAT._id,
+        entity_type: 'clientAcat',
+        created_by: this.state._user._id,
+        branch: client.branch._id,
+        comment: body.comment ? body.comment : ''
+      })
+    }
+
+   for(let acat of clientACAT.ACATs) {
+     yield computeValues(acat);
+   }
+
+   clientACAT = yield ClientACATDal.get(query);
 
     yield LogDal.track({
       event: 'form_update',
@@ -271,7 +298,7 @@ exports.update = function* updateACATForm(next) {
 
   } catch(ex) {
     return this.throw(new CustomError({
-      type: 'UPDATE_ACAT_FORM_ERROR',
+      type: 'UPDATE_CLIENT_ACAT_ERROR',
       message: ex.message
     }));
 
@@ -313,7 +340,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   };
 
   try {
-    let clientACATs = yield clientACAT.getCollectionByPagination(query, opts);
+    let clientACATs = yield ClientACATDal.getCollectionByPagination(query, opts);
 
     this.body = clientACATs;
 

@@ -26,6 +26,7 @@ const SectionDal        = require('../dal/ACATSection');
 const LogDal            = require('../dal/log');
 const QuestionDal       = require('../dal/question');
 const ACATFormDal       = require('../dal/ACATForm');
+const ACATDal       = require('../dal/ACAT');
 const CostListDal       = require('../dal/costList');
 const CostListItemDal   = require('../dal/costListItem');
 const GroupedListDal    = require('../dal/groupedList');
