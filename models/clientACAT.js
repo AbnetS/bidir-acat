@@ -17,10 +17,45 @@ var ClientACATSchema = new Schema({
     created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
     loan_product:   { type: Schema.Types.ObjectId, ref: 'LoanProduct', default: null },
     ACATs:          [{ type: Schema.Types.ObjectId, ref: 'ACAT'}],
-    total_cost:     { type: Number, default: 0 },
-    total_revenue:  { type: Number, default: 0 },
-    net_cash_flow:  { type: Number, default: 0 },
-    cumulative_cash_flow:  { type: Number, default: 0 },
+    status:         { type: String, default: 'new'},
+    estimated:      {
+      total_cost:     { type: Number, default: 0 },
+      total_revenue:  { type: Number, default: 0 },
+      net_income:     { type: Number, default: 0 },
+      net_cash_flow:  {
+        jan:             { type: Number, default: 0 },
+        feb:             { type: Number, default: 0 },
+        mar:             { type: Number, default: 0 },
+        apr:             { type: Number, default: 0 },
+        may:             { type: Number, default: 0 },
+        june:            { type: Number, default: 0 },
+        july:            { type: Number, default: 0 },
+        aug:             { type: Number, default: 0 },
+        sep:             { type: Number, default: 0 },
+        oct:             { type: Number, default: 0 },
+        nov:             { type: Number, default: 0 },
+        dec:             { type: Number, default: 0 }
+      }
+    },
+    achieved:      {
+      total_cost:     { type: Number, default: 0 },
+      total_revenue:  { type: Number, default: 0 },
+      net_income:     { type: Number, default: 0 },
+      net_cash_flow:  {
+        jan:             { type: Number, default: 0 },
+        feb:             { type: Number, default: 0 },
+        mar:             { type: Number, default: 0 },
+        apr:             { type: Number, default: 0 },
+        may:             { type: Number, default: 0 },
+        june:            { type: Number, default: 0 },
+        july:            { type: Number, default: 0 },
+        aug:             { type: Number, default: 0 },
+        sep:             { type: Number, default: 0 },
+        oct:             { type: Number, default: 0 },
+        nov:             { type: Number, default: 0 },
+        dec:             { type: Number, default: 0 }
+      }
+    },
     date_created:   { type: Date },
     last_modified:  { type: Date }
 });
@@ -57,11 +92,10 @@ ClientACATSchema.statics.attributes = {
   created_by: 1,
   loan_product: 1,
   ACATs: 1,
-  total_cost: 1,
-  total_revenue: 1,
-  net_cash_flow: 1,
-  cumulative_cash_flow: 1,
+  estimated: 1,
+  achieved: 1,
   date_created: 1,
+  status: 1,
   last_modified: 1,
   _id: 1
 };
