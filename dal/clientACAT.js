@@ -19,6 +19,11 @@ const LoanProduct       = require('../models/loanProduct');
 const Crop              = require('../models/crop');
 const YieldConsumption = require('../models/yieldConsumption');
 const CashFlow        = require('../models/cashFlow');
+const Client        = require('../models/client');
+const User        = require('../models/User');
+const Branch        = require('../models/branch');
+
+
 
 const mongoUpdate   = require('../lib/mongo-update');
 
@@ -106,6 +111,15 @@ var population = [{
 },{
   path: 'loan_product',
   select: LoanProduct.attributes
+},{
+  path: 'created_by',
+  select: User.attributes
+},{
+  path: 'client',
+  select: Client.attributes
+},{
+  path: 'branch',
+  select: Branch.attributes
 }];
 
 /**
