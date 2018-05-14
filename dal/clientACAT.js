@@ -20,7 +20,7 @@ const Crop              = require('../models/crop');
 const YieldConsumption = require('../models/yieldConsumption');
 const CashFlow        = require('../models/cashFlow');
 const Client        = require('../models/client');
-const User        = require('../models/User');
+const User        = require('../models/user');
 const Branch        = require('../models/branch');
 
 
