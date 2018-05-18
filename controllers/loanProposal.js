@@ -220,7 +220,7 @@ exports.update = function* updateLoanProposal(next) {
     let clientACAT = yield ClientACAT.findOne({ _id: loanProposal.client }).exec();
 
     if(body.status == 'declined_for_review') {
-      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_declined_for_review' });
+      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Declined_For_Review' });
       yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'declined_for_review' });
       let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
       if(task) {
@@ -244,7 +244,7 @@ exports.update = function* updateLoanProposal(next) {
       
 
     } else if(body.status == 'resubmitted') {
-      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_resubmitted' });
+      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Resubmitted' });
       yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'resubmitted' });
       let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
       if(task) {
@@ -256,7 +256,7 @@ exports.update = function* updateLoanProposal(next) {
       }
       
     } else {
-      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_authorized' });
+      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Authorized' });
       yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
       let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
       if(task) {

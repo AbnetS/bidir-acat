@@ -35,6 +35,7 @@ const CostListItemDal  = require('../dal/costListItem');
 const GroupedListDal   = require('../dal/groupedList');
 const LoanProductDal   = require('../dal/loanProduct');
 const LoanProposalDal  = require('../dal/loanProposal');
+const ClientDal        = require('../dal/client');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -104,6 +105,10 @@ exports.initialize = function* initializeClientACAT(next) {
         ACATs: acats
       })
     }
+
+    yield ClientDal.update({ _id: client._id },{
+      status: 'ACAT_New'
+    });
 
 
     clientACAT = yield ClientACATDal.update({ _id: clientACAT._id },{

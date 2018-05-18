@@ -237,28 +237,6 @@ exports.update = function* updateSection(next) {
       throw new Error('Section Does Not Exist')
     }
 
-    if(body.estimated_cash_flow) {
-      let ref = body.estimated_cash_flow._id;
-      delete body.estimated_cash_flow._id;
-
-      body.estimated_cash_flow.last_updated = moment().toISOString();
-
-      yield CashFlowDal.update({ _id: ref }, body.estimated_cash_flow);
-
-      delete body.estimated_cash_flow
-    }
-
-    if(body.achieved_cash_flow) {
-      let ref = body.achieved_cash_flow._id;
-      delete body.achieved_cash_flow._id;
-
-      body.achieved_cash_flow.last_updated = moment().toISOString();
-
-      yield CashFlowDal.update({ _id: ref }, body.achieved_cash_flow);
-
-      delete body.achieved_cash_flow
-    }
-
     section = yield SectionDal.update(query, body);
 
     if(body.is_client_acat) {
