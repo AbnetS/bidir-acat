@@ -65,7 +65,7 @@ var LoanProposalSchema = new Schema({
         item:           { type: String, default: ''}
       }]
     },    
-    created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
+    created_by:     { type: Schema.Types.ObjectId, ref: 'User' },
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
     date_created:   { type: Date },
     last_modified:  { type: Date }

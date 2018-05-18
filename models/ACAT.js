@@ -17,7 +17,7 @@ var ACATSchema = new Schema({
     subtitle:       { type: String, default: '' },
     purpose:        { type: String, default: '' },
     client:         { type: Schema.Types.ObjectId, ref: 'Client' },     
-    created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
+    created_by:     { type: Schema.Types.ObjectId, ref: 'User' },
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
     sections:       [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
     crop:           { type: Schema.Types.ObjectId, ref: 'Crop' },

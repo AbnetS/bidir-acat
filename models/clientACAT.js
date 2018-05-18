@@ -14,7 +14,7 @@ var Schema = mongoose.Schema;
 var ClientACATSchema = new Schema({
     client:         { type: Schema.Types.ObjectId, ref: 'Client' },
     branch:         { type: Schema.Types.ObjectId, ref: 'Branch' },
-    created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
+    created_by:     { type: Schema.Types.ObjectId, ref: 'User' },
     loan_product:   { type: Schema.Types.ObjectId, ref: 'LoanProduct', default: null },
     ACATs:          [{ type: Schema.Types.ObjectId, ref: 'ACAT'}],
     status:         { type: String, default: 'new'},

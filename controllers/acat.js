@@ -30,6 +30,8 @@ const SectionDal       = require('../dal/ACATSection');
 const CostListDal      = require('../dal/costList');
 const ClientACATDal    = require('../dal/clientACAT');
 const ACATDal          = require('../dal/ACAT');
+const TaskDal    = require('../dal/task');
+const NotificationDal          = require('../dal/notification');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -103,21 +105,23 @@ exports.update = function* updateACAT(next) {
 
   let canApprove = yield hasPermission(this.state._user, 'AUTHORIZE');
 
-  this.checkBody('status')
+  if(body.is_client_acat) {
+    this.checkBody('status')
       .notEmpty('Status should not be empty')
-      .isIn(['submitted', 'approved', 'declined_for_review'], 'Correct Status is either approved, submitted or declined_for_review');
-  this.checkBody('is_client_acat')
-      .notEmpty('Client ACAT Checker is empty');
+      .isIn(['inprogress', 'submitted', 'resubmitted', 'authorized', 'declined_for_review'], 'Correct Status is either inprogress, resubmitted, authorized, submitted or declined_for_review');
 
-  if(this.errors) {
-    return this.throw(new CustomError({
-      type: 'UPDATE_ACAT_ERROR',
-      message: JSON.stringify(this.errors)
-    }));
+    if(this.errors) {
+      return this.throw(new CustomError({
+        type: 'UPDATE_ACAT_ERROR',
+        message: JSON.stringify(this.errors)
+      }));
+  }
+
+  
   }
 
   try {
-    if(body.status === 'approved' || body.status === 'declined_for_review' ) {
+    if(body.status === 'authorized' || body.status === 'declined_for_review' ) {
       if(!canApprove) {
         throw new Error("You Don't have enough permissions to complete this action");
       }
@@ -128,7 +132,7 @@ exports.update = function* updateACAT(next) {
     if(body.is_client_acat && !body.client_acat) {
       throw new Error('Please provide Client ACAT reference!');
     } else {
-      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      clientACAT = yield ClientACATDal.get({ _id: body.client_acat});
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
       }
@@ -137,77 +141,57 @@ exports.update = function* updateACAT(next) {
     let ACAT = yield ACATDal.update(query, body);
     if(!ACAT) throw new Error('ACAT Does Not Exist');
 
-    if(body.status === 'approved') {
-      client = yield ClientDal.update({ _id: screening.client }, { status: 'ACAT_approval_in_progress' });
-      let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
-      if(task) {
-        yield NotificationDal.create({
-          for: task.created_by,
-          message: `Crop ACAT of ${client.first_name} ${client.last_name} has been approved`,
-          task_ref: task._id
-        });
-      }
+    let client;
 
-    } else if(body.status === 'declined_final') {
-      client = yield ClientDal.update({ _id: screening.client }, { status: 'ineligible' });
+    if(body.status === 'declined_for_review') {
+      client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT_declined_for_review' });
+      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'declined_for_review' });
       let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
-      if(task) {
-        yield NotificationDal.create({
-          for: task.created_by,
-          message: `Crop ACAT of ${client.first_name} ${client.last_name} has been declined in Final`,
-          task_ref: task._id
-        }); 
-      }
-      
-
-    } else if(body.status === 'declined_under_review') {
-      client = yield ClientDal.update({ _id: screening.client }, { status: 'screening_inprogress' });
-      let task = yield TaskDal.update({ entity_ref: screening._id }, { status: 'completed', comment: comment });
       if(task) {
         // Create Review Task
         let _task = yield TaskDal.create({
-          task: `Review Screening Application of ${client.first_name} ${client.last_name}`,
+          task: `Review Crop ACAT Application of ${client.first_name} ${client.last_name}`,
           task_type: 'review',
-          entity_ref: screening._id,
-          entity_type: 'screening',
+          entity_ref: ACAT._id,
+          entity_type: 'ACAT',
           created_by: this.state._user._id,
-          user: task.created_by,
-          branch: screening.branch,
+          user: ACAT.created_by,
+          branch: client.branch._id,
           comment: comment
         });
         yield NotificationDal.create({
-          for: this.state._user._id,
-          message: `Screening Application of ${client.first_name} ${client.last_name} has been declined For Further Review`,
+          for: ACAT.created_by,
+          message: `Crop ACAT Application of ${client.first_name} ${client.last_name} has been declined For Further Review`,
           task_ref: _task._id
         });
       }
       
 
-    } else if(body.status === 'submitted') {
-      client = yield ClientDal.update({ _id: screening.client }, { status: 'screening_inprogress' });
+    } else if(body.status == 'resubmitted'){
+      client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT_resubmitted' });
+      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'resubmitted' });
+      let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
+      if(task) {
+        yield NotificationDal.create({
+          for: task.created_by,
+          message: `Crop ACAT Application of ${client.first_name} ${client.last_name} has been Resubmitted`,
+          task_ref: task._id
+        });
+      }
+      
+    } else if(body.status == 'authorized') {
+      client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT_authorized' });
+      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
+      let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
+      if(task) {
+        yield NotificationDal.create({
+          for: task.created_by,
+          message: `Crop ACAT Application of ${client.first_name} ${client.last_name} has been Authorized`,
+          task_ref: task._id
+        });
+      }
     }
     
-    let mandatory = false;
-
-    if(body.questions) {
-      let questions = [];
-
-      for(let question of body.questions) {
-        let questionID = question._id;
-
-        delete question._id;
-        delete question._v;
-        delete question.date_created;
-        delete question.last_modified;
-
-        let result = yield QuestionDal.update({ _id: questionID }, question);
-
-        questions.push(result);
-      }
-
-      body.questions = questions;
-    }
-
 
     if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){

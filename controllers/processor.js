@@ -31,9 +31,10 @@ const SectionDal       = require('../dal/ACATSection');
 const CostListDal      = require('../dal/costList');
 const ClientACATDal    = require('../dal/clientACAT');
 const ACATDal          = require('../dal/ACAT');
-const CostListItemDal   = require('../dal/costListItem');
-const GroupedListDal    = require('../dal/groupedList');
-const LoanProductDal    = require('../dal/loanProduct');
+const CostListItemDal  = require('../dal/costListItem');
+const GroupedListDal   = require('../dal/groupedList');
+const LoanProductDal   = require('../dal/loanProduct');
+const LoanProposalDal  = require('../dal/loanProposal');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -245,7 +246,7 @@ exports.update = function* updateACATForm(next) {
 
   this.checkBody('status')
       .notEmpty('Status should not be empty')
-      .isIn(['inprogress','submitted', 'declined_final', 'declined_under_review'], 'Correct Status is either inprogress, declined_final, submitted or declined_under_review');
+      .isIn(['inprogress','submitted', 'resubmitted', 'declined_for_review'], 'Correct Status is either inprogress, declined_final, submitted or declined_under_review');
 
   if(this.errors) {
     return this.throw(new CustomError({
@@ -263,10 +264,29 @@ exports.update = function* updateACATForm(next) {
     let clientACAT = yield ClientACATDal.get(query);
     if(!clientACAT) throw new Error('Client ACAT doesnt exist!!');
 
-    clientACAT = yield ClientACATDal.update(query, body);
-
     // update client status
     if(body.status == 'submitted'){
+      // confirm if crop acats are submitted too
+      let isOK = true;
+      for(let acat of clientACAT.ACATs) {
+        if(acat.status !== 'submitted') {
+          isOK = false;
+        }
+      }
+
+      if(!isOK) {
+        throw new Error('Client ACAT crops are not yet submitted');
+      }
+
+      let loanProposal = yield LoanProposalDal.get({ client_acat: clientACAT._id });
+      if(!loanProposal) {
+        throw new Error('Loan Proposal Not Yet Set for client')
+      }
+
+      if(loanProposal.status != 'submitted') {
+        throw new Error('Loan Proposal Not Yet Submitted');
+      }
+
       let client = yield ClientDal.update({ _id: clientACAT.client }, { status: 'ACAT-Submitted' });
 
       // Create Task
@@ -274,12 +294,14 @@ exports.update = function* updateACATForm(next) {
         task: `Approve Client ACAT of ${client.first_name} ${client.last_name}`,
         task_type: 'approve',
         entity_ref: clientACAT._id,
-        entity_type: 'clientAcat',
+        entity_type: 'clientACAT',
         created_by: this.state._user._id,
         branch: client.branch._id,
         comment: body.comment ? body.comment : ''
       })
     }
+
+   clientACAT = yield ClientACATDal.update(query, body);
 
    for(let acat of clientACAT.ACATs) {
      yield computeValues(acat);

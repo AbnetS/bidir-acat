@@ -32,6 +32,8 @@ const CostListItemDal   = require('../dal/costListItem');
 const GroupedListDal    = require('../dal/groupedList');
 const LoanProductDal    = require('../dal/loanProduct');
 const LoanProposalDal    = require('../dal/loanProposal');
+const TaskDal    = require('../dal/task');
+const NotificationDal          = require('../dal/notification');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -196,15 +198,77 @@ exports.update = function* updateLoanProposal(next) {
   let query = {
     _id: this.params.id
   };
-  let body = this.request.body;
+
+  let canApprove = yield hasPermission(this.state._user, 'AUTHORIZE');
+
+  this.checkBody('status')
+      .notEmpty('Status should not be empty')
+      .isIn(['inprogress', 'submitted', 'resubmitted', 'authorized', 'declined_for_review'], 'Correct Status is either inprogress, resubmitted, authorized, submitted or declined_for_review');
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'UPDATE_LOAN_PROPOSAL_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
 
   try {
     let loanProposal = yield LoanProposalDal.update(query, body);
     if(!loanProposal) throw new Error('Loan Proposal Is Not Known!!');
 
+    let client;
     let clientACAT = yield ClientACAT.findOne({ _id: loanProposal.client }).exec();
 
+    if(body.status == 'declined_for_review') {
+      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_declined_for_review' });
+      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'declined_for_review' });
+      let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
+      if(task) {
+        // Create Review Task
+        let _task = yield TaskDal.create({
+          task: `Review Loan Proposal Application of ${client.first_name} ${client.last_name}`,
+          task_type: 'review',
+          entity_ref: loanProposal._id,
+          entity_type: 'LoanProposal',
+          created_by: this.state._user._id,
+          user: loanProposal.created_by,
+          branch: client.branch._id,
+          comment: comment
+        });
+        yield NotificationDal.create({
+          for: loanProposal.created_by,
+          message: `Loan Proposal Application of ${client.first_name} ${client.last_name} has been declined For Further Review`,
+          task_ref: _task._id
+        });
+      }
+      
 
+    } else if(body.status == 'resubmitted') {
+      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_resubmitted' });
+      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'resubmitted' });
+      let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
+      if(task) {
+        yield NotificationDal.create({
+          for: task.created_by,
+          message: `Loan Proposal Application of ${client.first_name} ${client.last_name} has been Resubmitted`,
+          task_ref: task._id
+        });
+      }
+      
+    } else {
+      client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_authorized' });
+      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
+      let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
+      if(task) {
+        yield NotificationDal.create({
+          for: task.created_by,
+          message: `Loan Proposal Application of ${client.first_name} ${client.last_name} has been authorized`,
+          task_ref: task._id
+        });
+      }
+    }
+
+    // Computations
     let update = {
       repayable: loanProposal.loan_proposed - (loanProposal.loan_detail.total_deductibles + loanProposal.loan_detail.total_cost_of_loan),
       cumulative_cash_flow: clientACAT.cumulative_cash_flow,   //This is brought from the client ACAT
