@@ -85,7 +85,7 @@ exports.initialize = function* initializeClientACAT(next) {
     clientACAT = yield ClientACATDal.create({
       client: client._id,
       branch: client.branch,
-      created_by: this.state._user.account
+      created_by: this.state._user._id
     });
 
     clientACAT = yield ClientACAT.findOne({ client: client._id }).exec();
