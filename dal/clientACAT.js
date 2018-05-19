@@ -31,16 +31,16 @@ var returnFields = ClientACAT.attributes;
 var population = [{
   path: 'ACATs',
   select: ACAT.attributes,
-  populate: {
+  populate: [{
+      path: 'crop',
+      select: Crop.attributes
+    },{
     path: 'sections',
     select: ACATSection.attributes,
     options: {
         sort: { number: '1' }
     },
     populate: [{
-      path: 'crop',
-      select: Crop.attributes
-    },{
       path: 'sub_sections',
       select: ACATSection.attributes,
       options: {
@@ -81,7 +81,11 @@ var population = [{
           select: CostListItem.attributes
         },{
            path: 'grouped',
-          select: GroupedList.attributes
+          select: GroupedList.attributes,
+          populate: {
+              path: 'items',
+              select: CostListItem.attributes
+            }
         }]
       },{
         path: 'yield_consumption',
@@ -98,7 +102,11 @@ var population = [{
         select: CostListItem.attributes
       },{
          path: 'grouped',
-        select: GroupedList.attributes
+        select: GroupedList.attributes,
+        populate: {
+              path: 'items',
+              select: CostListItem.attributes
+            }
       }]
     },{
       path: 'yield_consumption',
@@ -107,7 +115,7 @@ var population = [{
       path: 'yield',
       select: CostListItem.attributes
     }]
-  }
+  }]
 },{
   path: 'loan_product',
   select: LoanProduct.attributes
