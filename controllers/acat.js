@@ -129,10 +129,8 @@ exports.update = function* updateACAT(next) {
 
     let clientACAT;
 
-    if(body.is_client_acat && !body.client_acat) {
-      throw new Error('Please provide Client ACAT reference!');
-    } else {
-      clientACAT = yield ClientACATDal.get({ _id: body.client_acat});
+    if(body.is_client_acat && body.client_acat) {     
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
       }

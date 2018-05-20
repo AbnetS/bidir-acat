@@ -286,7 +286,6 @@ exports.update = function* updateItem(next) {
     if(!costListItem) throw new Error('Cost List Item Does Not Exist')
 
     if(body.is_client_acat) {
-      console.log('here')
       for(let acat of clientACAT.ACATs){
         yield computeValues(acat);
       }
@@ -339,6 +338,17 @@ exports.reset = function* resetList(next) {
   }
 
   try {
+
+    let clientACAT;
+
+    if(body.is_client_acat && body.client_acat) {     
+      clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
+      if(!clientACAT) {
+        throw new Error('Client ACAT Does Not Exist')
+      }
+    }
+
+
     let costList = yield CostListDal.get(query);
     if(!costList) throw new Error('Cost List Does Not Exist!!')
 
@@ -358,6 +368,12 @@ exports.reset = function* resetList(next) {
     }
 
     costList = yield CostListDal.update(query, body);
+    
+    if(body.is_client_acat) {
+      for(let acat of clientACAT.ACATs){
+        yield computeValues(acat);
+      }
+    }
 
     yield LogDal.track({
       event: 'list_update',
@@ -409,9 +425,7 @@ exports.removeLinear = function* removeLinear(next) {
 
     let clientACAT;
 
-    if(body.is_client_acat && !body.client_acat) {
-      throw new Error('Please provide Client ACAT reference!');
-    } else {
+    if(body.is_client_acat && body.client_acat) {     
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
@@ -481,9 +495,7 @@ exports.removeGroupedItem = function* removeGroupedItem(next) {
 
     let clientACAT;
 
-    if(body.is_client_acat && !body.client_acat) {
-      throw new Error('Please provide Client ACAT reference!');
-    } else {
+    if(body.is_client_acat && body.client_acat) {     
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
@@ -554,9 +566,7 @@ exports.removeGrouped = function* removeGrouped(next) {
 
     let clientACAT;
 
-    if(body.is_client_acat && !body.client_acat) {
-      throw new Error('Please provide Client ACAT reference!');
-    } else {
+    if(body.is_client_acat && body.client_acat) {     
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
