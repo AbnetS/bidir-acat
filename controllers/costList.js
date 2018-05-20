@@ -275,9 +275,7 @@ exports.update = function* updateItem(next) {
   try {
     let clientACAT;
 
-    if(body.is_client_acat && !body.client_acat) {
-      throw new Error('Please provide Client ACAT reference!');
-    } else {
+    if(body.is_client_acat && body.client_acat) {     
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
@@ -288,6 +286,7 @@ exports.update = function* updateItem(next) {
     if(!costListItem) throw new Error('Cost List Item Does Not Exist')
 
     if(body.is_client_acat) {
+      console.log('here')
       for(let acat of clientACAT.ACATs){
         yield computeValues(acat);
       }
