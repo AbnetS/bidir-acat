@@ -102,6 +102,7 @@ exports.update = function* updateACAT(next) {
   let query = {
     _id: this.params.id
   };
+  let body = this.request.body;
 
   let canApprove = yield hasPermission(this.state._user, 'AUTHORIZE');
 
