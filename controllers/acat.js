@@ -201,7 +201,7 @@ exports.update = function* updateACAT(next) {
     yield LogDal.track({
       event: 'acat_update',
       user: this.state._user._id ,
-      message: `Update Info for ${acat.title}`,
+      message: `Update Info for ${ACAT.title}`,
       diff: body
     });
 

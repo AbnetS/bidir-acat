@@ -89,8 +89,8 @@ exports.create = function* createLoanProposal(next) {
     body.total_revenue =  clientACAT.total_revenue;        //This is brought from the client ACAT
     body.total_cost =  clientACAT.total_cost;               //This is brought from the client ACAT
     if(loanProduct) {
-      body.loan_details.deductibles = loanProduct.deductibles.slice();
-      body.loan_details.cost_of_loan = loanProduct.cost_of_loan.slice();
+      body.loan_detail.deductibles = loanProduct.deductibles.slice();
+      body.loan_detail.cost_of_loan = loanProduct.cost_of_loan.slice();
     }
     
 

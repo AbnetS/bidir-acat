@@ -119,7 +119,6 @@ exports.initialize = function* initializeClientACAT(next) {
     this.body = clientACAT;
 
   } catch(ex) {
-    console.log(ex);
     this.throw(new CustomError({
       type: 'INITIALIZE_CLIENT_ACAT_ERROR',
       message: ex.message
