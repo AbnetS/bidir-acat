@@ -88,12 +88,16 @@ exports.create = function* createLoanProposal(next) {
     body.net_cash_flow = clientACAT.net_cash_flow;                //This is brought from the client ACAT
     body.total_revenue =  clientACAT.total_revenue;        //This is brought from the client ACAT
     body.total_cost =  clientACAT.total_cost;               //This is brought from the client ACAT
-    if(loanProduct) {
+    
+    if(body.loan_detail) {
       body.loan_detail.deductibles = loanProduct.deductibles.slice();
       body.loan_detail.cost_of_loan = loanProduct.cost_of_loan.slice();
+    } else {
+      body.loan_detail = {
+        deductibles: loanProduct.deductibles.slice(),
+        cost_of_loan: loanProduct.cost_of_loan.slice()
+      }
     }
-    
-
 
     loanProposal = yield LoanProposalDal.create(body);
 
