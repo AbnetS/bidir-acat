@@ -107,7 +107,7 @@ exports.initialize = function* initializeClientACAT(next) {
     }
 
     yield ClientDal.update({ _id: client._id },{
-      status: 'ACAT_New'
+      status: 'ACAT_IN_PROGRESS'
     });
 
 
