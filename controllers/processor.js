@@ -113,7 +113,7 @@ exports.initialize = function* initializeClientACAT(next) {
 
     clientACAT = yield ClientACATDal.update({ _id: clientACAT._id },{
       loan_product: body.loan_product,
-      status: 'ACAT_IN_PROGRESS'
+      status: 'inprogress'
     });
     
     this.body = clientACAT;
