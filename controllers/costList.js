@@ -287,7 +287,7 @@ exports.update = function* updateItem(next) {
 
     if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){
-        yield computeValues(acat);
+        //yield computeValues(acat);
       }
     }
 
@@ -448,7 +448,7 @@ exports.removeLinear = function* removeLinear(next) {
 
     if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){
-        yield computeValues(acat);
+        //yield computeValues(acat);
       }
     }
 
@@ -518,7 +518,7 @@ exports.removeGroupedItem = function* removeGroupedItem(next) {
 
     if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){
-        yield computeValues(acat);
+        //yield computeValues(acat);
       }
     }
 
@@ -592,7 +592,7 @@ exports.removeGrouped = function* removeGrouped(next) {
 
      if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){
-        yield computeValues(acat);
+        //yield computeValues(acat);
       }
     }
 

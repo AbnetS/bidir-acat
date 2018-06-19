@@ -241,7 +241,7 @@ exports.update = function* updateSection(next) {
 
     if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){
-        yield computeValues(acat);
+        //yield computeValues(acat);
       }
     }
 
