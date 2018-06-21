@@ -36,6 +36,7 @@ const GroupedListDal   = require('../dal/groupedList');
 const LoanProductDal   = require('../dal/loanProduct');
 const LoanProposalDal  = require('../dal/loanProposal');
 const ClientDal        = require('../dal/client');
+const YieldConsumptionDal  = require('../dal/yieldConsumption')
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
@@ -391,9 +392,17 @@ function createSection(section, parent) {
     delete section.sub_sections;
 
     if(section.cost_list) {
+      delete section.cost_list._id;
       let costList    = yield createCostList(section.cost_list);
 
       section.cost_list = costList._id;
+    }
+
+    if(section.yield_consumption) {
+      delete section.yield_consumption._id;
+      let yieldConsumption    = yield YieldConsumptionDal.create(section.yield_consumption);
+
+      section.yield_consumption = yieldConsumption._id;
     }
 
     section = yield SectionDal.create(section);
