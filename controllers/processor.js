@@ -96,7 +96,7 @@ exports.initialize = function* initializeClientACAT(next) {
       let acats = [];
 
       for(let form of body.crop_acats) {
-        
+
         let acat = yield createCropACAT(form, this.state._user, client);
 
         acats.push(acat._id);
@@ -116,7 +116,7 @@ exports.initialize = function* initializeClientACAT(next) {
       loan_product: body.loan_product,
       status: 'inprogress'
     });
-    
+
     this.body = clientACAT;
 
   } catch(ex) {
@@ -131,8 +131,8 @@ exports.initialize = function* initializeClientACAT(next) {
 /**
  * Create a ACAT.
  *
- * @desc create a acat from form 
- * 
+ * @desc create a acat from form
+ *
  * @param {Function} next Middleware dispatcher
  *
  */
@@ -262,7 +262,7 @@ exports.update = function* updateACATForm(next) {
   }
 
   try {
-    
+
     delete body.signatures;
     delete body.type;
 
@@ -400,7 +400,7 @@ function createSection(section, parent) {
 
     if(section.yield_consumption) {
       delete section.yield_consumption._id;
-      let yieldConsumption    = yield YieldConsumptionDal.create(section.yield_consumption);
+      let yieldConsumption    = yield YieldConsumptionDal.create({});
 
       section.yield_consumption = yieldConsumption._id;
     }
@@ -436,7 +436,7 @@ function createCostList(costList) {
 
     for(let linearItem of costList.linear) {
       delete linearItem._id;
-      
+
       let item = yield CostListItemDal.create(linearItem);
 
       linear.push(item._id);
@@ -536,12 +536,12 @@ function computeValues(acat) {
               case 'Labour Cost':
                 inputAchievedSubTotal += sub.achieved_sub_total;
                 inputEstimatedSubTotal += sub.estimated_sub_total;
-                
+
               break;
               case 'Other Costs':
                 inputAchievedSubTotal += sub.achieved_sub_total;
                 inputEstimatedSubTotal += sub.estimated_sub_total;
-                
+
 
               break;
               case 'Input':
@@ -556,7 +556,7 @@ function computeValues(acat) {
 
                 inputAchievedSubTotal += achievedSubtotal;
                 inputEstimatedSubTotal += estimatedSubtotal;
-                
+
               break;
             }
         }
@@ -571,7 +571,7 @@ function computeValues(acat) {
              }
 
              inputEstimatedSubTotal += sub.estimated_sub_total;
-             
+
           }
         }
       }
