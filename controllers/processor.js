@@ -398,6 +398,13 @@ function createSection(section, parent) {
       section.cost_list = costList._id;
     }
 
+    if(section.yield) {
+      delete section.yield._id;
+      let _yield    = yield CostListItemDal.create(section.yield);
+
+      section.yield = _yield._id;
+    }
+
     if(section.yield_consumption) {
       delete section.yield_consumption._id;
       let yieldConsumption    = yield YieldConsumptionDal.create({});
