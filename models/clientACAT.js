@@ -18,6 +18,7 @@ var ClientACATSchema = new Schema({
     loan_product:   { type: Schema.Types.ObjectId, ref: 'LoanProduct', default: null },
     ACATs:          [{ type: Schema.Types.ObjectId, ref: 'ACAT'}],
     status:         { type: String, default: 'new'},
+    filling_status: { type: String, default: 'new' },
     estimated:      {
       total_cost:     { type: Number, default: 0 },
       total_revenue:  { type: Number, default: 0 },
@@ -88,6 +89,7 @@ ClientACATSchema.pre('save', function preSaveMiddleware(next) {
  */
 ClientACATSchema.statics.attributes = {
   client: 1,
+  filling_status: 1,
   branch: 1,
   created_by: 1,
   loan_product: 1,
