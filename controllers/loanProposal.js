@@ -83,12 +83,12 @@ exports.create = function* createLoanProposal(next) {
     }
 
     let loanProduct = yield LoanProductDal.get({ _id: clientACAT.loan_product });
- 
+
     body.cumulative_cash_flow = clientACAT.cumulative_cash_flow;   //This is brought from the client ACAT
     body.net_cash_flow = clientACAT.net_cash_flow;                //This is brought from the client ACAT
     body.total_revenue =  clientACAT.total_revenue;        //This is brought from the client ACAT
     body.total_cost =  clientACAT.total_cost;               //This is brought from the client ACAT
-    
+
     if(body.loan_detail) {
       body.loan_detail.deductibles = loanProduct.deductibles.slice();
       body.loan_detail.cost_of_loan = loanProduct.cost_of_loan.slice();
@@ -205,6 +205,7 @@ exports.update = function* updateLoanProposal(next) {
   let query = {
     _id: this.params.id
   };
+  let body = this.request.body;
 
   let canApprove = yield hasPermission(this.state._user, 'AUTHORIZE');
 
@@ -248,7 +249,7 @@ exports.update = function* updateLoanProposal(next) {
           task_ref: _task._id
         });
       }
-      
+
 
     } else if(body.status == 'resubmitted') {
       client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Resubmitted' });
@@ -261,7 +262,7 @@ exports.update = function* updateLoanProposal(next) {
           task_ref: task._id
         });
       }
-      
+
     } else {
       client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Authorized' });
       yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
@@ -342,7 +343,7 @@ exports.fetchAllByPagination = function* fetchAllLoanProposals(next) {
     let loanProposals = yield LoanProposalDal.getCollectionByPagination(query, opts);
 
     this.body = loanProposals;
-    
+
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'FETCH_LOAN_PROPOSALS_COLLECTION_ERROR',
