@@ -227,6 +227,9 @@ exports.update = function* updateLoanProposal(next) {
 
     let client;
     let clientACAT = yield ClientACAT.findOne({ _id: loanProposal.client }).exec();
+    if(!clientACAT) {
+      throw new Error('Client Does Not Have a client ACAT yet!');
+    }
 
     if(body.status == 'declined_for_review') {
       client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Declined_For_Review' });
@@ -280,10 +283,10 @@ exports.update = function* updateLoanProposal(next) {
     // Computations
     let update = {
       repayable: loanProposal.loan_proposed - (loanProposal.loan_detail.total_deductibles + loanProposal.loan_detail.total_cost_of_loan),
-      cumulative_cash_flow: clientACAT.cumulative_cash_flow,   //This is brought from the client ACAT
-      net_cash_flow : clientACAT.net_cash_flow,                //This is brought from the client ACAT
-      total_revenue :  clientACAT.total_revenue,        //This is brought from the client ACAT
-      total_cost :  clientACAT.total_cost
+      cumulative_cash_flow: clientACAT.estimated.net_cash_flow,   //This is brought from the client ACAT
+      net_cash_flow : clientACAT.estimated.net_income,                //This is brought from the client ACAT
+      total_revenue :  clientACAT.estimated.total_revenue,        //This is brought from the client ACAT
+      total_cost :  clientACAT.estimated.total_cost
     };
 
     loanProposal = yield LoanProposalDal.update(query, update);
