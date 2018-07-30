@@ -264,11 +264,11 @@ exports.update = function* updateLoanProposal(next) {
         });
       }
 
-    } else {
+    } else if(body.status == 'authorized'){
       client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Authorized' });
       yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
       let task = yield TaskDal.update({ entity_ref: loanProposal._id }, { status: 'completed', comment: comment });
-      if(task) {
+      if(task && task._id) {
         yield NotificationDal.create({
           for: task.created_by,
           message: `Loan Proposal Application of ${client.first_name} ${client.last_name} has been authorized`,
