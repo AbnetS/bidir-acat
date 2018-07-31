@@ -84,11 +84,14 @@ exports.create = function* createLoanProposal(next) {
     }
 
     let loanProduct = yield LoanProductDal.get({ _id: clientACAT.loan_product });
+    if(!loanProduct) {
+      throw new Error('Loan Product Is Missing');
+    }
 
-    body.cumulative_cash_flow = clientACAT.cumulative_cash_flow;   //This is brought from the client ACAT
-    body.net_cash_flow = clientACAT.net_cash_flow;                //This is brought from the client ACAT
-    body.total_revenue =  clientACAT.total_revenue;        //This is brought from the client ACAT
-    body.total_cost =  clientACAT.total_cost;               //This is brought from the client ACAT
+    body.cumulative_cash_flow = clientACAT.estimated.net_cash_flow;   //This is brought from the client ACAT
+    body.net_cash_flow = clientACAT.estimated.net_income;                //This is brought from the client ACAT
+    body.total_revenue =  clientACAT.estimated.total_revenue;        //This is brought from the client ACAT
+    body.total_cost =  clientACAT.estimated.total_cost;
 
     if(body.loan_detail) {
       body.loan_detail.deductibles = loanProduct.deductibles.slice();
@@ -226,10 +229,11 @@ exports.update = function* updateLoanProposal(next) {
     if(!loanProposal) throw new Error('Loan Proposal Is Not Known!!');
 
     let client;
-    let clientACAT = yield ClientACAT.findOne({ _id: loanProposal.client }).exec();
+    let clientACAT = yield ClientACAT.findOne({ _id: loanProposal.client_acat }).exec();
     if(!clientACAT) {
       throw new Error('Client Does Not Have a client ACAT yet!');
     }
+    let comment = body.comment;
 
     if(body.status == 'declined_for_review') {
       client = yield ClientDal.update({ _id: loanProposal.client }, { status: 'ACAT_Declined_For_Review' });

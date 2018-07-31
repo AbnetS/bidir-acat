@@ -13,8 +13,8 @@ var Schema = mongoose.Schema;
 
 // New Client Schema model
 var ClientSchema = new Schema({
-  branch:         { type: Schema.Types.ObjectId, ref: 'Branch', default: null },
-  created_by:     { type: Schema.Types.ObjectId, ref: 'Account' },
+  branch:         { type: Schema.Types.ObjectId, ref: 'Branch'},
+  created_by:     { type: Schema.Types.ObjectId, ref: 'User' },
   picture:        { type: String, default: '' },
   gender:         { type: String, default: 'SELECT' },
   first_name:     { type: String, default: '' },
@@ -33,9 +33,14 @@ var ClientSchema = new Schema({
     grandfather_name: { type: String, default: '' },
     national_id_no: { type: String, default: '' }
   },
+  geolocation:    {
+    latitude:   { type: Number, default: 0 },
+    longitude:  { type: Number, default: 0 }
+  },
   email:          { type: String, default: '' },
   phone:          { type: String, default: '' },
-  household_members_count: { type: Number, default: 0 },
+  household_members_count: { type: String, default: "0" },
+  status:         { type: String, default: 'new' },
   date_created:   { type: Date },
   last_modified:  { type: Date }
 });
@@ -62,6 +67,8 @@ ClientSchema.statics.attributes = {
   email:          1,
   phone:          1,
   household_members_count: 1,
+  geolocation: 1,
+  status: 1,
   date_created:   1,
   last_modified:  1,
   _id: 1
