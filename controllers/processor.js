@@ -37,6 +37,7 @@ const LoanProductDal   = require('../dal/loanProduct');
 const LoanProposalDal  = require('../dal/loanProposal');
 const ClientDal        = require('../dal/client');
 const YieldConsumptionDal  = require('../dal/yieldConsumption')
+const TaskDal          = require('../dal/task');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
 
