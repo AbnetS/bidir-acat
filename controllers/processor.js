@@ -253,7 +253,7 @@ exports.update = function* updateACATForm(next) {
 
   this.checkBody('status')
       .notEmpty('Status should not be empty')
-      .isIn(['inprogress','submitted', 'resubmitted', 'declined_for_review'], 'Correct Status is either inprogress, declined_final, submitted or declined_under_review');
+      .isIn(['inprogress','submitted', 'authorized', 'resubmitted', 'declined_for_review'], 'Correct Status is either inprogress, resubmitted, authorized, submitted or declined_for_review');
 
   if(this.errors) {
     return this.throw(new CustomError({
