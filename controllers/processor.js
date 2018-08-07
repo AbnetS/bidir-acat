@@ -311,13 +311,13 @@ exports.update = function* updateACATForm(next) {
    clientACAT = yield ClientACATDal.update(query, body);
 
    for(let acat of clientACAT.ACATs) {
-     yield computeValues(acat);
+     //yield computeValues(acat);
    }
 
    clientACAT = yield ClientACATDal.get(query);
 
     yield LogDal.track({
-      event: 'form_update',
+      event: 'client_acat_update',
       user: this.state._user._id ,
       message: `Update Info for ${clientACAT._id}`,
       diff: body
@@ -557,7 +557,6 @@ function computeValues(acat) {
                 let estimatedSubtotal = 0;
 
                 for(let ssub of sub.sub_sections) {
-                  console.log(ssub.title, ssub.estimated_sub_total)
                   achievedSubtotal += ssub.achieved_sub_total;
                   estimatedSubtotal += ssub.estimated_sub_total;
                 }
