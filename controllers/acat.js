@@ -118,7 +118,7 @@ exports.update = function* updateACAT(next) {
       }));
   }
 
-  
+
   }
 
   try {
@@ -130,7 +130,7 @@ exports.update = function* updateACAT(next) {
 
     let clientACAT;
 
-    if(body.is_client_acat && body.client_acat) {     
+    if(body.is_client_acat && body.client_acat) {
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
@@ -143,8 +143,8 @@ exports.update = function* updateACAT(next) {
     let client;
 
     if(body.status === 'declined_for_review') {
-      client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT_Declined_For_Review' });
-      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'declined_for_review' });
+      //client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT-Declined-For-Review' });
+      //yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'declined_for_review' });
       let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
       if(task) {
         // Create Review Task
@@ -164,11 +164,11 @@ exports.update = function* updateACAT(next) {
           task_ref: _task._id
         });
       }
-      
+
 
     } else if(body.status == 'resubmitted'){
-      client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT_Resubmitted' });
-      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'resubmitted' });
+      //client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT-Resubmitted' });
+      //yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'resubmitted' });
       let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
       if(task) {
         yield NotificationDal.create({
@@ -177,10 +177,10 @@ exports.update = function* updateACAT(next) {
           task_ref: task._id
         });
       }
-      
+
     } else if(body.status == 'authorized') {
-      client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT_Authorized' });
-      yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
+      //client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT-Authorized' });
+      //yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
       let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
       if(task) {
         yield NotificationDal.create({
@@ -190,7 +190,7 @@ exports.update = function* updateACAT(next) {
         });
       }
     }
-    
+
 
     if(body.is_client_acat) {
       for(let acat of clientACAT.ACATs){
@@ -360,12 +360,12 @@ function computeValues(acat) {
               case 'Labour Cost':
                 inputAchievedSubTotal += sub.achieved_sub_total;
                 inputEstimatedSubTotal += sub.estimated_sub_total;
-                
+
               break;
               case 'Other Costs':
                 inputAchievedSubTotal += sub.achieved_sub_total;
                 inputEstimatedSubTotal += sub.estimated_sub_total;
-                
+
 
               break;
               case 'Input':
@@ -380,7 +380,7 @@ function computeValues(acat) {
 
                 inputAchievedSubTotal += achievedSubtotal;
                 inputEstimatedSubTotal += estimatedSubtotal;
-                
+
               break;
             }
         }
@@ -395,7 +395,7 @@ function computeValues(acat) {
              }
 
              inputEstimatedSubTotal += sub.estimated_sub_total;
-             
+
           }
         }
       }

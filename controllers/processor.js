@@ -253,7 +253,7 @@ exports.update = function* updateACATForm(next) {
 
   this.checkBody('status')
       .notEmpty('Status should not be empty')
-      .isIn(['inprogress','submitted', 'authorized', 'resubmitted', 'declined_for_review'], 'Correct Status is either inprogress, resubmitted, authorized, submitted or declined_for_review');
+      .isIn(['loan_granted', 'inprogress','submitted', 'authorized', 'resubmitted', 'declined_for_review'], 'Correct Status is either inprogress, resubmitted, authorized, submitted, loan_granted or declined_for_review');
 
   if(this.errors) {
     return this.throw(new CustomError({
@@ -294,7 +294,8 @@ exports.update = function* updateACATForm(next) {
         throw new Error('Loan Proposal Not Yet Submitted');
       }
 
-      let client = yield ClientDal.update({ _id: clientACAT.client }, { status: 'ACAT-Submitted' });
+      client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'ACAT-Submitted' });
+      task = yield TaskDal.update({ entity_ref: clientACAT._id }, { status: 'completed', comment: comment });
 
       // Create Task
       yield TaskDal.create({
@@ -306,6 +307,86 @@ exports.update = function* updateACATForm(next) {
         branch: client.branch._id,
         comment: body.comment ? body.comment : ''
       })
+
+    } else if(body.status == 'declined_for_review') {
+      client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'ACAT-Declined-For-Review' });
+      task = yield TaskDal.update({ entity_ref: clientACAT._id }, { status: 'completed', comment: comment });
+
+      // Create Task
+      yield TaskDal.create({
+        task: `Client ACAT of ${client.first_name} ${client.last_name} Declined For Review`,
+        task_type: 'review',
+        entity_ref: clientACAT._id,
+        entity_type: 'clientACAT',
+        created_by: clientACAT.created_by ? clientACAT.created_by._id : null,
+        branch: client.branch._id,
+        comment: body.comment ? body.comment : ''
+      })
+
+    } else if(body.status == 'resubmitted') {
+      client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'ACAT-Resubmitted' });
+      task = yield TaskDal.update({ entity_ref: clientACAT._id }, { status: 'completed', comment: comment });
+
+      // Create Task
+      yield TaskDal.create({
+        task: `Client ACAT of ${client.first_name} ${client.last_name} Resubmitted`,
+        task_type: 'approve',
+        entity_ref: clientACAT._id,
+        entity_type: 'clientACAT',
+        created_by: this.state._user._id,
+        branch: client.branch._id,
+        comment: body.comment ? body.comment : ''
+      })
+
+    } else if(body.status == 'authorized') {
+      // confirm if crop acats are submitted too0
+      let isOK = true;
+      for(let acat of clientACAT.ACATs) {
+        if(acat.status !== 'authorized') {
+          isOK = false;
+        }
+      }
+
+      if(!isOK) {
+        throw new Error('Client ACAT crops are not yet authorized');
+      }
+
+      let loanProposal = yield LoanProposalDal.get({ client_acat: clientACAT._id });
+      if(!loanProposal) {
+        throw new Error('Loan Proposal Not Yet Set for client')
+      }
+
+      if(loanProposal.status != 'authorized') {
+        throw new Error('Loan Proposal Not Yet Authorized');
+      }
+
+      client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'ACAT-Authorized' });
+      task = yield TaskDal.update({ entity_ref: clientACAT._id }, { status: 'completed', comment: comment });
+
+    } else if(body.status == 'loan_granted') {
+      // confirm if crop acats are submitted too0
+      let isOK = true;
+      for(let acat of clientACAT.ACATs) {
+        if(acat.status !== 'authorized') {
+          isOK = false;
+        }
+      }
+
+      if(!isOK) {
+        throw new Error('Client ACAT crops are not yet authorized');
+      }
+
+      let loanProposal = yield LoanProposalDal.get({ client_acat: clientACAT._id });
+      if(!loanProposal) {
+        throw new Error('Loan Proposal Not Yet Set for client')
+      }
+
+      if(loanProposal.status != 'authorized') {
+        throw new Error('Loan Proposal Not Yet Authorized');
+      }
+
+      client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'Loan-Granted' });
+
     }
 
    clientACAT = yield ClientACATDal.update(query, body);
