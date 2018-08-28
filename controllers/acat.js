@@ -29,6 +29,7 @@ const LogDal           = require('../dal/log');
 const SectionDal       = require('../dal/ACATSection');
 const CostListDal      = require('../dal/costList');
 const ClientACATDal    = require('../dal/clientACAT');
+const ClientDal        = require('../dal/client');
 const ACATDal          = require('../dal/ACAT');
 const TaskDal    = require('../dal/task');
 const NotificationDal          = require('../dal/notification');
