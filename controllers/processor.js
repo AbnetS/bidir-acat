@@ -267,7 +267,9 @@ exports.update = function* updateACATForm(next) {
     delete body.signatures;
     delete body.type;
 
-
+    let client;
+    let task;
+    let comment = body.comment;
     let clientACAT = yield ClientACATDal.get(query);
     if(!clientACAT) throw new Error('Client ACAT doesnt exist!!');
 
@@ -407,6 +409,7 @@ exports.update = function* updateACATForm(next) {
     this.body = clientACAT;
 
   } catch(ex) {
+    console.log(ex)
     return this.throw(new CustomError({
       type: 'UPDATE_CLIENT_ACAT_ERROR',
       message: ex.message

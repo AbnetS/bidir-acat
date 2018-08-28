@@ -93,8 +93,6 @@ exports.update = function update(query, updates) {
 
   updates = emquery(updates);
 
-  console.log(updates);
-
   return LoanProposal.findOneAndUpdate(query, updates, opts)
       .populate(population)
       .exec();

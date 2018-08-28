@@ -129,6 +129,8 @@ exports.update = function* updateACAT(next) {
     }
 
     let clientACAT;
+    let comment = body.comment;
+    let task;
 
     if(body.is_client_acat && body.client_acat) {
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
@@ -140,12 +142,10 @@ exports.update = function* updateACAT(next) {
     let ACAT = yield ACATDal.update(query, body);
     if(!ACAT) throw new Error('ACAT Does Not Exist');
 
-    let client;
+    let client = yield ClientDal.get({ _id: ACAT.client });
 
     if(body.status === 'declined_for_review') {
-      //client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT-Declined-For-Review' });
-      //yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'declined_for_review' });
-      let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
+      task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
       if(task) {
         // Create Review Task
         let _task = yield TaskDal.create({
@@ -167,9 +167,7 @@ exports.update = function* updateACAT(next) {
 
 
     } else if(body.status == 'resubmitted'){
-      //client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT-Resubmitted' });
-      //yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'resubmitted' });
-      let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
+      task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
       if(task) {
         yield NotificationDal.create({
           for: task.created_by,
@@ -179,9 +177,7 @@ exports.update = function* updateACAT(next) {
       }
 
     } else if(body.status == 'authorized') {
-      //client = yield ClientDal.update({ _id: ACAT.client }, { status: 'ACAT-Authorized' });
-      //yield ClientACATDal.update({ _id: clientACAT._id },{ status: 'authorized' });
-      let task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
+      task = yield TaskDal.update({ entity_ref: ACAT._id }, { status: 'completed', comment: comment });
       if(task) {
         yield NotificationDal.create({
           for: task.created_by,
