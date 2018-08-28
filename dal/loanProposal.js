@@ -8,6 +8,7 @@ const debug   = require('debug')('api:dal-form');
 const moment  = require('moment');
 const _       = require('lodash');
 const co      = require('co');
+const emquery = require('emquery');
 
 const LoanProposal          = require('../models/loanProposal');
 
@@ -90,7 +91,9 @@ exports.update = function update(query, updates) {
     select: returnFields
   };
 
-  updates = mongoUpdate(updates);
+  updates = emquery(updates);
+
+  console.log(updates);
 
   return LoanProposal.findOneAndUpdate(query, updates, opts)
       .populate(population)

@@ -293,8 +293,6 @@ exports.update = function* updateLoanProposal(next) {
       total_cost :  clientACAT.estimated.total_cost
     };
 
-    loanProposal = yield LoanProposalDal.update(query, update);
-
     yield LogDal.track({
       event: 'loanProposal_update',
       user: this.state._user._id ,
