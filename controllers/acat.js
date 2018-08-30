@@ -271,6 +271,14 @@ exports.fetchAllByPagination = function* fetchAllACATs(next) {
 exports.remove = function* removeACAT(next) {
   debug(`removing screening: ${this.params.id}`);
 
+  let isPermitted = yield hasPermission(this.state._user, 'REMOVE');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'REMOVE_ACAT_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
   let query = {
     _id: this.params.id
   };
@@ -317,6 +325,14 @@ exports.remove = function* removeACAT(next) {
  */
 exports.getClientACATs = function* getClientACATs(next) {
   debug('get a collection of ACATs for a client');
+
+  let isPermitted = yield hasPermission(this.state._user, 'VIEW');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'VIEW_CLIENT_ACATS_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
 
   let query = {
     client: this.params.id

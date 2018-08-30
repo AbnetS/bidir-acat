@@ -39,7 +39,7 @@ const ClientDal        = require('../dal/client');
 const YieldConsumptionDal  = require('../dal/yieldConsumption')
 const TaskDal          = require('../dal/task');
 
-let hasPermission = checkPermissions.isPermitted('ACAT');
+let hasPermission = checkPermissions.isPermitted('CLIENT_ACAT');
 
 /**
  * Initialize client acat skeleton.
@@ -194,7 +194,7 @@ exports.fetchOne = function* fetchOneACATForm(next) {
   let isPermitted = yield hasPermission(this.state._user, 'VIEW');
   if(!isPermitted) {
     return this.throw(new CustomError({
-      type: 'GET_ACAT_FORM_ERROR',
+      type: 'VIEW_CIENT_ACAT_ERROR',
       message: "You Don't have enough permissions to complete this action"
     }));
   }
