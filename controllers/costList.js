@@ -192,7 +192,7 @@ exports.fetchOne = function* fetchOne(next) {
   };
 
   try {
-    let costList = yield CostListDal.update(query);
+    let costList = yield CostListDal.get(query);
     if(!costList) throw new Error('Cost Does Not Exist')
 
     this.body = costList;
