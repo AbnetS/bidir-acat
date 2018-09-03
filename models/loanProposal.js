@@ -67,6 +67,7 @@ var LoanProposalSchema = new Schema({
     },    
     created_by:     { type: Schema.Types.ObjectId, ref: 'User' },
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
+    comment:        { type: String, default: '' },
     date_created:   { type: Date },
     last_modified:  { type: Date }
 });
@@ -99,6 +100,7 @@ LoanProposalSchema.pre('save', function preSaveMiddleware(next) {
  */
 LoanProposalSchema.statics.attributes = {
   type: 1,
+  comment: 1,
   created_by: 1,
   client: 1,
   layout: 1,

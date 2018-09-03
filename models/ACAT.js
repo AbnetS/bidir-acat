@@ -75,6 +75,7 @@ var ACATSchema = new Schema({
         dec:             { type: Number, default: 0 }
       }
     },
+    comment:        { type: String, default: '' },
     date_created:   { type: Date },
     last_modified:  { type: Date }
 });
@@ -107,6 +108,7 @@ ACATSchema.pre('save', function preSaveMiddleware(next) {
  */
 ACATSchema.statics.attributes = {
   type: 1,
+  comment: 1,
   client: 1,
   title: 1,
   created_by: 1,

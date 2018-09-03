@@ -465,7 +465,8 @@ function createIAC(form) {
 
           let seedSection = yield SectionDal.create({
             variety: '',
-            seed_source: ['ESE', 'Union', 'Private'],
+            //seed_source: ['ESE', 'Union', 'Private'],
+            seed_source: [],
             title: 'Seed',
             estimated_sub_total:    0,
             achieved_sub_total:     0,

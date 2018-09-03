@@ -57,6 +57,7 @@ var ClientACATSchema = new Schema({
         dec:             { type: Number, default: 0 }
       }
     },
+    comment:        { type: String, default: '' },
     date_created:   { type: Date },
     last_modified:  { type: Date }
 });
@@ -89,6 +90,7 @@ ClientACATSchema.pre('save', function preSaveMiddleware(next) {
  */
 ClientACATSchema.statics.attributes = {
   client: 1,
+  comment: 1,
   filling_status: 1,
   branch: 1,
   created_by: 1,
