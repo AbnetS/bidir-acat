@@ -292,9 +292,9 @@ exports.update = function* updateACATForm(next) {
         throw new Error('Loan Proposal Not Yet Set for client')
       }
 
-      if(loanProposal.status != 'submitted') {
+      /*if(loanProposal.status != 'submitted') {
         throw new Error('Loan Proposal Not Yet Submitted');
-      }
+      }*/
 
       client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'ACAT-Submitted' });
       task = yield TaskDal.update({ entity_ref: clientACAT._id }, { status: 'completed', comment: comment });
@@ -358,9 +358,9 @@ exports.update = function* updateACATForm(next) {
         throw new Error('Loan Proposal Not Yet Set for client')
       }
 
-      if(loanProposal.status != 'authorized') {
+      /*if(loanProposal.status != 'authorized') {
         throw new Error('Loan Proposal Not Yet Authorized');
-      }
+      }*/
 
       client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'ACAT-Authorized' });
       task = yield TaskDal.update({ entity_ref: clientACAT._id }, { status: 'completed', comment: comment });
@@ -383,9 +383,9 @@ exports.update = function* updateACATForm(next) {
         throw new Error('Loan Proposal Not Yet Set for client')
       }
 
-      if(loanProposal.status != 'authorized') {
+      /*if(loanProposal.status != 'authorized') {
         throw new Error('Loan Proposal Not Yet Authorized');
-      }
+      }*/
 
       client = yield ClientDal.update({ _id: clientACAT.client._id }, { status: 'Loan-Granted' });
 
