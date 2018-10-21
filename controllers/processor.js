@@ -23,6 +23,8 @@ const Section         = require('../models/ACATSection');
 const Form            = require('../models/ACATForm');
 const Client          = require('../models/client');
 const ClientACAT      = require('../models/clientACAT');
+const Screening          = require('../models/screening');
+const History            = require('../models/history');
 
 const TokenDal         = require('../dal/token');
 const FormDal          = require('../dal/ACATForm');
@@ -81,8 +83,25 @@ exports.initialize = function* initializeClientACAT(next) {
     let client = yield Client.findOne({ _id: body.client }).exec();
     if(!client) throw new Error('Client Does Not Exist');
 
-    let clientACAT = yield ClientACAT.findOne({ client: client._id }).exec();
-    if(clientACAT) throw new Error('Client Has an ACAT Processor Already!!');
+    let screening = yield Screening.findOne({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
+    if (!screening) {
+      throw new Error("Client Has No Screening Form")
+    }
+    if(screening.status != 'approved') {
+      throw new Error('Screening Application Has Not Been Approved Yet');
+    }
+
+    let clientACAT = yield ClientACAT.findOne({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
+    if(clientACAT && (clientACAT.status === 'new'
+      || clientACAT.status === 'submitted'
+      || clientACAT.status === 'resubmitted'
+      || clientACAT.status === "inprogress")) {
+      throw new Error('Client Has An ACAT Application In Progress!!');
+    }
 
     clientACAT = yield ClientACATDal.create({
       client: client._id,
@@ -117,6 +136,12 @@ exports.initialize = function* initializeClientACAT(next) {
       loan_product: body.loan_product,
       status: 'inprogress'
     });
+
+    yield History.findOneAndUpdate({
+      client: client._id
+    },{
+      $push: { acats: clientACAT._id }
+    })
 
     this.body = clientACAT;
 
