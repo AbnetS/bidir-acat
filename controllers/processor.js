@@ -24,6 +24,7 @@ const Form            = require('../models/ACATForm');
 const Client          = require('../models/client');
 const ClientACAT      = require('../models/clientACAT');
 const Screening          = require('../models/screening');
+const Loan          = require('../models/loan');
 const History            = require('../models/history');
 
 const TokenDal         = require('../dal/token');
@@ -83,25 +84,7 @@ exports.initialize = function* initializeClientACAT(next) {
     let client = yield Client.findOne({ _id: body.client }).exec();
     if(!client) throw new Error('Client Does Not Exist');
 
-    let screening = yield Screening.findOne({ client: body.client })
-      .sort({ date_created: -1 })
-      .exec();
-    if (!screening) {
-      throw new Error("Client Has No Screening Form")
-    }
-    if(screening.status != 'approved') {
-      throw new Error('Screening Application Has Not Been Approved Yet');
-    }
-
-    let clientACAT = yield ClientACAT.findOne({ client: body.client })
-      .sort({ date_created: -1 })
-      .exec();
-    if(clientACAT && (clientACAT.status === 'new'
-      || clientACAT.status === 'submitted'
-      || clientACAT.status === 'resubmitted'
-      || clientACAT.status === "inprogress")) {
-      throw new Error('Client Has An ACAT Application In Progress!!');
-    }
+    let clientACAT = yield validateCycle(body)
 
     clientACAT = yield ClientACATDal.create({
       client: client._id,
@@ -700,4 +683,53 @@ function computeValues(acat) {
     })
 
   });
+}
+
+
+function validateCycle(body) {
+  return co(function*(){
+    debug("Validating loan cycle")
+    // Validate Screenings
+    let screenings = yield Screening.find({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
+    if(!screenings.length) {
+      throw new Error('Client Has Not Screening Form Yet!');
+    }
+
+    for(let screening of screenings) {
+      if(screening.status === "new" || screening.status === "screening_inprogress" || screening.status === "submitted") {
+        throw new Error('Client Has A Screening in progress!!')
+      }
+    }
+
+    // Validate Loans
+    let loans = yield Loan.find({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
+
+    for(let loan of loans) {
+      if(loan.status === 'new' || loan.status === 'submitted' || loan.status === "inprogress") {
+        throw new Error('Client Has A Loan in progress!!')
+      }
+    }
+
+    // Validate acats
+    let clientACATS = yield ClientACAT.find({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
+
+    for(let acat of clientACATS) {
+      if(acat.status === 'new' || acat.status === 'submitted' || acat.status === 'resubmitted' || acat.status === "inprogress") {
+        throw new Error('Client Has An ACAT in progress!!')
+      }
+    }
+
+    let clientACAT = yield ClientACAT.findOne({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
+
+    return clientACAT;
+    
+  })
 }
