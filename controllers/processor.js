@@ -86,6 +86,41 @@ exports.initialize = function* initializeClientACAT(next) {
 
     let clientACAT = yield validateCycle(body)
 
+    let history = yield History.findOne({client: client._id}).exec()
+    if (!history) {
+      throw new Error('Client Has No Loan History');
+
+    } else {
+      history = history.toJSON();
+
+      let cycleOk = true;
+      let acatPresent = true;
+      let whichCycle = history.cycle_number;
+      let missingApplications = [];
+
+      for(let cycle of history.cycles) {
+        if (cycle.cycle_number === history.cycle_number) {
+          if (!cycle.screening || !cycle.loan) {
+            !cycle.screening ? missingApplications.push('Screening') : null;
+            !cycle.loan ? missingApplications.push('Loan') : null;
+            cycleOk = false;
+            break;
+          } else if (cycle.acat) {
+            acatPresent = false;
+            break;
+          }
+        }
+      }
+
+      if (!cycleOk) {
+        throw new Error(`Loan Cycle (${whichCycle}) is in progress. Missing ${missingApplications.join(', ')} Application(s)`);
+      }
+
+      if (!acatPresent) {
+        throw new Error(`Loan Cycle (${whichCycle}) is in progress.`);
+      }
+    }
+
     clientACAT = yield ClientACATDal.create({
       client: client._id,
       branch: client.branch,
@@ -120,9 +155,7 @@ exports.initialize = function* initializeClientACAT(next) {
       status: 'inprogress'
     });
 
-    let history = yield History.findOne({client: client._id}).exec()
     if (history) {
-      history = history.toJSON()
       let cycles = history.cycles.slice();
 
       for(let cycle of cycles) {
