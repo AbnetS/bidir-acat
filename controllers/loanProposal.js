@@ -80,7 +80,7 @@ exports.create = function* createLoanProposal(next) {
 
     let loanProposal = yield LoanProposalDal.get({ client: body.client });
     if(loanProposal) {
-      throw new Error('Client has a loan Proposal already!!');
+      //throw new Error('Client has a loan Proposal already!!');
     }
 
     let loanProduct = yield LoanProductDal.get({ _id: clientACAT.loan_product });

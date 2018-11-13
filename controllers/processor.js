@@ -120,11 +120,27 @@ exports.initialize = function* initializeClientACAT(next) {
       status: 'inprogress'
     });
 
-    yield History.findOneAndUpdate({
-      client: client._id
-    },{
-      $push: { acats: clientACAT._id }
-    })
+    let history = yield History.findOne({client: client._id}).exec()
+    if (history) {
+      history = history.toJSON()
+      let cycles = history.cycles.slice();
+
+      for(let cycle of cycles) {
+        if (cycle.cycle_number === history.cycle_number) {
+          cycle.acat = clientACAT._id;
+          cycle.last_edit_by = this.state._user._id;
+        }
+      }
+
+      yield History.findOneAndUpdate({
+        _id: history._id
+      },{
+        $set: {
+          cycles: cycles,
+          last_modified: moment().toISOString()
+        }
+      }).exec()
+    }
 
     this.body = clientACAT;
 
