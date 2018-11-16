@@ -344,7 +344,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
  * @param {Function} next Middleware dispatcher
  */
 exports.remove = function* removeACATForm(next) {
-  debug(`removing screening: ${this.params.id}`);
+  debug(`removing acat: ${this.params.id}`);
 
   let query = {
     _id: this.params.id
