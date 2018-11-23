@@ -26,6 +26,7 @@ const ClientACAT      = require('../models/clientACAT');
 const Screening          = require('../models/screening');
 const Loan          = require('../models/loan');
 const History            = require('../models/history');
+const Account         = require('../models/account');
 
 const TokenDal         = require('../dal/token');
 const FormDal          = require('../dal/ACATForm');
@@ -511,6 +512,133 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
 
   try {
     let clientACATs = yield ClientACATDal.getCollectionByPagination(query, opts);
+
+    this.body = clientACATs;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
+      message: ex.message
+    }));
+  }
+};
+
+/**
+ * Get a collection of forms by Pagination
+ *
+ * @desc Fetch a collection of forms
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.search = function* searchClientACAT(next) {
+  debug('search client acats');
+
+  let isPermitted = yield hasPermission(this.state._user, 'VIEW');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'SEARCH_CLIENT_ACAT_COLLECTION_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
+  // retrieve pagination query params
+  let page   = this.query.page || 1;
+  let limit  = this.query.per_page || 10;
+  let query = {};
+
+  let sortType = this.query.sort_by;
+  let sort = {};
+  sortType ? (sort[sortType] = -1) : (sort.date_created = -1 );
+
+  let opts = {
+    page: +page,
+    limit: +limit,
+    sort: sort
+  };
+
+  let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
+  let canView =  yield hasPermission(this.state._user, 'VIEW');
+
+  try {
+    let user = this.state._user;
+    let account = yield Account.findOne({ user: user._id }).exec();
+
+    let searchTerm = this.query.search;
+    if(!searchTerm) {
+      throw new Error('Please Provide A Search Term');
+    }
+
+    // Super Admin
+    if (!account || (account.multi_branches && canViewAll)) {
+        query = {};
+
+    // Can VIEW ALL
+    } else if (canViewAll) {
+      if(account.access_branches.length) {
+          query.branch = { $in: account.access_branches };
+
+      } else if(account.default_branch) {
+          query.branch = account.default_branch;
+
+      }
+
+    // Can VIEW
+    } else if(canView) {
+        query = {
+          created_by: user._id
+        };
+
+    // DEFAULT
+    } else {
+      query = {
+          created_by: user._id
+        };
+    }
+
+    let terms = searchTerm.split(/\s+/);
+    let groupTerms = { $in: [] };
+    let refTerms = {$in:[]}
+
+    for(let term of terms) {
+      if(validator.isMongoId(term)) {
+        refTerms.$in.push(term);
+      } else {
+
+        term = new RegExp(`${term}`, 'i')
+
+        groupTerms.$in.push(term);
+      }
+    }
+
+    query.$or = [];
+
+    if (refTerms.$in.length) {
+      query.$or.push({
+        client: searchTerm
+      },{
+        branch: searchTerm
+      },{
+        created_by: searchTerm
+      },{
+        loan_product: searchTerm
+      });
+    } else {
+      query.$or.push({
+        status: searchTerm
+      },{
+        filling_status: searchTerm
+      });
+    }
+
+    let fields = null;
+    if (this.query.fields) {
+      fields = {};
+      this.query.fields.split(",").forEach(function remap(field){
+        fields[field] = 1;
+      })
+    }
+
+    let clientACATs = yield ClientACATDal.getCollectionByPagination(query, opts, fields);
 
     this.body = clientACATs;
 

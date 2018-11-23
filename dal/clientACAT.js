@@ -261,11 +261,11 @@ exports.getCollection = function getCollection(query, qs) {
  *
  * @return {Promise}
  */
-exports.getCollectionByPagination = function getCollection(query, qs) {
+exports.getCollectionByPagination = function getCollection(query, qs, fields) {
   debug('fetching a collection of forms');
 
   let opts = {
-    select:  returnFields,
+    select:  fields ? fields : returnFields,
     sort:   qs.sort || {},
     populate: population,
     page:     qs.page,
