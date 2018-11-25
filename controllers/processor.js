@@ -128,7 +128,7 @@ exports.initialize = function* initializeClientACAT(next) {
       created_by: this.state._user._id
     });
 
-    clientACAT = yield ClientACAT.findOne({ client: client._id }).exec();
+    clientACAT = yield ClientACAT.findOne({ _id: clientACAT._id }).exec();
 
     // ADD ACAT Items
     if(body.crop_acats && Array.isArray(body.crop_acats)) {
