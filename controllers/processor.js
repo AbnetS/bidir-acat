@@ -262,7 +262,10 @@ exports.fetchOne = function* fetchOneACATForm(next) {
   };
 
   try {
-    let clientACAT = yield ClientACATDal.get(query);
+   
+    let clientACAT = yield ClientACAT.findOne(query)
+      .sort({ date_created: -1 })
+      .exec();
     if(!clientACAT) throw new Error('Client ACAT doesnt exist!!');
 
     yield LogDal.track({

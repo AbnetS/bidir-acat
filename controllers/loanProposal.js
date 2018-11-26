@@ -73,7 +73,9 @@ exports.create = function* createLoanProposal(next) {
 
     body.created_by = this.state._user._id;
 
-    let clientACAT = yield ClientACAT.findOne({ client: body.client }).exec();
+    let clientACAT = yield ClientACAT.findOne({ client: body.client })
+      .sort({ date_created: -1 })
+      .exec();
     if(!clientACAT) throw new Error('Client Has Not Client ACAT Yet!!')
 
     body.client_acat = clientACAT._id;
@@ -167,7 +169,9 @@ exports.getClientLoanProposal = function* getClientLoanProposal(next) {
   };
 
   try {
-    let loanProposal = yield LoanProposalDal.get(query);
+    let loanProposal = yield LoanProposal.findOne(query)
+      .sort({ date_created: -1 })
+      .exec();
     if(!loanProposal) throw new Error('Loan Proposal is not known!')
 
     yield LogDal.track({
