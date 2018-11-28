@@ -268,6 +268,8 @@ exports.fetchOne = function* fetchOneACATForm(next) {
       .exec();
     if(!clientACAT) throw new Error('Client ACAT doesnt exist!!');
 
+    clientACAT = yield ClientACATDal.get({ _id: clientACAT._id });
+
     yield LogDal.track({
       event: 'view_clientACAT',
       user: this.state._user._id ,
