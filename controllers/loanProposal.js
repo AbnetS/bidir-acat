@@ -219,7 +219,7 @@ exports.update = function* updateLoanProposal(next) {
 
   this.checkBody('status')
       .notEmpty('Status should not be empty')
-      .isIn(['inprogress', 'submitted', 'resubmitted', 'authorized', 'declined_for_review'], 'Correct Status is either inprogress, resubmitted, authorized, submitted or declined_for_review');
+      .isIn(['loan_paid','inprogress', 'submitted', 'resubmitted', 'authorized', 'declined_for_review'], 'Correct Status is either loan_paid, inprogress, resubmitted, authorized, submitted or declined_for_review');
 
   if(this.errors) {
     return this.throw(new CustomError({
