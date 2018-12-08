@@ -5,6 +5,7 @@
 const crypto  = require('crypto');
 const path    = require('path');
 const url     = require('url');
+const fs      = require('fs');
 
 const debug       = require('debug')('api:form-controller');
 const moment      = require('moment');
@@ -13,6 +14,7 @@ const _           = require('lodash');
 const co          = require('co');
 const del         = require('del');
 const validator   = require('validator');
+const request     = require('request-promise');
 
 const config              = require('../config');
 const CustomError         = require('../lib/custom-error');
@@ -41,9 +43,10 @@ const LoanProductDal   = require('../dal/loanProduct');
 const LoanProposalDal  = require('../dal/loanProposal');
 const ClientDal        = require('../dal/client');
 const YieldConsumptionDal  = require('../dal/yieldConsumption')
-const TaskDal          = require('../dal/task');
+const TaskDal              = require('../dal/task');
 
 let hasPermission = checkPermissions.isPermitted('CLIENT_ACAT');
+
 
 /**
  * Initialize client acat skeleton.

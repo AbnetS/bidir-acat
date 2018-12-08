@@ -57,6 +57,10 @@ let config = {
   GOOGLE_BUCKETS: {
     ACCESS_ID: 'bidir-bucket-access@los-bidir.iam.gserviceaccount.com',
     KEY: path.join(__dirname, '../config/google-buckets.pem')
+  },
+
+  S2: {
+    URL: "http://35.195.254.222/CommonSense/S2/wps"
   }
 };
 

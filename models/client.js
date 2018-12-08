@@ -35,13 +35,18 @@ var ClientSchema = new Schema({
   },
   geolocation:    {
     latitude:   { type: Number, default: 0 },
-    longitude:  { type: Number, default: 0 }
+    longitude:  { type: Number, default: 0 },
+    S2_Id:      { type: String, default: "NULL"},
+    status:     { type: String, default: "NO ATTEMPT" }
   },
   email:          { type: String, default: '' },
   phone:          { type: String, default: '' },
   household_members_count: { type: String, default: "0" },
   status:         { type: String, default: 'new' },
   date_created:   { type: Date },
+  cbs_status:         { type: String, default: "NO ATTEMPT" },
+  cbs_status_message: { type: String, default: "None"},
+  loan_cycle_number:  { type: Number, default: 1 },
   last_modified:  { type: Date }
 });
 
@@ -69,6 +74,9 @@ ClientSchema.statics.attributes = {
   household_members_count: 1,
   geolocation: 1,
   status: 1,
+  cbs_status: 1,
+  cbs_status_message: 1,
+  loan_cycle_number: 1,
   date_created:   1,
   last_modified:  1,
   _id: 1

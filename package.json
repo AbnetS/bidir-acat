@@ -33,6 +33,7 @@
     "debug": "~2.2.0",
     "del": "~2.2.2",
     "emquery": "~1.0.2",
+    "fs-extra": "^7.0.1",
     "koa": "~1.2.4",
     "koa-body": "~1.5.0",
     "koa-conditional-get": "~1.0.3",
@@ -53,6 +54,7 @@
     "passport": "^0.4.0",
     "passport-facebook-token": "^3.3.0",
     "request": "~2.75.0",
+    "request-promise": "^4.2.2",
     "streaming-json-stringify": "~3.1.0",
     "uuid": "~2.0.3",
     "validator": "~5.7.0"

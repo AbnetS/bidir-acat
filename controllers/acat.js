@@ -5,6 +5,7 @@
 const crypto  = require('crypto');
 const path    = require('path');
 const url     = require('url');
+const fs      = require('fs');
 
 const debug       = require('debug')('api:acat-controller');
 const moment      = require('moment');
@@ -13,6 +14,7 @@ const _           = require('lodash');
 const co          = require('co');
 const del         = require('del');
 const validator   = require('validator');
+const request          = require('request-promise')
 
 const config              = require('../config');
 const CustomError         = require('../lib/custom-error');
@@ -35,6 +37,136 @@ const TaskDal    = require('../dal/task');
 const NotificationDal          = require('../dal/notification');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
+
+/**
+ * Update a single client geolocation.
+ *
+ * @desc Fetch a client with the given id from the database
+ *       and update their data
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.updateGeolocation = function* updateGeolocation(next) {
+  debug(`updating acat: ${this.params.id}`);
+
+  let isPermitted = yield hasPermission(this.state._user, 'UPDATE');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'ACAT_UPDATE_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
+  let query = {
+    _id: this.params.id
+  };
+  let body = this.request.body;
+
+  this.checkBody('latitude')
+      .notEmpty('Latitude is Empty');
+  this.checkBody('longitude')
+      .notEmpty('Longitude is Empty');
+  this.checkBody('type')
+      .notEmpty('GPS location is Empty')
+      .isIn(["single_point", "polygon"], "Correct types are single_point or polygon")
+
+  if(this.errors) {
+    return this.throw(new CustomError({
+      type: 'ACAT_UPDATE_ERROR',
+      message: JSON.stringify(this.errors)
+    }));
+  }
+
+  try {
+    let acat = yield ACATDal.get(query);
+    if(!acat) throw new Error('ACAT Does Not Exist!!');
+
+    acat        = acat.toJSON();
+    let geolocation = acat.gps_location;
+
+    body.crop = acat.crop.name;
+
+    // check for dups
+    if (body.type === 'single_point') {
+      let singlePoint = geolocation.single_point;
+
+      if (singlePoint.latitude === body.latitude &&
+         singlePoint.longitude === body.longitude &&
+         singlePoint.S2_Id !== "NULL") {
+        throw new Error("Single Point Has Already Been Registered")
+      }
+
+      let s2Res = yield sendToS2(body);
+
+      body.s2 = s2Res
+
+      try {
+        s2Res = JSON.parse(s2Res)
+      } catch(ex) {
+        //
+        s2Res = null;
+      }
+
+      if (!s2Res) {
+        geolocation.single_point = {
+          longitude: body.longitude,
+          latitude: body.latitude,
+          status: "DECLINED"
+        }
+      } else {
+        geolocation.single_point = {
+          longitude: body.longitude,
+          latitude: body.latitude,
+          status: "ACCEPTED",
+          S2_Id: s2Res.field_id
+        }
+      }
+
+    } else if (body.type === 'polygon') {
+      let polygon = geolocation.polygon;
+
+      let isRegistered = polygon.some(function iter(coord) {
+        return (coord.latitude === body.latitude && coord.longitude === body.longitude);
+      })
+
+      if (isRegistered) {
+        throw new Error("Polygon Point Has Already Been Registered")
+      }
+
+      geolocation.polygon.push({
+        longitude: body.longitude,
+        latitude: body.latitude,
+        status: "ACCEPTED",
+        S2_Id: s2Res.field_id
+      })
+
+    }
+
+    yield LogDal.track({
+      event: 'acat_update',
+      client: this.state._user._id ,
+      message: `Update Info for ${acat._id}`,
+      diff: body
+    });
+
+    acat = yield ACATDal.update({
+      _id: acat._id
+    }, {
+      gps_location: geolocation
+    })
+
+    this.body = acat;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'UPDATE_ACAT_ERROR',
+      message: ex.message
+    }));
+
+  }
+
+};
+
 
 
 /**
@@ -386,7 +518,7 @@ function computeValues(acat) {
                 let estimatedSubtotal = 0;
 
                 for(let ssub of sub.sub_sections) {
-                  console.log(ssub.title, ssub.estimated_sub_total)
+                  
                   achievedSubtotal += ssub.achieved_sub_total;
                   estimatedSubtotal += ssub.estimated_sub_total;
                 }
@@ -421,4 +553,82 @@ function computeValues(acat) {
     })
 
   });
+}
+
+
+//
+
+function polygonFromPoint(longitude, latitude) {
+  let size = 15;
+  let metersPerDegree = 111319.49;
+  let sizeInDegree = (1/metersPerDegree) * size;
+
+  // Create square of 10m around the longitude, latitude
+  let offset = sizeInDegree / 2;
+  let square = [
+    [(longitude - offset), (latitude + offset)],  // Upper left
+    [(longitude + offset), (latitude + offset)],  // Upper right
+    [(longitude + offset), (latitude - offset)],  // Lower right
+    [(longitude - offset), (latitude - offset)],  // Lower left
+    [(longitude - offset), (latitude + offset)]   // Upper left to close the polygon
+  ];
+
+  let squarePoly = {
+     "type": "FeatureCollection",
+     "crs": {
+      "properties": {
+       "name": "urn:ogc:def:crs:EPSG::4326"
+      },
+      "type": "name"
+     },
+     "features": [
+      {
+       "type": "Feature",
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [square]
+       },
+       "properties": {}
+      }
+     ]
+    }
+
+  return squarePoly
+}
+
+function* sendToS2(body){
+  let squarePoly = polygonFromPoint(body.longitude, body.latitude);
+  let s2XML = fs.readFileSync('./config/s2.xml', 'utf8');
+
+  // try S2 First
+  let data = {
+    USER_ID: "demo-wur",
+    GROUP_ID: "Allard", // meki
+    TAG: body.crop, // Onion,
+    FEATURES: squarePoly
+  };
+
+  s2XML = s2XML
+    .replace('{{USER_ID}}', data.USER_ID)
+    .replace('{{GROUP_ID}}', data.GROUP_ID)
+    .replace('{{TAG}}', data.TAG)
+    .replace('{{FEATURES}}', JSON.stringify(data.FEATURES, null, '\t'))
+
+  let opts = {
+      method: 'POST',
+      url: `${config.S2.URL}`,
+      body: s2XML,
+      headers: {
+        "Content-Type": "text/xml"
+      },
+      qs: {
+        service: "WPS",
+        version: "1.0.0",
+        request: "Execute"
+      }
+    }
+
+    let res = yield request(opts);
+
+    return res
 }
