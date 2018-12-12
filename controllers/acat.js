@@ -24,6 +24,7 @@ const FORM                = require ('../lib/enums').FORM;
 const ACATForm       = require('../models/ACATForm');
 const Section        = require('../models/ACATSection');
 const ClientACAT     = require('../models/clientACAT');
+const Client         = require('../models/client');
 
 const TokenDal         = require('../dal/token');
 const FormDal          = require('../dal/ACATForm');
@@ -479,6 +480,107 @@ exports.getClientACATs = function* getClientACATs(next) {
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'GET_CLIENT_ACATS_ERROR',
+      message: ex.message
+    }));
+  }
+};
+
+/**
+ * Search Acat instance
+ *
+ * @desc Search a collection of acat instances
+ *
+ * @param {Function} next Middleware dispatcher
+ */
+exports.search = function* searchAcats(next) {
+  debug('Search a collection of acats by pagination');
+
+  // retrieve pagination query params
+  let page   = this.query.page || 1;
+  let limit  = this.query.per_page || 10;
+
+  let sortType = this.query.sort_by;
+  let sort = {};
+  sortType ? (sort[sortType] = -1) : (sort.date_created = -1 );
+
+  let opts = {
+    page: +page,
+    limit: +limit,
+    sort: sort
+  };
+
+  try {
+
+    let user = this.state._user;
+    let query = {};
+
+    let returnFields = null;
+
+    if (this.query.fields) {
+      returnFields = {
+        _id: 1
+      };
+
+      let unfiltered = this.query.fields.split(",")
+
+      unfiltered.forEach(function(field){
+        returnFields[field] = 1;
+      })
+      delete this.query.fields;
+    }
+
+
+     let qsKeys = Object.keys(this.query)
+
+     if (this.query.branch) {
+      let clients  = yield Client.find({ branch: this.query.branch }, '_id').exec();
+      let clientIds = clients.map(function (client){
+        return client._id;
+      })
+
+      delete this.query.branch;
+
+      this.query.client = clientIds.slice()
+     }
+
+    for(let key of qsKeys) {
+      query[key] = query[key] || {
+        $in: []
+      };
+      let vals = this.query[key];
+
+      let values = Array.isArray(vals) ? vals.slice() : [vals]
+
+      query[key] = {
+        $in: values.slice()
+      }
+    }
+
+    // rebuild with $or
+    qsKeys = Object.keys(query);
+    let _qs = []
+    qsKeys.forEach((item)=>{
+      let _item = {}
+      if (item === 'branch') {
+        _item["client.branch"] = query[item]
+      } else {
+        _item[item] = query[item]
+      }
+      
+      _qs.push(_item)
+    })
+
+    query = {
+      $or: _qs
+    }
+  
+    let acats = yield ACATDal.getCollectionByPagination(query, opts, returnFields);
+
+    this.body = acats;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'SEARCH_ACATS_ERROR',
       message: ex.message
     }));
   }

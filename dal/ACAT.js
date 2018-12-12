@@ -14,14 +14,18 @@ const ACATSection       = require('../models/ACATSection');
 const CostList          = require('../models/costList');
 const CostListItem      = require('../models/costListItem');
 const Crop              = require('../models/crop');
-const YieldConsumption = require('../models/yieldConsumption');
-const CashFlow        = require('../models/cashFlow');
+const Client            = require('../models/client');
+const YieldConsumption  = require('../models/yieldConsumption');
+const CashFlow          = require('../models/cashFlow');
 const GroupedList       = require('../models/groupedList');
 
 const mongoUpdate   = require('../lib/mongo-update');
 
 var returnFields = ACAT.attributes;
 var population = [{
+      path: 'client',
+      select: Client.attributes
+    },{
       path: 'crop',
       select: Crop.attributes
     },{
@@ -234,11 +238,12 @@ exports.getCollection = function getCollection(query, qs) {
  *
  * @return {Promise}
  */
-exports.getCollectionByPagination = function getCollection(query, qs) {
+exports.getCollectionByPagination = function getCollection(query, qs, fields) {
   debug('fetching a collection of forms');
+  console.log(query, qs, fields)
 
   let opts = {
-    select:  returnFields,
+    select:  fields ? fields : returnFields,
     sort:   qs.sort || {},
     populate: population,
     page:     qs.page,
