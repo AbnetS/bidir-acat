@@ -98,6 +98,7 @@ exports.updateGeolocation = function* updateGeolocation(next) {
       }
 
       let s2Res = yield sendToS2(body);
+      let gps_registered = false;
 
       body.s2 = s2Res
 
@@ -115,6 +116,7 @@ exports.updateGeolocation = function* updateGeolocation(next) {
           status: "DECLINED"
         }
       } else {
+        gps_registered = true;
         geolocation.single_point = {
           longitude: body.longitude,
           latitude: body.latitude,
@@ -140,7 +142,7 @@ exports.updateGeolocation = function* updateGeolocation(next) {
         status: "ACCEPTED",
         S2_Id: s2Res.field_id
       })
-
+      gps_registered = true;
     }
 
     yield LogDal.track({
@@ -153,7 +155,8 @@ exports.updateGeolocation = function* updateGeolocation(next) {
     acat = yield ACATDal.update({
       _id: acat._id
     }, {
-      gps_location: geolocation
+      gps_location: geolocation,
+      gps_registered: gps_registered
     })
 
     this.body = acat;

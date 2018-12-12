@@ -24,8 +24,9 @@ var ACATSchema = new Schema({
     cropping_area_size:  { type: String, default: '0x0' },
     access_to_non_financial_resources: { type: Boolean, default: false },
     non_financial_resources: [{ type: String }],
-    first_expense_month: { type: String, default: 'None' }, 
-    gps_location:        { 
+    first_expense_month: { type: String, default: 'None' },
+    gps_registered: { type: Boolean, default: false }, 
+    gps_location:        {
       single_point: {
         latitude:   { type: Number, default: 0 },
         longitude:   { type: Number, default: 0 },
