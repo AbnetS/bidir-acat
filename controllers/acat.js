@@ -546,6 +546,13 @@ exports.search = function* searchAcats(next) {
       this.query.client = clientIds.slice()
      }
 
+    let gpsRegistered = false;
+    if (this.query.gps_registered) {
+      gpsRegistered =  true;
+
+      delete this.query.gps_registered;
+    }
+
     for(let key of qsKeys) {
       query[key] = query[key] || {
         $in: []
@@ -575,6 +582,10 @@ exports.search = function* searchAcats(next) {
 
     query = {
       $or: _qs
+    }
+
+    if (gpsRegistered) {
+      query['gps_location.single_point.status'] = 'ACCEPTED';
     }
   
     let acats = yield ACATDal.getCollectionByPagination(query, opts, returnFields);
