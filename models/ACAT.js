@@ -30,12 +30,14 @@ var ACATSchema = new Schema({
       single_point: {
         latitude:   { type: Number, default: 0 },
         longitude:   { type: Number, default: 0 },
+        longtude:   { type: Number, default: 0 },
         S2_Id:      { type: String, default: "NULL"},
         status:     { type: String, default: "NO ATTEMPT" }
       },
       polygon: [{
         latitude:   { type: Number, default: 0  },
-        longitude:   { type: Number, default: 0  }
+        longitude:   { type: Number, default: 0  },
+        longtude:   { type: Number, default: 0 },
       }]
     },
     status:              { type: String, default: 'new' },
