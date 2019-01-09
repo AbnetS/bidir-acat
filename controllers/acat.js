@@ -159,6 +159,10 @@ exports.updateGeolocation = function* updateGeolocation(next) {
       gps_registered: gps_registered
     })
 
+    acat = acat.toJSON()
+
+    acat.client = acat.client._id;
+
     this.body = acat;
 
   } catch(ex) {
