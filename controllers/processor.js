@@ -499,7 +499,8 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   if(!isPermitted) {
     return this.throw(new CustomError({
       type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
-      message: "You Don't have enough permissions to complete this action " + this.state._user.first_name
+      //message: "You Don't have enough permissions to complete this action ".concat (this.state._user.first_name)
+      message: this.state._user.first_name
     }));
   }
 
