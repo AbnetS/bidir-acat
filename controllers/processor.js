@@ -506,7 +506,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   // retrieve pagination query params
   let page   = this.query.page || 1;
   let limit  = this.query.per_page || 10;
-  let query = {};
+  
 
   let sortType = this.query.sort_by;
   let sort = {};
@@ -525,6 +525,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     
     let user = this.state._user;
     let account = yield Account.findOne({ user: user._id }).exec();
+    let query = {};
 
     // Super Admin
     if (!account || (account.multi_branches)) {
@@ -550,12 +551,17 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
 
     // DEFAULT
     } else {
-      // query = {
-      //     created_by: user._id
-      //   };
-        query.created_by = user._id
+       query = {
+           created_by: user._id
+         };
+        
         
     }
+
+    //ignore super....
+    query = {
+      created_by: user._id
+    };
 
 
     let clientACATs = yield ClientACATDal.getCollectionByPagination(query, opts);
