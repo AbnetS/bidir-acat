@@ -499,8 +499,8 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   if(!isPermitted) {
     return this.throw(new CustomError({
       type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
-      //message: "You Don't have enough permissions to complete this action ".concat (this.state._user.first_name)
-      message: this.state._user.first_name
+      message: "You Don't have enough permissions to complete this action ".concat (this.state._user.first_name)
+      
     }));
   }
 
@@ -519,7 +519,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     sort: sort
   };
   
-  //let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
+  let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
   let canView =  yield hasPermission(this.state._user, 'VIEW');
 
   try {
@@ -529,26 +529,26 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     let query = {};
 
     // Super Admin
-    if (!account || (account.multi_branches)) {
+    if (!account || (account.multi_branches && canViewAll)) {
         query = {};       
         
 
-    //TODO: But need to be considered....
-        // Can VIEW ALL
-    // } else if (canViewAll) {
-    //   if(account.access_branches.length) {
-    //       query.branch = { $in: account.access_branches.slice() };
+    //TODO: Need to create View All permission
+    //Can VIEW ALL
+    } else if (canViewAll) {
+      if(account.access_branches.length) {
+          query.branch = { $in: account.access_branches.slice() };
 
-    //   } else if(account.default_branch) {
-    //       query.branch = account.default_branch;
+      } else if(account.default_branch) {
+          query.branch = account.default_branch;
 
-    //   }  
+      }  
       
-    // Can VIEW
-    // } else if(canView) {
-    //   query = {
-    //     created_by: user._id
-    // };
+    //Can VIEW
+    } else if(canView) {
+      query = {
+        created_by: user._id
+    };
 
     // DEFAULT
     } else {
@@ -559,12 +559,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
         
     }
 
-    //ignore super....
-    query = {
-      created_by: user._id
-    };
-
-
+    
     let clientACATs = yield ClientACATDal.getCollectionByPagination(query, opts);
 
     this.body = clientACATs;
