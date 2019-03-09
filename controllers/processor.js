@@ -527,6 +527,11 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     // Super Admin
     if (!account || (account.multi_branches)) {
         query = {};
+        return this.throw(new CustomError({
+          type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
+          message: "The User is super"
+        }));
+        
 
     // Can VIEW
     } else if (canView) {
@@ -536,13 +541,21 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
       } else if(account.default_branch) {
           query.branch = account.default_branch;
 
-      }   
+      }  
+      return this.throw(new CustomError({
+        type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
+        message: "The User can access branches"
+      })); 
      
     // DEFAULT
     } else {
       query = {
           created_by: user._id
         };
+        return this.throw(new CustomError({
+          type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
+          message: "The User has an id"
+        }));
     }
 
 
