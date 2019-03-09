@@ -517,10 +517,12 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     limit: +limit,
     sort: sort
   };
+  
+  //let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
+  let canView =  yield hasPermission(this.state._user, 'VIEW');
 
   try {
-    //let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
-    let canView =  yield hasPermission(this.state._user, 'VIEW');
+    
     let user = this.state._user;
     let account = yield Account.findOne({ user: user._id }).exec();
 
@@ -541,16 +543,17 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     //   }  
       
     // Can VIEW
-    } else if(canView) {
-      query = {
-        created_by: user._id
-    };
+    // } else if(canView) {
+    //   query = {
+    //     created_by: user._id
+    // };
 
     // DEFAULT
     } else {
-      query = {
-          created_by: user._id
-        };
+      // query = {
+      //     created_by: user._id
+      //   };
+        query.created_by = user._id
         
     }
 
@@ -562,7 +565,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
-      message: ex.message
+      message: ex.message+query
     }));
   }
 };
