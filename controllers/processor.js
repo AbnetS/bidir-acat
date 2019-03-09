@@ -519,31 +519,25 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   };
 
   try {
-    let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
+    //let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
     let canView =  yield hasPermission(this.state._user, 'VIEW');
     let user = this.state._user;
     let account = yield Account.findOne({ user: user._id }).exec();
 
     // Super Admin
-    if (!account || (account.multi_branches && canViewAll)) {
+    if (!account || (account.multi_branches)) {
         query = {};
 
-    // Can VIEW ALL
-    } else if (canViewAll) {
+    // Can VIEW
+    } else if (canView) {
       if(account.access_branches.length) {
-          query.branch = { $in: account.access_branches };
+          query.branch = { $in: account.access_branches.slice() };
 
       } else if(account.default_branch) {
           query.branch = account.default_branch;
 
-      }
-
-    // Can VIEW
-    } else if(canView) {
-        query = {
-          created_by: user._id
-        };
-
+      }   
+     
     // DEFAULT
     } else {
       query = {
