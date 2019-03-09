@@ -518,7 +518,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     sort: sort
   };
 
-  try {
+  //try {
     //let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
     let canView =  yield hasPermission(this.state._user, 'VIEW');
     let user = this.state._user;
@@ -563,11 +563,11 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
 
     this.body = clientACATs;
 
-  } catch(ex) {
-    return this.throw(new CustomError({
-      type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
-      message: ex.message
-    }));
+  //} catch(ex) {
+    //return this.throw(new CustomError({
+      //type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
+      //message: ex.message
+    //}));
   }
 };
 
