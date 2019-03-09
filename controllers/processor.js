@@ -518,23 +518,19 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     sort: sort
   };
 
-  //try {
-    //let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
+  try {
+    let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
     let canView =  yield hasPermission(this.state._user, 'VIEW');
     let user = this.state._user;
     let account = yield Account.findOne({ user: user._id }).exec();
 
     // Super Admin
-    if (!account || (account.multi_branches)) {
-        query = {};
-        return this.throw(new CustomError({
-          type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
-          message: "The User is super"
-        }));
+    if (!account || (account.multi_branches && canViewAll)) {
+        query = {};       
         
 
-    // Can VIEW
-    } else if (canView) {
+    // Can VIEW ALL
+    } else if (canViewAll) {
       if(account.access_branches.length) {
           query.branch = { $in: account.access_branches.slice() };
 
@@ -542,20 +538,19 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
           query.branch = account.default_branch;
 
       }  
-      return this.throw(new CustomError({
-        type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
-        message: "The User can access branches"
-      })); 
-     
+      
+    // Can VIEW
+    } else if(canView) {
+      query = {
+        created_by: user._id
+    };
+
     // DEFAULT
     } else {
       query = {
           created_by: user._id
         };
-        return this.throw(new CustomError({
-          type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
-          message: "The User has an id"
-        }));
+        
     }
 
 
@@ -563,11 +558,11 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
 
     this.body = clientACATs;
 
-  //} catch(ex) {
-    //return this.throw(new CustomError({
-      //type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
-      //message: ex.message
-    //}));
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
+      message: ex.message
+    }));
   }
 };
 
