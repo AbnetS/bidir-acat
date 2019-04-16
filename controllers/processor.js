@@ -501,14 +501,15 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   if(!isPermitted) {
     return this.throw(new CustomError({
       type: 'VIEW_CLIENT_ACAT_COLLECTION_ERROR',
-      message: "You Don't have enough permissions to complete this action"
+      message: "You Don't have enough permissions to complete this action ".concat (this.state._user.first_name)
+      
     }));
   }
 
   // retrieve pagination query params
   let page   = this.query.page || 1;
   let limit  = this.query.per_page || 10;
-  let query = {};
+  
 
   let sortType = this.query.sort_by;
   let sort = {};
@@ -519,8 +520,48 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
     limit: +limit,
     sort: sort
   };
+  
+  let canViewAll =  yield hasPermission(this.state._user, 'VIEW_ALL');
+  let canView =  yield hasPermission(this.state._user, 'VIEW');
 
   try {
+    
+    let user = this.state._user;
+    let account = yield Account.findOne({ user: user._id }).exec();
+    let query = {};
+
+    // Super Admin
+    if (!account || (account.multi_branches && canViewAll)) {
+        query = {};       
+        
+
+    //TODO: Need to create View All permission
+    //Can VIEW ALL
+    } else if (canViewAll) {
+      if(account.access_branches.length) {
+          query.branch = { $in: account.access_branches.slice() };
+
+      } else if(account.default_branch) {
+          query.branch = account.default_branch;
+
+      }  
+      
+    //Can VIEW
+    } else if(canView) {
+      query = {
+        created_by: user._id
+    };
+
+    // DEFAULT
+    } else {
+       query = {
+           created_by: user._id
+         };
+        
+        
+    }
+
+    
     let clientACATs = yield ClientACATDal.getCollectionByPagination(query, opts);
 
     this.body = clientACATs;
@@ -528,7 +569,7 @@ exports.fetchAllByPagination = function* fetchAllACATForms(next) {
   } catch(ex) {
     return this.throw(new CustomError({
       type: 'FETCH_CLIENT_ACAT_COLLECTION_ERROR',
-      message: ex.message
+      message: ex.message+query
     }));
   }
 };
