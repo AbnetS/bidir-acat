@@ -225,7 +225,7 @@ exports.update = function* updateSection(next) {
 
     if(body.is_client_acat && !body.client_acat) {
       throw new Error('Please provide Client ACAT reference!');
-    } else {
+    } else if (body.is_client_acat && body.client_acat)  {
       clientACAT = yield ClientACAT.findOne({ _id: body.client_acat}).exec();
       if(!clientACAT) {
         throw new Error('Client ACAT Does Not Exist')
