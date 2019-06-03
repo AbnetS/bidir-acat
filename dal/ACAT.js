@@ -23,6 +23,21 @@ const mongoUpdate   = require('../lib/mongo-update');
 
 var returnFields = ACAT.attributes;
 var population = [{
+    path: 'client',
+    select: Client.attributes
+  },{
+    path: 'crop',
+    select: Crop.attributes
+  },{
+    path: 'sections',
+    select: ACATSection.attributes,
+    options: {
+      sort: { number: '1' }
+    }
+
+  }
+  ]
+var population = [{
       path: 'client',
       select: Client.attributes
     },{

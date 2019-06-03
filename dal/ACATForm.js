@@ -37,7 +37,10 @@ var population = [{
       select: YieldConsumption.attributes
     },{
       path: 'yield',
-      select: CostListItem.attributes
+      select: CostListItem.attributes,
+      options: {
+        sort: { number: '1' }
+      },
     },{
       path: 'sub_sections',
       select: ACATSection.attributes,
@@ -49,13 +52,19 @@ var population = [{
         select: CostList.attributes,
         populate: [{
           path: 'linear',
-          select: CostListItem.attributes
+          select: CostListItem.attributes,
+          options: {
+            sort: { number: '1' }
+          },
         },{
           path: 'grouped',
           select: GroupedList.attributes,
           populate: {
             path: 'items',
-            select: CostListItem.attributes
+            select: CostListItem.attributes,
+            options: {
+              sort: { number: '1' }
+            },
           }
         }]
       }
@@ -65,16 +74,25 @@ var population = [{
       populate: [{
         path: 'linear',
         select: CostListItem.attributes,
+        options: {
+          sort: { number: '1' }
+        },
         populate: {
           path: 'items',
-          select: CostListItem.attributes
+          select: CostListItem.attributes,
+          options: {
+            sort: { number: '1' }
+          },
         }
       },{
          path: 'grouped',
         select: GroupedList.attributes,
         populate: {
           path: 'items',
-          select: CostListItem.attributes
+          select: CostListItem.attributes,
+          options: {
+            sort: { number: '1' }
+          },
         }
       }]
     }]
@@ -84,16 +102,25 @@ var population = [{
     populate: [{
       path: 'linear',
       select: CostListItem.attributes,
+      options: {
+        sort: { number: '1' }
+      },
       populate: {
           path: 'items',
-          select: CostListItem.attributes
+          select: CostListItem.attributes,
+          options: {
+            sort: { number: '1' }
+          },
         }
     },{
       path: 'grouped',
       select: GroupedList.attributes,
       populate: {
           path: 'items',
-          select: CostListItem.attributes
+          select: CostListItem.attributes,
+          options: {
+            sort: { number: '1' }
+          },
         }
     }]
   },{
@@ -101,7 +128,10 @@ var population = [{
     select: YieldConsumption.attributes
   },{
     path: 'yield',
-    select: CostListItem.attributes
+    select: CostListItem.attributes,
+    options: {
+      sort: { number: '1' }
+    },
   }],
   options: {
     sort: { number: '1' }
