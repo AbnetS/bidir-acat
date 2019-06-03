@@ -262,7 +262,7 @@ exports.update = function* updateItem(next) {
   let isPermitted = yield hasPermission(this.state._user, 'UPDATE');
   if(!isPermitted) {
     return this.throw(new CustomError({
-      type: 'UPDATE_COST_LIST_ERROR',
+      type: 'UPDATE_COSTLIST_ITEM_ERROR',
       message: "You Don't have enough permissions to complete this action"
     }));
   }
@@ -292,7 +292,7 @@ exports.update = function* updateItem(next) {
     }
 
     yield LogDal.track({
-      event: 'section_update',
+      event: 'costlist_item_update',
       section: this.state._user._id ,
       message: `Update Info for ${costListItem._id}`,
       diff: body
