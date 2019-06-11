@@ -6,6 +6,8 @@ const crypto  = require('crypto');
 const path    = require('path');
 const url     = require('url');
 const fs      = require('fs');
+const XlsxTemplate = require('xlsx-template');
+
 
 const debug       = require('debug')('api:acat-controller');
 const moment      = require('moment');
@@ -20,11 +22,15 @@ const config              = require('../config');
 const CustomError         = require('../lib/custom-error');
 const checkPermissions    = require('../lib/permissions');
 const FORM                = require ('../lib/enums').FORM;
+const DOC_GENERATOR      = require ('../lib/doc-generator');//CLASS
+const XLSX_GENERATOR      = require ('../lib/xlsx-generator');//CLASS
+
 
 const ACATForm       = require('../models/ACATForm');
 const Section        = require('../models/ACATSection');
 const ClientACAT     = require('../models/clientACAT');
 const Client         = require('../models/client');
+const LoanProposal   = require ('../models/loanProposal');
 
 const TokenDal         = require('../dal/token');
 const FormDal          = require('../dal/ACATForm');
@@ -35,6 +41,7 @@ const ClientACATDal    = require('../dal/clientACAT');
 const ClientDal        = require('../dal/client');
 const ACATDal          = require('../dal/ACAT');
 const TaskDal    = require('../dal/task');
+const LoanProposalDal = require ('../dal/loanProposal');
 const NotificationDal          = require('../dal/notification');
 
 let hasPermission = checkPermissions.isPermitted('ACAT');
@@ -210,6 +217,92 @@ exports.fetchOne = function* fetchOneACAT(next) {
     });
 
     this.body = ACAT;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'VIEW_ACAT_ERROR',
+      message: ex.message
+    }));
+  }
+
+};
+
+
+exports.generatePrintOut = function* generatePrintOutForACAT(next) {
+  debug(`fetch acat: ${this.params.id}`);
+
+  let isPermitted = yield hasPermission(this.state._user, 'VIEW');
+  if(!isPermitted) {
+    return this.throw(new CustomError({
+      type: 'VIEW_ACAT_ERROR',
+      message: "You Don't have enough permissions to complete this action"
+    }));
+  }
+
+  let query = {
+    _id: this.params.id
+  };
+
+  try {
+    let ACAT = yield ACATDal.get(query);
+    if(!ACAT) throw new Error('ACAT Does Not Exist');
+
+    yield LogDal.track({
+      event: 'view_ACAT',
+      user: this.state._user._id ,
+      message: `View ACAT - ${ACAT.title}`
+    });
+
+    let data = ACAT._doc;
+
+    let loanProposal = yield LoanProposal.findOne({client: data.client._id})
+      .sort({ date_created: -1 })
+      .exec();
+    if (!loanProposal){
+      data.loan_proposal = loanProposal;
+      //Compute the deductibles and cost of loan for reporting purpose
+      data.deductibles = [];
+      for (let ded of data.loan_proposal.loan_detail.deductibles){
+        if (ded.fixed_amount!=0){
+          ded.value = fixed_amount
+        } else {
+          ded.value = ded.percent * data.loan_proposal.loan_proposed;
+        }
+        data.deductibles.push (ded);
+      }
+
+      data.cost_of_loan = [];
+      for (let cost of data.loan_proposal.loan_detail.cost_of_loan){
+        if (cost.fixed_amount != 0){
+          cost.value = fixed_amount
+        } else {
+          cost.value = cost.percent * data.loan_proposal.loan_proposed;
+        }
+        data.cost_of_loan.push (cost);
+      }
+    }
+
+    
+    data.seed_cost_items = data.sections[0].sub_sections[0].sub_sections[0].cost_list.linear.slice();
+    data.fertilizer_cost_items =  data.sections[0].sub_sections[0].sub_sections[1].cost_list.linear.slice();
+    data.insecticide_cost_items = data.sections[0].sub_sections[0].sub_sections[2].cost_list.grouped[0].items.slice();
+    data.fungicide_cost_items = data.sections[0].sub_sections[0].sub_sections[2].cost_list.grouped[1].items.slice();
+    data.laborcost_cost_items =  data.sections[0].sub_sections[1].cost_list.linear.slice();
+    data.othercost_cost_items =  data.sections[0].sub_sections[2].cost_list.linear.slice();
+
+    
+
+    
+
+    
+    
+    let template = "./templates/" + "CLIENT_ACAT_DETAIL_TEMPLATE.xlsx";
+    //let template = "./templates/" + "test.docx";
+    let docGenerator = new XLSX_GENERATOR(); 
+    let report = yield docGenerator.generateXlsx(data, template);
+
+    let buf = Buffer.from(report); 
+    this.body = report;    
 
   } catch(ex) {
     return this.throw(new CustomError({

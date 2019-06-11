@@ -303,6 +303,8 @@ router.put('/:id/geolocation', acl(['*']), acatController.updateGeolocation);
  */
 router.get('/:id', acl(['*']), acatController.fetchOne);
 
+router.get('/printout/:id', acl(['*']), acatController.generatePrintOut);
+
 
 /**
  * @api {put} /acat/:id Update ACAT 
