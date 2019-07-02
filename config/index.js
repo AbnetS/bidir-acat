@@ -12,21 +12,20 @@ const API_URL     = env.API_URL || 'http://127.0.0.1:8120';
 const NODE_ENV    = env.NODE_ENV || 'development';
 const HOST        = env.HOST_IP || 'localhost';
 
-const MONTHS      = {
-  January:      {name: 'jan', label: 'Jan', index: 0},
-  February:     {name: 'feb', label: 'Feb', index: 1},
-  March:        {name: 'mar', label: 'Mar', index: 2},
-  April:        {name: 'apr', label: 'Apr', index: 3},
-  May:          {name: 'may', label: 'May', index: 4},
-  June:         {name: 'june', label: 'June', index: 5},
-  July:         {name: 'july', label: 'July', index: 6},
-  August:       {name: 'aug', label: 'Aug', index: 7},
-  September:    {name: 'sep', label: 'Sep', index: 8},
-  October:      {name: 'oct', label: 'Oct', index: 9},
-  November:     {name: 'nov', label: 'Nov', index: 10},
-  December:     {name: 'dec', label: 'Dec', index: 11}
-
-}
+const MONTHS      = [
+  {name: 'jan', label: 'Jan', full_name: "January", index: 0},
+  {name: 'feb', label: 'Feb', full_name: "February", index: 1},
+  {name: 'mar', label: 'Mar', full_name: "March", index: 2},
+  {name: 'apr', label: 'Apr', full_name: "April", index: 3},
+  {name: 'may', label: 'May', full_name: "May", index: 4},
+  {name: 'june', label: 'June', full_name: "June", index: 5},
+  {name: 'july', label: 'July', full_name: "July", index: 6},
+  {name: 'aug', label: 'Aug', full_name: "August", index: 7},
+  {name: 'sep', label: 'Sep', full_name: "September", index: 8},
+  {name: 'oct', label: 'Oct', full_name: "October", index: 9},
+  {name: 'nov', label: 'Nov', full_name: "November", index: 10},
+  {name: 'dec', label: 'Dec', full_name: "December", index: 11}
+]
 
 const MONGODB_URL = env.MONGODB_URL || 'mongodb://127.0.0.1:27017/bidir';
 

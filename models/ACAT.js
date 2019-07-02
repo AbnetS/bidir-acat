@@ -21,7 +21,7 @@ var ACATSchema = new Schema({
     layout:         { type: String, default: FORM.LAYOUTS[0], enums: FORM.LAYOUTS },
     sections:       [{ type: Schema.Types.ObjectId, ref: 'ACATSection' }],
     crop:           { type: Schema.Types.ObjectId, ref: 'Crop' },
-    cropping_area_size:  { type: String, default: '0x0' },
+    cropping_area_size:  { type: String },
     access_to_non_financial_resources: { type: Boolean, default: false },
     non_financial_resources: [{ type: String }],
     first_expense_month: { type: String, default: 'None' },

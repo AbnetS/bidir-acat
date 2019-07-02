@@ -258,42 +258,72 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
     let loanProposal = yield LoanProposal.findOne({client: data.client._id})
       .sort({ date_created: -1 })
       .exec();
-    if (!loanProposal){
-      data.loan_proposal = loanProposal;
+    if (loanProposal._doc){
+      data.loan_proposal = loanProposal._doc;
       //Compute the deductibles and cost of loan for reporting purpose
       data.deductibles = [];
       for (let ded of data.loan_proposal.loan_detail.deductibles){
         if (ded.fixed_amount!=0){
-          ded.value = fixed_amount
+          ded.value = ded.fixed_amount
         } else {
           ded.value = ded.percent * data.loan_proposal.loan_proposed;
         }
+        ded.currency = "Birr";
+        ded.placeholder = "";
         data.deductibles.push (ded);
       }
 
       data.cost_of_loan = [];
       for (let cost of data.loan_proposal.loan_detail.cost_of_loan){
         if (cost.fixed_amount != 0){
-          cost.value = fixed_amount
+          cost.value = cost.fixed_amount
         } else {
           cost.value = cost.percent * data.loan_proposal.loan_proposed;
         }
+        cost.currency = "Birr";
+        cost.placeholder = "";
         data.cost_of_loan.push (cost);
       }
     }
+    data.loan_proposal.cash_at_hand = data.loan_proposal.loan_proposed - data.loan_proposal.loan_detail.total_deductibles;
+
+    data.cashFlowOrder = [];
+    let firstExpenseMonthIndex = config.MONTHS.find(elt=>elt.full_name === data.first_expense_month).index;
+    let loop = true; let index = firstExpenseMonthIndex;
+    data.cashFlowOrder.push (config.MONTHS[index]);
+    if (index == 11) {index = 0} else index++; 
+    while (loop){
+      if (index == firstExpenseMonthIndex) loop = false;
+      else {
+        data.cashFlowOrder.push(config.MONTHS[index]);
+        if (index == 11) index = 0; else index++;
+      }
+    }
+
+    data.sections[0] = yield orderCashFlowForSection(data.sections[0], data.cashFlowOrder);
+    data.sections[0].sub_sections[0] = yield orderCashFlowForSection(data.sections[0].sub_sections[0], data.cashFlowOrder);
+    data.sections[0].sub_sections[0].sub_sections[0] = yield orderCashFlowForSection(data.sections[0].sub_sections[0].sub_sections[0], data.cashFlowOrder);
+    data.sections[0].sub_sections[0].sub_sections[1] = yield orderCashFlowForSection(data.sections[0].sub_sections[0].sub_sections[1], data.cashFlowOrder);
+    data.sections[0].sub_sections[0].sub_sections[2] = yield orderCashFlowForSection(data.sections[0].sub_sections[0].sub_sections[2], data.cashFlowOrder);
+    data.sections[0].sub_sections[1] = yield orderCashFlowForSection(data.sections[0].sub_sections[1], data.cashFlowOrder);
+    data.sections[0].sub_sections[2] = yield orderCashFlowForSection(data.sections[0].sub_sections[2], data.cashFlowOrder);
+    
+    data.sections[1] = yield orderCashFlowForSection(data.sections[1], data.cashFlowOrder);
+    data.sections[1].sub_sections[0] = yield orderCashFlowForSection(data.sections[1].sub_sections[0], data.cashFlowOrder);
+    data.sections[1].sub_sections[1] = yield orderCashFlowForSection(data.sections[1].sub_sections[1], data.cashFlowOrder);
+    data.sections[1].sub_sections[2] = yield orderCashFlowForSection(data.sections[1].sub_sections[2], data.cashFlowOrder);
+
 
     
-    data.seed_cost_items = data.sections[0].sub_sections[0].sub_sections[0].cost_list.linear.slice();
-    data.fertilizer_cost_items =  data.sections[0].sub_sections[0].sub_sections[1].cost_list.linear.slice();
-    data.insecticide_cost_items = data.sections[0].sub_sections[0].sub_sections[2].cost_list.grouped[0].items.slice();
-    data.fungicide_cost_items = data.sections[0].sub_sections[0].sub_sections[2].cost_list.grouped[1].items.slice();
-    data.laborcost_cost_items =  data.sections[0].sub_sections[1].cost_list.linear.slice();
-    data.othercost_cost_items =  data.sections[0].sub_sections[2].cost_list.linear.slice();
+    data.seed_cost_items = yield orderCashFlowForItem(data.sections[0].sub_sections[0].sub_sections[0].cost_list.linear.slice(),data.cashFlowOrder);
+    data.fertilizer_cost_items =  yield orderCashFlowForItem(data.sections[0].sub_sections[0].sub_sections[1].cost_list.linear.slice(),data.cashFlowOrder);
+    data.insecticide_cost_items = yield orderCashFlowForItem(data.sections[0].sub_sections[0].sub_sections[2].cost_list.grouped[0].items.slice(),data.cashFlowOrder);
+    data.fungicide_cost_items = yield orderCashFlowForItem(data.sections[0].sub_sections[0].sub_sections[2].cost_list.grouped[1].items.slice(),data.cashFlowOrder);
+    data.laborcost_cost_items =  yield orderCashFlowForItem(data.sections[0].sub_sections[1].cost_list.linear.slice(),data.cashFlowOrder);
+    data.othercost_cost_items =  yield orderCashFlowForItem(data.sections[0].sub_sections[2].cost_list.linear.slice(),data.cashFlowOrder);
 
-    
-
-    
-
+    data = yield orderCashFlowForCropACAT(data,data.cashFlowOrder);
+    data.currency = "Birr";
     
     
     let template = "./templates/" + "CLIENT_ACAT_DETAIL_TEMPLATE.xlsx";
@@ -306,7 +336,7 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
 
   } catch(ex) {
     return this.throw(new CustomError({
-      type: 'VIEW_ACAT_ERROR',
+      type: 'GENERATE_ACAT_PRINT_OUT_ERROR',
       message: ex.message
     }));
   }
@@ -844,4 +874,68 @@ function* sendToS2(body){
     let res = yield request(opts);
 
     return res
+}
+
+function* orderCashFlowForItem(costListItems, cashFlowOrder){
+  
+  for (let costlistItem of costListItems){
+    costlistItem.estimated_cash_flow = []; costlistItem.achieved_cash_flow = []; costlistItem.placeholder = "";
+    for (let i = 0; i < cashFlowOrder.length;  i++){
+      let month = cashFlowOrder[i].name;
+      let estimatedCashFlow = yield cashFlowToArray(costlistItem.estimated.cash_flow); 
+      let achievedCashFlow = yield cashFlowToArray(costlistItem.achieved.cash_flow); 
+      
+      costlistItem.estimated_cash_flow.push (estimatedCashFlow.find(elt=> elt.label === month));
+      costlistItem.achieved_cash_flow.push (achievedCashFlow.find(elt=> elt.label === month));
+
+    }
+  }
+
+  return costListItems;
+}
+
+function* orderCashFlowForSection(section, cashFlowOrder){
+  let estimatedCashFlow = yield cashFlowToArray(section.estimated_cash_flow); 
+  let achievedCashFlow = yield cashFlowToArray(section.achieved_cash_flow); 
+  section.estimated_cash_flow = []; section.achieved_cash_flow = [];
+  for (let i = 0; i < cashFlowOrder.length;  i++){
+    let month = cashFlowOrder[i].name;
+    section.estimated_cash_flow.push (estimatedCashFlow.find(elt=> elt.label === month));
+    section.achieved_cash_flow.push (achievedCashFlow.find(elt=> elt.label === month));
+  }  
+
+  return section;
+}
+
+function* orderCashFlowForCropACAT(cropACAT, cashFlowOrder){
+  let estimatedCashFlow = yield cashFlowToArray(cropACAT.estimated.net_cash_flow); 
+  let achievedCashFlow = yield cashFlowToArray(cropACAT.achieved.net_cash_flow); 
+  cropACAT.estimated_net_cash_flow = []; cropACAT.achieved_net_cash_flow = [];
+  for (let i = 0; i < cashFlowOrder.length;  i++){
+    let month = cashFlowOrder[i].name;
+    cropACAT.estimated_net_cash_flow.push (estimatedCashFlow.find(elt=> elt.label === month));
+    cropACAT.achieved_net_cash_flow.push (achievedCashFlow.find(elt=> elt.label === month));
+  }  
+
+  return cropACAT;
+}
+
+function* cashFlowToArray(cashFlowObj){
+  let cashFlowArray = [];
+  cashFlowArray.push ({label: 'jan', 'value':cashFlowObj.jan});
+  cashFlowArray.push ({label: 'feb', 'value':cashFlowObj.feb});
+  cashFlowArray.push ({label: 'mar', 'value':cashFlowObj.mar});
+  cashFlowArray.push ({label: 'apr', 'value':cashFlowObj.apr});
+  cashFlowArray.push ({label: 'may', 'value':cashFlowObj.may});
+  cashFlowArray.push ({label: 'june', 'value':cashFlowObj.june});
+  cashFlowArray.push ({label: 'july', 'value':cashFlowObj.july});
+  cashFlowArray.push ({label: 'aug', 'value':cashFlowObj.aug});
+  cashFlowArray.push ({label: 'sep', 'value':cashFlowObj.sep});
+  cashFlowArray.push ({label: 'oct', 'value':cashFlowObj.oct});
+  cashFlowArray.push ({label: 'nov', 'value':cashFlowObj.nov});
+  cashFlowArray.push ({label: 'dec', 'value':cashFlowObj.dec});
+
+  return cashFlowArray;
+
+
 }
