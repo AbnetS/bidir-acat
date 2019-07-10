@@ -191,6 +191,36 @@ exports.getClientLoanProposal = function* getClientLoanProposal(next) {
 
 };
 
+exports.getACATLoanProposal = function* getACATLoanProposal(next) {
+  debug(`fetch client loanProposal for a specific ACAT: ${this.params.id}`);
+
+  let query = {
+    client_acat: this.params.id
+  };
+
+  try {
+    let loanProposal = yield LoanProposal.findOne(query)
+      .sort({ date_created: -1 })
+      .exec();
+    if(!loanProposal) throw new Error('Loan Proposal is not known!')
+
+    yield LogDal.track({
+      event: 'view_loanProposal',
+      user: this.state._user._id ,
+      message: `View loanProposal - ${loanProposal._id}`
+    });
+
+    this.body = loanProposal;
+
+  } catch(ex) {
+    return this.throw(new CustomError({
+      type: 'GET_LOAN_PROPOSAL_ERROR',
+      message: ex.message
+    }));
+  }
+
+};
+
 /**
  * Update a single loanProposal.
  *

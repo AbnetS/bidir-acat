@@ -211,6 +211,7 @@ router.put('/:id', acl(['*']), loanProposalController.update);
  */
 router.get('/paginate', acl(['*']), loanProposalController.fetchAllByPagination);
 
+router.get('/acat/:id', acl(['*']), loanProposalController.getACATLoanProposal);
 
 // Expose LoanProposal Router
 module.exports = router;
