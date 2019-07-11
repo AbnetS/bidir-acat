@@ -268,7 +268,7 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
         if (ded.fixed_amount!=0){
           ded.value = ded.fixed_amount;
         } else {
-          ded.value = ded.percent * data.loan_proposal.loan_proposed;
+          ded.value = (ded.percent/100) * data.loan_proposal.loan_proposed;
         }
         ded.currency = "Birr";
         ded.placeholder = "";
@@ -280,7 +280,7 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
         if (cost.fixed_amount != 0){
           cost.value = cost.fixed_amount
         } else {
-          cost.value = cost.percent * data.loan_proposal.loan_proposed;
+          cost.value = (cost.percent/100) * data.loan_proposal.loan_proposed;
         }
         cost.currency = "Birr";
         cost.placeholder = "";
