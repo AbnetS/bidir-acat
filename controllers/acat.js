@@ -255,7 +255,9 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
 
     let data = ACAT._doc;
 
-    let loanProposal = yield LoanProposal.findOne({client: data.client._id})
+    let clientACAT = yield ClientACATDal.get({"ACATs":{$in:[this.params.id]}});
+
+    let loanProposal = yield LoanProposal.findOne({client_acat: clientACAT._id})
       .sort({ date_created: -1 })
       .exec();
     if (loanProposal._doc){
@@ -264,7 +266,7 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
       data.deductibles = [];
       for (let ded of data.loan_proposal.loan_detail.deductibles){
         if (ded.fixed_amount!=0){
-          ded.value = ded.fixed_amount
+          ded.value = ded.fixed_amount;
         } else {
           ded.value = ded.percent * data.loan_proposal.loan_proposed;
         }
@@ -312,7 +314,6 @@ exports.generatePrintOut = function* generatePrintOutForACAT(next) {
     data.sections[1].sub_sections[0] = yield orderCashFlowForSection(data.sections[1].sub_sections[0], data.cashFlowOrder);
     data.sections[1].sub_sections[1] = yield orderCashFlowForSection(data.sections[1].sub_sections[1], data.cashFlowOrder);
     data.sections[1].sub_sections[2] = yield orderCashFlowForSection(data.sections[1].sub_sections[2], data.cashFlowOrder);
-
 
     
     data.seed_cost_items = yield orderCashFlowForItem(data.sections[0].sub_sections[0].sub_sections[0].cost_list.linear.slice(),data.cashFlowOrder);
