@@ -16,7 +16,8 @@ const _           = require('lodash');
 const co          = require('co');
 const del         = require('del');
 const validator   = require('validator');
-const request          = require('request-promise')
+const request     = require('request-promise')
+const isReachable = require ("is-reachable");
 
 const config              = require('../config');
 const CustomError         = require('../lib/custom-error');
@@ -70,12 +71,9 @@ exports.updateGeolocation = function* updateGeolocation(next) {
   };
   let body = this.request.body;
 
-  this.checkBody('latitude')
-      .notEmpty('Latitude is Empty');
-  this.checkBody('longitude')
-      .notEmpty('Longitude is Empty');
+ 
   this.checkBody('type')
-      .notEmpty('GPS location is Empty')
+      .notEmpty('GPS location type is Empty')
       .isIn(["single_point", "polygon"], "Correct types are single_point or polygon")
 
   if(this.errors) {
@@ -96,60 +94,92 @@ exports.updateGeolocation = function* updateGeolocation(next) {
 
     // check for dups
     if (body.type === 'single_point') {
+      let singlePointLocation = body.gps_location.single_point;
       let singlePoint = geolocation.single_point;
+      geolocation.polygon = [];
 
-      if (singlePoint.latitude === body.latitude &&
-         singlePoint.longitude === body.longitude &&
-         singlePoint.S2_Id !== "NULL") {
-        throw new Error("Single Point Has Already Been Registered")
-      }
+      if (!(singlePoint.latitude === singlePointLocation.latitude &&
+          singlePoint.longitude === singlePointLocation.longitude &&  (singlePoint.S2_Id !== "NULL"))){    
+          let isWpsAvailable = yield isReachable(config.S2.URL);  
+          if (isWpsAvailable)  { 
+            let s2Res = yield sendToS2(singlePointLocation);
+            let gps_registered = false;
 
-      let s2Res = yield sendToS2(body);
-      let gps_registered = false;
+            singlePointLocation.s2 = s2Res
 
-      body.s2 = s2Res
+            try {
+              s2Res = JSON.parse(s2Res)
+            } catch(ex) {
+              //
+              s2Res = null;
+            }
 
-      try {
-        s2Res = JSON.parse(s2Res)
-      } catch(ex) {
-        //
-        s2Res = null;
-      }
+            if (!s2Res) {
+              geolocation.single_point = {
+                longitude: singlePointLocation.longitude,
+                latitude: singlePointLocation.latitude,
+                status: "DECLINED"
+              }
+            } else {
+              gps_registered = true;
+              geolocation.single_point = {
+                longitude: singlePointLocation.longitude,
+                latitude: singlePointLocation.latitude,
+                status: "ACCEPTED",
+                S2_Id: s2Res.field_id
+              }
+            }
+          }
+          else {
+            geolocation.single_point = {
+              longitude: singlePointLocation.longitude,
+              latitude: singlePointLocation.latitude,
+              status: "NO ATTEMPT"
+            }
 
-      if (!s2Res) {
-        geolocation.single_point = {
-          longitude: body.longitude,
-          latitude: body.latitude,
-          status: "DECLINED"
-        }
-      } else {
-        gps_registered = true;
-        geolocation.single_point = {
-          longitude: body.longitude,
-          latitude: body.latitude,
-          status: "ACCEPTED",
-          S2_Id: s2Res.field_id
-        }
-      }
-
+          }        
+      } 
     } else if (body.type === 'polygon') {
+      let polygonLocations = body.gps_location.polygon;
       let polygon = geolocation.polygon;
+      geolocation.single_point = {};
+      geolocation.polygon = [];
 
-      let isRegistered = polygon.some(function iter(coord) {
-        return (coord.latitude === body.latitude && coord.longitude === body.longitude);
-      })
+      for (let loc of polygonLocations){
+        let isRegistered = polygon.some(function iter(coord) {
+          return (coord.latitude === loc.latitude && coord.longitude === loc.longitude && coord.S2_Id != "NULL")
+        });
 
-      if (isRegistered) {
-        throw new Error("Polygon Point Has Already Been Registered")
+        if (!isRegistered){
+          let isWpsAvailable = yield isReachable(config.S2.URL);  
+          if (isWpsAvailable){
+            let s2Res = yield sendToS2(loc);
+            let gps_registered = false;
+
+            loc.s2 = s2Res
+
+            try {
+              s2Res = JSON.parse(s2Res)
+            } catch(ex) {
+              //
+              s2Res = null;
+            }
+
+            if (!s2Res) {
+              loc.status = "ACCEPTED"; loc.S2_Id = s2Res.field_id
+            } else {loc.status = "DECLINED"}
+
+            geolocation.polygon.push(loc)
+          
+            gps_registered = true;
+          } else{
+            loc.S2_Id = "NULL";
+            loc.status = "NO ATTEMPT";
+            geolocation.polygon.push(loc)
+
+          }
+        }
       }
-
-      geolocation.polygon.push({
-        longitude: body.longitude,
-        latitude: body.latitude,
-        status: "ACCEPTED",
-        S2_Id: s2Res.field_id
-      })
-      gps_registered = true;
     }
 
     yield LogDal.track({
@@ -163,7 +193,7 @@ exports.updateGeolocation = function* updateGeolocation(next) {
       _id: acat._id
     }, {
       gps_location: geolocation,
-      gps_registered: gps_registered
+      //gps_registered: gps_registered
     })
 
     acat = acat.toJSON()
@@ -874,7 +904,7 @@ function* sendToS2(body){
 
     let res = yield request(opts);
 
-    return res
+    return res;
 }
 
 function* orderCashFlowForItem(costListItems, cashFlowOrder){

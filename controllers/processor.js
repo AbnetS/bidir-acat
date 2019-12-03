@@ -300,7 +300,7 @@ exports.fetchOne = function* fetchOneACATForm(next) {
  *
  * @param {Function} next Middleware dispatcher
  */
-exports.update = function* updateACATForm(next) {
+exports.update = function* updateClientACAT(next) {
   debug(`updating form: ${this.params.id}`);
 
   let isPermitted = yield hasPermission(this.state._user, 'UPDATE');

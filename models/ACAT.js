@@ -28,16 +28,18 @@ var ACATSchema = new Schema({
     gps_registered: { type: Boolean, default: false }, 
     gps_location:        {
       single_point: {
-        latitude:   { type: Number, default: 0 },
-        longitude:   { type: Number, default: 0 },
-        longtude:   { type: Number, default: 0 },
-        S2_Id:      { type: String, default: "NULL"},
+        latitude:   { type: Number, default: 0  },
+        longitude:   { type: Number, default: 0  },
+        //longtude:   { type: Number, default: 0 },
+        S2_Id:      { type: String, default: "NULL" },
         status:     { type: String, default: "NO ATTEMPT" }
       },
       polygon: [{
         latitude:   { type: Number, default: 0  },
         longitude:   { type: Number, default: 0  },
-        longtude:   { type: Number, default: 0 },
+        //longtude:   { type: Number, default: 0 },
+        S2_Id:      { type: String, default: "NULL"},
+        status:     { type: String, default: "NO ATTEMPT" }
       }]
     },
     status:              { type: String, default: 'new' },

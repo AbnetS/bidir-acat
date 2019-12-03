@@ -227,7 +227,8 @@ exports.update = function update(query, updates) {
     select: returnFields
   };
 
-  updates = mongoUpdate(updates);
+  //updates = mongoUpdate(updates);
+  updates.last_modified = now;
 
   return ACAT.findOneAndUpdate(query, updates, opts)
       .populate(population)
