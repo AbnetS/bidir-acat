@@ -13,6 +13,7 @@ const _          = require('lodash');
 const co         = require('co');
 const del        = require('del');
 const validator  = require('validator');
+const fs         = require ('fs-extra');
 
 const config             = require('../config');
 const CustomError        = require('../lib/custom-error');
@@ -95,9 +96,14 @@ exports.create = function* createCrop(next) {
       let extname   = path.extname(body.image.name);
       let assetName = `${filename}_${id}${extname}`;
 
-      let url       = yield googleBuckets(body.image.path, assetName);
+      yield fs.move(body.image.path, `./assets/${assetName}`)
+      yield fs.remove(body.image.path);
 
-      body.image = url;
+      body.image =  `${config.ASSETS.DEV}${assetName}`
+
+      // let url       = yield googleBuckets(body.image.path, assetName);
+
+      // body.image = url;
     }
 
     crop = yield CropDal.create(body);
@@ -178,10 +184,60 @@ exports.update = function* updateCrop(next) {
   let query = {
     _id: this.params.id
   };
+
   let body = this.request.body;
 
+  let bodyKeys = Object.keys(body);
+  let isMultipart = (bodyKeys.indexOf('fields') !== -1) && (bodyKeys.indexOf('files') !== -1);
+
+  // If content is multipart reduce fields and files path
+  if(isMultipart) {
+    let _clone = {};
+
+    for(let key of bodyKeys) {
+      let props = body[key];
+      let propsKeys = Object.keys(props);
+
+      for(let prop of propsKeys) {
+        _clone[prop] = props[prop];
+      }
+    }
+
+    this.request.body = _clone;
+
+    body = this.request.body;
+
+  }
+
+  
   try {
-    let crop = yield CropDal.update(query, body);
+
+    let crop = yield CropDal.get(query);
+    if(!crop) {
+      throw new Error('Crop does not exist');
+    }
+
+    if(body.image) {
+      let filename = "";
+      if (body.name)
+        filename  = body.name.trim().toUpperCase().split(/\s+/).join('_');
+      else
+        filename  = crop.name.trim().toUpperCase().split(/\s+/).join('_');
+      let id        = crypto.randomBytes(6).toString('hex');
+      let extname   = path.extname(body.image.name);
+      let assetName = `${filename}_${id}${extname}`;
+
+      yield fs.move(body.image.path, `./assets/${assetName}`)
+      yield fs.remove(body.image.path);
+
+      body.image =  `${config.ASSETS.DEV}${assetName}`
+
+      // let url       = yield googleBuckets(body.image.path, assetName);
+
+      // body.image = url;
+    }
+
+    crop = yield CropDal.update(query, body);
 
     yield LogDal.track({
       event: 'crop_update',
@@ -190,7 +246,7 @@ exports.update = function* updateCrop(next) {
       diff: body
     });
 
-    this.body = crop;
+    this.body = crop; 
 
   } catch(ex) {
     return this.throw(new CustomError({

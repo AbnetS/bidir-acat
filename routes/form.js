@@ -14,22 +14,20 @@ var router  = Router();
 /**
  * @api {post} /acat/forms/initialize Initialize Skeleton ACAT
  * @apiVersion 1.0.0
- * @apiName InitializeACAT
- * @apiGroup ACAT
+ * @apiName InitializeACATForm
+ * @apiGroup ACAT Form
  *
- * @apiDescription Initialize skeleton ACAT With defaults. Use _MULTIPART/FORMDATA_
+ * @apiDescription Initialize skeleton ACAT With default sections. Use _MULTIPART/FORMDATA_
  *
  * @apiParam {String} [subtitle] ACAT Subtitle
  * @apiParam {String} [purpose] ACAT Purpose
- * @apiParam {String} title ACAT Title
- * @apiParam {String} crop ACAT Crop
- * @apiParam {String} crop_category ACAT Crop Category
- * @apiParam {Object} crop_image ACAT Crop Image
+ * @apiParam {String} title ACAT Form Title
+ * @apiParam {String} crop crop Id for the ACAT form is created for
+ 
  *
  * @apiParamExample Request Example:
  *  {
- *    subtitle: "This is a subtitle",
- *    title: "ACAT Form",
+ *    title: "Tomato-CAT",
  *    crop: "Maize",
  *    crop_category: "Grain"
  *    crop_image: "<IMAGE_OBJECT>"
@@ -40,7 +38,7 @@ var router  = Router();
  * @apiSuccess {String} subtitle ACAT Form Subtitle
  * @apiSuccess {String} title ACAT Form Title
  * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {Object[]} sections ACAT Form sections
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
@@ -49,6 +47,7 @@ var router  = Router();
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
+ * 
  * @apiSuccessExample Response Example:
  *  {
  *    _id : "556e1174a8952c9521286a60",
@@ -82,9 +81,9 @@ var router  = Router();
 router.post('/initialize', acl(['*']), builderController.initialize);
 
 /**
- * @api {post} /acat/forms/create Create new ACAT
+ * @api {post} /acat/forms/create Create new ACAT form
  * @apiVersion 1.0.0
- * @apiName CreateACAT
+ * @apiName CreateACATForm
  * @apiGroup ACAT
  *
  * @apiDescription Create new ACAT. Use _MULTIPART/FORMDATA_

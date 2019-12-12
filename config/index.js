@@ -53,7 +53,7 @@ let config = {
   CORS_OPTS: {
     origin: '*',
     methods: 'GET,POST,PUT,DELETE,OPTIONS',
-    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization'
+    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization'    
   },
 
   SALT_FACTOR: 12,
@@ -66,7 +66,9 @@ let config = {
   ASSETS: {
     FILE_SIZE: 2 * 1024 * 1024, // 1MB,
     URL: API_URL + '/media/',
-    DIR: path.resolve(process.cwd(), './assets') + '/'
+    DIR: path.resolve(process.cwd(), './assets') + '/',
+    PROD: 'http://api.bidir.gebeya.co/assets/',
+    DEV: 'http://api.dev.bidir.gebeya.co/assets/'
   },
 
   GOOGLE_BUCKETS: {
