@@ -12,183 +12,64 @@ const acl               = authController.accessControl;
 var router  = Router();
 
 
-/**
- * @api {get} /acat/search?<QUERY_FIELD>=<QUERY_VALUE>&fields=<Fields> Search acats
- * @apiVersion 1.0.0
- * @apiName Search
- * @apiGroup ACAT
- *
- * @apiDescription Search a collection of acats. The endpoint has pagination
- * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
- * and `per_page=<RESULTS_PER_PAGE>`.
- *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
- * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
- * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
- * @apiSuccess {String} created_by Officer Account registering this
- * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
- * @apiSuccess {Object} estimated Estimated ACAT Values
- * @apiSuccess {Object} achieved Estimated ACAT Achieved
- *
- * @apiSuccessExample Response Example:
- *  {
- *    "total_pages": 1,
- *    "total_docs_count": 0,
- *    "docs": [{
- *        _id : "556e1174a8952c9521286a60",
- *        type: "ACAT",
- *        crop: "Maize",
- *        crop_category: "Grain",
- *        crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *        description: "This is a Description",
- *        title: "ACAT Form",
- *        process: "",
- *        sections: [{
- *            _id : "556e1174a8952c9521286a60",
- *            ....
- *        }],
- *        created_by: "556e1174a8952c9521286a60",
- *        achieved: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        },
- *        estimated: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        }
- *    }]
- *  }
- */
+
 router.get('/search', acl(['*']), acatController.search);
 
 
 /**
- * @api {get} /acat/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get acats collection
+ * @api {get} /acat/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get ACAT Instances collection
  * @apiVersion 1.0.0
  * @apiName FetchPaginated
- * @apiGroup ACAT
+ * @apiGroup ACAT Instance
  *
  * @apiDescription Get a collection of acats. The endpoint has pagination
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} _id crop ACAT Id
+ * @apiSuccess {String} type Form Type
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object} client Client
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {Object[]} sections ACAT Form sections 
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
+ * @apiSuccess {Object} gps_location GPS location of the farm on which the crop will be cultivated
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    "total_pages": 1,
- *    "total_docs_count": 0,
- *    "docs": [{
- *        _id : "556e1174a8952c9521286a60",
- *        type: "ACAT",
- *        crop: "Maize",
- *        crop_category: "Grain",
- *        crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *        description: "This is a Description",
- *        title: "ACAT Form",
- *        process: "",
- *        sections: [{
- *            _id : "556e1174a8952c9521286a60",
- *            ....
- *        }],
- *        created_by: "556e1174a8952c9521286a60",
- *        achieved: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        },
- *        estimated: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        }
- *    }]
+        "total_pages": 14,
+        "total_docs_count": 136,
+        "current_page": 1,
+        "docs": [
+            {
+                "_id": "5df34c1544c3a500015799e6",
+                ...
+            },
+            {
+                ...
+            }...
+        ]
  *  }
  */
 router.get('/paginate', acl(['*']), acatController.fetchAllByPagination);
 
-/**
- * @api {get} /acat/client/:id Get client acats
- * @apiVersion 1.0.0
- * @apiName GetClientACATs
- * @apiGroup ACAT
- *
- * @apiDescription Get a collection of acats for a given client
- *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
- * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
- * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
- * @apiSuccess {String} created_by Officer Account registering this
- * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
- * @apiSuccess {Object} estimated Estimated ACAT Values
- * @apiSuccess {Object} achieved Estimated ACAT Achieved
- *
- * @apiSuccessExample Response Example:
- *  [{
- *        _id : "556e1174a8952c9521286a60",
- *        type: "ACAT",
- *        crop: "Maize",
- *        crop_category: "Grain",
- *        crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *        description: "This is a Description",
- *        title: "ACAT Form",
- *        process: "",
- *        sections: [{
- *            _id : "556e1174a8952c9521286a60",
- *            ....
- *        }],
- *        created_by: "556e1174a8952c9521286a60",
- *        achieved: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        },
- *        estimated: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        }
- *    }]
- */
+
 router.get('/client/:id', acl(['*']), acatController.getClientACATs);
 
 /**
- * @api {put} /acat/:id/geolocation Update ACAT Geoloction
+ * @api {put} /acat/:id/geolocation Update ACAT Geolocation
  * @apiVersion 1.0.0
  * @apiName UpdateGeolocation
- * @apiGroup ACAT 
+ * @apiGroup ACAT Instance
  *
  * @apiDescription Update a ACAT Geolocation with the given id
  *
@@ -200,172 +81,310 @@ router.get('/client/:id', acl(['*']), acatController.getClientACATs);
  * {
  *    type: "single_point",
  *    latitude: 1.346677
- *    longitude; 45.688454
+ *    longitude: 45.688454
  * }
  *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} _id crop ACAT Id
+ * @apiSuccess {String} type Form Type
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object} client Client
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {Object[]} sections ACAT Form sections 
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
+ * @apiSuccess {Object} gps_location GPS location of the farm on which the crop will be cultivated
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
+        "_id": "5df34c1544c3a500015799e6",
+        "last_modified": "2019-12-13T08:30:14.236Z",
+        "date_created": "2019-12-13T08:30:13.729Z",
+        "type": "ACAT",
+        "client": {
+            "_id": "5bd057573620aa0001c26c21",
+            ...
+        },
+        crop": {
+            "_id": "5c02550102ff5a00012e815e",
+            ...
+        },
+        "created_by": "5ce0047a8958650001a8001a",
+        "comment": "",
+        "achieved": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                ...
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                ...
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "status": "new",
+        "gps_location": {
+            "polygon": [],
+            "single_point": {
+                "status": "NO ATTEMPT",
+                "S2_Id": "NULL",
+                "latitude": 1.346677
+                "longitude"; 45.688454
+            }
+        },
+        "first_expense_month": "None",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0x0",
+        "sections": [
+            {
+                "_id": "5df34c1544c3a500015799e7",
+                ...
+            },
+            {
+                ...
+            }
+        ],
+        "layout": "TWO_COLUMNS",
+        "purpose": "",
+        "subtitle": "",
+        "title": "Cabbage-CAT"
  *  }
  *
  */
 router.put('/:id/geolocation', acl(['*']), acatController.updateGeolocation);
 
 /**
- * @api {get} /acat/:id Get ACAT 
+ * @api {get} /acat/:id Get an ACAT Instance
  * @apiVersion 1.0.0
  * @apiName Get
- * @apiGroup ACAT
+ * @apiGroup ACAT Instance
  *
- * @apiDescription Get a user acat with the given id
+ * @apiDescription Get an ACAT instance with the given id
  *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} _id crop ACAT Id
+ * @apiSuccess {String} type Form Type
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object} client Client
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {Object[]} sections ACAT Form sections 
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
+ * @apiSuccess {Object} gps_location GPS location of the farm on which the crop will be cultivated
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
+        "_id": "5df34c1544c3a500015799e6",
+        "last_modified": "2019-12-13T08:30:14.236Z",
+        "date_created": "2019-12-13T08:30:13.729Z",
+        "type": "ACAT",
+        "client": {
+            "_id": "5bd057573620aa0001c26c21",
+            ...
+        },
+        crop": {
+            "_id": "5c02550102ff5a00012e815e",
+            ...
+        },
+        "created_by": "5ce0047a8958650001a8001a",
+        "comment": "",
+        "achieved": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                ...
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                ...
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "status": "new",
+        "gps_location": {
+            "polygon": [],
+            "single_point": {
+                "status": "NO ATTEMPT",
+                "S2_Id": "NULL",
+                "longitude": 0,
+                "latitude": 0
+            }
+        },
+        "first_expense_month": "None",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0x0",
+        "sections": [
+            {
+                "_id": "5df34c1544c3a500015799e7",
+                ...
+            },
+            {
+                ...
+            }
+        ],
+        "layout": "TWO_COLUMNS",
+        "purpose": "",
+        "subtitle": "",
+        "title": "Cabbage-CAT"
  *  }
  *
  */
 router.get('/:id', acl(['*']), acatController.fetchOne);
 
+
+/**
+ * @api {put} /acat/:id Generate Printout for ACAT Instance
+ * @apiVersion 1.0.0
+ * @apiName GeneratePrintOut
+ * @apiGroup ACAT Instance
+ *
+ * @apiDescription Generate Excel printout for ACAT Instance
+ * 
+ * @apiSuccess file Excel file whose content is the details of the ACAT Instance
+ * 
+ * 
+ * */
 router.get('/printout/:id', acl(['*']), acatController.generatePrintOut);
 
 
 /**
- * @api {put} /acat/:id Update ACAT 
+ * @api {put} /acat/:id Update ACAT Instance
  * @apiVersion 1.0.0
  * @apiName Update
- * @apiGroup ACAT 
+ * @apiGroup ACAT Instance
  *
- * @apiDescription Update a ACAT acat with the given id
+ * @apiDescription Update an ACAT instance with the given id
  *
  * @apiParam {Object} Data Update data
-  * @apiParam {Boolean} [is_client_acat] If section belongs to a client acat and not acat form
+ * @apiParam {Boolean} [is_client_acat] If ACAT instance belongs to a client acat and not acat form
  * @apiParam {String} [client_acat] Client ACAT Reference
  *
  * @apiParamExample Request example:
  * {
- *    title: "MFI ACAT Title",
- *    is_client_acat: true,
- *    client_acat: "556e1174a8952c9521286a60"
+        "first_expense_month":"January"
  * }
  *
- * @apiSuccess {String} _id ACAT form id
- * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
+ * @apiSuccess {String} _id crop ACAT Id
+ * @apiSuccess {String} type Form Type
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object} client Client
  * @apiSuccess {String} created_by Officer Account registering this
+ * @apiSuccess {Object[]} sections ACAT Form sections 
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
+ * @apiSuccess {Object} gps_location GPS location of the farm on which the crop will be cultivated
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
+        "_id": "5df34c1544c3a500015799e6",
+        "last_modified": "2019-12-13T08:30:14.236Z",
+        "date_created": "2019-12-13T08:30:13.729Z",
+        "type": "ACAT",
+        "client": {
+            "_id": "5bd057573620aa0001c26c21",
+            ...
+        },
+        crop": {
+            "_id": "5c02550102ff5a00012e815e",
+            ...
+        },
+        "created_by": "5ce0047a8958650001a8001a",
+        "comment": "",
+        "achieved": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                ...
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                ...
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "status": "new",
+        "gps_location": {
+            "polygon": [],
+            "single_point": {
+                "status": "NO ATTEMPT",
+                "S2_Id": "NULL",
+                "longitude": 0,
+                "latitude": 0
+            }
+        },
+        "first_expense_month": "January",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0x0",
+        "sections": [
+            {
+                "_id": "5df34c1544c3a500015799e7",
+                ...
+            },
+            {
+                ...
+            }
+        ],
+        "layout": "TWO_COLUMNS",
+        "purpose": "",
+        "subtitle": "",
+        "title": "Cabbage-CAT"
+ *  }
  *  }
  */
 router.put('/:id', acl(['*']), acatController.update);

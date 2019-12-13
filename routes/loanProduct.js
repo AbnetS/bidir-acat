@@ -17,37 +17,76 @@ var router  = Router();
  * @apiName CreateLoanProduct
  * @apiGroup LoanProduct
  *
- * @apiDescription Create new LoanProduct. 
+ * @apiDescription Create a new LoanProduct. 
  *
  * @apiParam {String} name LoanProduct Name
  * @apiParam {String} maximum_loan_amount LoanProduct Maximum Loan Amount
- * @apiParam {String} client Client Reference
+ 
  *
  * @apiParamExample Request Example:
  *  {
- *    name: "Loan Something Something",
- *    maximum_loan_amount : 100000000000000000000000000000, // Very rich guy
- *    client : "556e1174a8952c9521286a60",
+        "name":"Rain Fed Loan",
+        "currency":"ETB",
+        "maximum_loan_amount":"20000",
+        "deductibles":[
+            {
+            "item":"Compulsory Saving",
+            "percent":"5"
+            },
+            {
+            "item":"Registration Fee",
+            "fixed_amount":"250"
+            }],
+        "cost_of_loan":[
+            {
+            "item":"Interest",
+            "percent":"10"
+            
+            }]
+        ] 
  *  }
  *
  * @apiSuccess {String} _id loanProduct id
  * @apiSuccess {String} name LoanProduct Name
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
- * @apiSuccess {Array} deductibles Deductibles List
- * @apiSuccess {Array} cost_of_loan Cost of Loan
  * @apiSuccess {String} currency Currency
- * @apiSuccess {String} client Client Reference
+ * @apiSuccess {Object[]} deductibles Deductibles List
+ * @apiSuccess {Object[]} cost_of_loan Cost of Loan 
+ * @apiSuccess {String} created_by User registering this
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    client : "556e1174a8952c9521286a60",
- *    name: "Loan Something Something",
- *    maximum_loan_amount : 100000000000000000000000000000,
- *    currency: "$"
- *    deductibles: [],
- *    cost_of_loan: [],
- *    ...
+        "_id": "5df35f365f7fc03e78ca44a2",
+        "last_modified": "2019-12-13T09:51:50.737Z",
+        "date_created": "2019-12-13T09:51:50.737Z",
+        "created_by": "5b925494b1cfc10001d80908",
+        "layout": "TWO_COLUMNS",
+        "cost_of_loan": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a3",
+                "item": "Interest",
+                "percent": 10,
+                "fixed_amount": 0
+            }
+        ],
+        "deductibles": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a5",
+                "item": "Compulsory Saving",
+                "percent": 5,
+                "fixed_amount": 0
+            },
+            {
+                "_id": "5df35f365f7fc03e78ca44a4",
+                "item": "Registration Fee",
+                "percent": 0,
+                "fixed_amount": 250
+            }
+        ],
+        "maximum_loan_amount": 20000,
+        "currency": "ETB",
+        "purpose": "",
+        "name": "Rain Fed Loan"
  *  }
  *
  */
@@ -56,86 +95,119 @@ router.post('/create', acl(['*']), loanProductController.create);
 
 
 /**
- * @api {get} /acat/loanProducts/:id Get LoanProduct
+ * @api {get} /acat/loanProducts/:id Get Loan Product
  * @apiVersion 1.0.0
  * @apiName Get
  * @apiGroup LoanProduct
  *
- * @apiDescription Get a user loanProduct with the given id
+ * @apiDescription Get a loanProduct with the given id
  *
  * @apiSuccess {String} _id loanProduct id
  * @apiSuccess {String} name LoanProduct Name
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
- * @apiSuccess {Array} deductibles Deductibles List
- * @apiSuccess {Array} cost_of_loan Cost of Loan
  * @apiSuccess {String} currency Currency
- * @apiSuccess {String} client Client Reference
+ * @apiSuccess {Object[]} deductibles Deductibles List
+ * @apiSuccess {Object[]} cost_of_loan Cost of Loan 
+ * @apiSuccess {String} created_by User registering this
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    client : "556e1174a8952c9521286a60",
- *    name: "Loan Something Something",
- *    maximum_loan_amount : 100000000000000000000000000000,
- *    currency: "$"
- *    deductibles: [{
- *      fixed_amount: 0,
- *      percent: 5 ,
- *      item: "Item"
- *    }],
- *    cost_of_loan: [{
- *      fixed_amount: 0,
- *      percent: 5,
- *      item: "Item"
- *    }],
- *    ...
- *  }
+        "_id": "5df35f365f7fc03e78ca44a2",
+        "last_modified": "2019-12-13T09:51:50.737Z",
+        "date_created": "2019-12-13T09:51:50.737Z",
+        "created_by": "5b925494b1cfc10001d80908",
+        "layout": "TWO_COLUMNS",
+        "cost_of_loan": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a3",
+                "item": "Interest",
+                "percent": 10,
+                "fixed_amount": 0
+            }
+        ],
+        "deductibles": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a5",
+                "item": "Compulsory Saving",
+                "percent": 5,
+                "fixed_amount": 0
+            },
+            {
+                "_id": "5df35f365f7fc03e78ca44a4",
+                "item": "Registration Fee",
+                "percent": 0,
+                "fixed_amount": 250
+            }
+        ],
+        "maximum_loan_amount": 20000,
+        "currency": "ETB",
+        "purpose": "",
+        "name": "Rain Fed Loan"
+    }
+ 
+ *  
  *
  */
 router.get('/:id', acl(['*']), loanProductController.fetchOne);
 
 
 /**
- * @api {put} /acat/loanProducts/:id Update LoanProduct
+ * @api {put} /acat/loanProducts/:id Update Loan Product
  * @apiVersion 1.0.0
  * @apiName Update
  * @apiGroup LoanProduct 
  *
- * @apiDescription Update a LoanProduct loanProduct with the given id
+ * @apiDescription Update a loanProduct with the given id
  *
  * @apiParam {Object} Data Update data
  *
  * @apiParamExample Request example:
  * {
- *    name: "Crop Fertiliser and Chemicals Distribution "
+ *    name: "Rainfed loan"
  * }
  *
  * @apiSuccess {String} _id loanProduct id
  * @apiSuccess {String} name LoanProduct Name
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
- * @apiSuccess {Array} deductibles Deductibles List
- * @apiSuccess {Array} cost_of_loan Cost of Loan
  * @apiSuccess {String} currency Currency
- * @apiSuccess {String} client Client Reference
+ * @apiSuccess {Object[]} deductibles Deductibles List
+ * @apiSuccess {Object[]} cost_of_loan Cost of Loan 
+ * @apiSuccess {String} created_by User registering this
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    client : "556e1174a8952c9521286a60",
- *    name: "Loan Something Something",
- *    maximum_loan_amount : 100000000000000000000000000000,
- *    currency: "$"
- *    deductibles: [{
- *      fixed_amount: 0,
- *      percent: 5,
- *      item: "Item" 
- *    }],
- *    cost_of_loan: [{
- *      fixed_amount: 0,
- *      percent: 5,
- *      item: "Item" 
- *    }],
- *    ...
+        "_id": "5df35f365f7fc03e78ca44a2",
+        "last_modified": "2019-12-13T09:51:50.737Z",
+        "date_created": "2019-12-13T09:51:50.737Z",
+        "created_by": "5b925494b1cfc10001d80908",
+        "layout": "TWO_COLUMNS",
+        "cost_of_loan": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a3",
+                "item": "Interest",
+                "percent": 10,
+                "fixed_amount": 0
+            }
+        ],
+        "deductibles": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a5",
+                "item": "Compulsory Saving",
+                "percent": 5,
+                "fixed_amount": 0
+            },
+            {
+                "_id": "5df35f365f7fc03e78ca44a4",
+                "item": "Registration Fee",
+                "percent": 0,
+                "fixed_amount": 250
+            }
+        ],
+        "maximum_loan_amount": 20000,
+        "currency": "ETB",
+        "purpose": "",
+        "name": "Rainfed Loan"
+    
  *  }
  */
 router.put('/:id', acl(['*']), loanProductController.update);
@@ -150,36 +222,28 @@ router.put('/:id', acl(['*']), loanProductController.update);
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  *
- * @apiSuccess {String} _id loanProduct id
+  * @apiSuccess {String} _id loanProduct id
  * @apiSuccess {String} name LoanProduct Name
  * @apiSuccess {String} maximum_loan_amount Maximum Loan Amount
- * @apiSuccess {Array} deductibles Deductibles List
- * @apiSuccess {Array} cost_of_loan Cost of Loan
  * @apiSuccess {String} currency Currency
- * @apiSuccess {String} client Client Reference
+ * @apiSuccess {Object[]} deductibles Deductibles List
+ * @apiSuccess {Object[]} cost_of_loan Cost of Loan 
+ * @apiSuccess {String} created_by User registering this
  *
  * @apiSuccessExample Response Example:
  *  {
- *    "total_pages": 1,
- *    "total_docs_count": 0,
- *    "docs": [{
- *    _id : "556e1174a8952c9521286a60",
- *    client : "556e1174a8952c9521286a60",
- *    name: "Loan Something Something",
- *    maximum_loan_amount : 100000000000000000000000000000,
- *    currency: "$"
- *    deductibles: [{
- *      fixed_amount: 0,
- *      percent: 5,
- *      item: "Item" 
- *    }],
- *    cost_of_loan: [{
- *      fixed_amount: 0,
- *      percent: 5,
- *      item: "Item" 
- *    }],
- *    ...
- *    }]
+        "total_pages": 1,
+        "total_docs_count": 2,
+        "current_page": 1,
+        "docs": [
+            {
+                "_id": "5df35f365f7fc03e78ca44a2",
+                ...
+            },
+            {
+                ...
+            }
+        ]
  *  }
  */
 router.get('/paginate', acl(['*']), loanProductController.fetchAllByPagination);

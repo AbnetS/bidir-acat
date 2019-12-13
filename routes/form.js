@@ -743,66 +743,100 @@ router.post('/initialize', acl(['*']), builderController.initialize);
  * @apiName CreateACATForm
  * @apiGroup ACAT Form
  *
- * @apiDescription Create new ACAT Fomr. 
+ * @apiDescription Create new ACAT Form. This endpoint creates a blank new ACAT form
  *
- * @apiParam {String} subtitle ACAT Subtitle
- * @apiParam {String} purpose ACAT Purpose
- * @apiParam {String} title ACAT Title
- * @apiParam {String} crop ACAT Crop
- * @apiParam {String} crop_category ACAT Crop Category
- * @apiParam {Object} crop_image ACAT Crop Image
+ * @apiParam {String} [subtitle] ACAT Subtitle
+ * @apiParam {String} [purpose] ACAT Purpose
+ * @apiParam {String} title ACAT Form Title
+ * @apiParam {String} crop crop Id for the ACAT form is created for
  *
  * @apiParamExample Request Example:
  *  {
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "<IMAGE_OBJECT>"
+        "title": "Maize-CAT",
+        "crop":"5df1ef07354e8100015ca1c2"
  *  }
  *
  * @apiSuccess {String} _id ACAT form id
  * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object[]} sections Return empty array, as no sections are added
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    process: "",
- *    sections: [{
- *		 _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
- *  }
+        "_id": "5d0a0aad61269e0001d9c700",
+        "last_modified": "2019-06-19T10:13:01.272Z",
+        "date_created": "2019-06-19T10:13:01.156Z",
+        "crop": {
+            "_id": "5df1ef07354e8100015ca1c2",
+            "last_modified": "2019-06-19T10:13:01.414Z",
+            "date_created": "2019-06-19T10:12:33.757Z",
+            "has_acat": true,
+            "category": "Cereal",
+            "image": "",
+            "name": "Maize"
+        },
+        "type": "ACAT",
+        "achieved": {
+                "net_cash_flow": {
+                    "dec": 0,
+                    "nov": 0,
+                    "oct": 0,
+                    "sep": 0,
+                    "aug": 0,
+                    "july": 0,
+                    "june": 0,
+                    "may": 0,
+                    "apr": 0,
+                    "mar": 0,
+                    "feb": 0,
+                    "jan": 0
+                },
+                "net_income": 0,
+                "total_revenue": 0,
+                "total_cost": 0
+            },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                "sep": 0,
+                "aug": 0,
+                "july": 0,
+                "june": 0,
+                "may": 0,
+                "apr": 0,
+                "mar": 0,
+                "feb": 0,
+                "jan": 0
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "first_expense_month": "None",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0",
+        "sections": [],
+        "layout": "TWO_COLUMNS",
+        "purpose": "",
+        "subtitle": "",
+        "title": "Maize-CAT"
+    }
+}
+ 
  *
  */
 router.post('/create', acl(['*']), builderController.create);
@@ -812,7 +846,7 @@ router.post('/create', acl(['*']), builderController.create);
  * @api {get} /acat/forms/paginate?page=<RESULTS_PAGE>&per_page=<RESULTS_PER_PAGE> Get builders collection
  * @apiVersion 1.0.0
  * @apiName FetchPaginated
- * @apiGroup ACAT
+ * @apiGroup ACAT Form
  *
  * @apiDescription Get a collection of builders. The endpoint has pagination
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
@@ -820,102 +854,128 @@ router.post('/create', acl(['*']), builderController.create);
  *
  * @apiSuccess {String} _id ACAT form id
  * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object[]} sections Return empty array, as no sections are added
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
  *    "total_pages": 1,
- *    "total_docs_count": 0,
+ *    "total_docs_count": 15,
  *    "docs": [{
- *        _id : "556e1174a8952c9521286a60",
- *        type: "ACAT",
- *        crop: "Maize",
- *        crop_category: "Grain",
- *        crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *        description: "This is a Description",
- *        title: "ACAT Form",
- *        process: "",
- *        sections: [{
- *            _id : "556e1174a8952c9521286a60",
- *            ....
- *        }],
- *        created_by: "556e1174a8952c9521286a60",
- *        achieved: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        },
- *        estimated: {
- *            net_cash_flow: 0,
- *            net_income: 0,
- *            total_revenue: 0,
- *            total_cost: 0
- *        }
- *    }]
+                _id : "556e1174a8952c9521286a60",
+                ...
+    *       }, 
+    *       {
+    *           ...
+    *       }
+ *    ]
  *  }
  */
 router.get('/paginate', acl(['*']), builderController.fetchAllByPagination);
 
 /**
- * @api {get} /acat/forms/:id Get ACAT ACAT
+ * @api {get} /acat/forms/:id Get ACAT Form
  * @apiVersion 1.0.0
  * @apiName Get
- * @apiGroup ACAT
+ * @apiGroup ACAT Form
  *
- * @apiDescription Get a user builder with the given id
+ * @apiDescription Get an ACAT form with the given id
  *
  * @apiSuccess {String} _id ACAT form id
  * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object[]} sections Return empty array, as no sections are added
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
+ * {
+        "_id": "5d0a0aad61269e0001d9c700",
+        "last_modified": "2019-06-19T10:13:01.272Z",
+        "date_created": "2019-06-19T10:13:01.156Z",
+        "crop": {
+            "_id": "5df1ef07354e8100015ca1c2",
+            ...
+        },
+        "type": "ACAT",
+        "achieved": {
+                "net_cash_flow": {
+                    "dec": 0,
+                    "nov": 0,
+                    "oct": 0,
+                    "sep": 0,
+                    "aug": 0,
+                    "july": 0,
+                    "june": 0,
+                    "may": 0,
+                    "apr": 0,
+                    "mar": 0,
+                    "feb": 0,
+                    "jan": 0
+                },
+                "net_income": 0,
+                "total_revenue": 0,
+                "total_cost": 0
+            },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                "sep": 0,
+                "aug": 0,
+                "july": 0,
+                "june": 0,
+                "may": 0,
+                "apr": 0,
+                "mar": 0,
+                "feb": 0,
+                "jan": 0
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "first_expense_month": "None",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0",
+        "sections": [
+            {
+                "_id": "5df201381cd19659c8f6a0a5",
+                ...
+            },
+            {
+                ...
+            }
+
+        ],
+        "layout": "TWO_COLUMNS",
+        "purpose": "",
+        "subtitle": "",
+        "title": "Teff-CAT"
+ 
  *  }
  *
  */
@@ -923,114 +983,205 @@ router.get('/:id', acl(['*']), builderController.fetchOne);
 
 
 /**
- * @api {put} /acat/forms/:id Update ACAT 
+ * @api {put} /acat/forms/:id Update ACAT Form
  * @apiVersion 1.0.0
  * @apiName Update
- * @apiGroup ACAT 
+ * @apiGroup ACAT Form
  *
- * @apiDescription Update a ACAT builder with the given id
+ * @apiDescription Update an ACAT Form with the given id
  *
  * @apiParam {Object} Data Update data
  *
  * @apiParamExample Request example:
  * {
- *    title: "MFI ACAT Title"
+ *    purpose: "To collect cost/revenue information of cultivating tomato"
  * }
  *
  * @apiSuccess {String} _id ACAT form id
  * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object[]} sections Return empty array, as no sections are added
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
- *  }
+        "_id": "5d0a0aad61269e0001d9c700",
+        "last_modified": "2019-12-12T11:31:29.098Z",
+        "date_created": "2019-06-19T10:13:01.156Z",
+        "crop": {
+            "_id": "5d0a0a9161269e0001d9c6ff",
+            "last_modified": "2019-06-19T10:13:01.414Z",
+            "date_created": "2019-06-19T10:12:33.757Z",
+            "has_acat": true,
+            "category": "Cereal",
+            "image": "",
+            "name": "Rice"
+        },
+        "type": "ACAT",
+        "created_by": "5b925494b1cfc10001d80908",
+        "achieved": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                "sep": 0,
+                "aug": 0,
+                "july": 0,
+                "june": 0,
+                "may": 0,
+                "apr": 0,
+                "mar": 0,
+                "feb": 0,
+                "jan": 0
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                "sep": 0,
+                "aug": 0,
+                "july": 0,
+                "june": 0,
+                "may": 0,
+                "apr": 0,
+                "mar": 0,
+                "feb": 0,
+                "jan": 0
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "first_expense_month": "None",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0x0",
+        "sections":[
+            {
+                "_id": "5d0a0aad61269e0001d9c701",
+                ...
+            },
+            {
+                ...
+            }
+        ],
+        "layout": "TWO_COLUMNS",
+        "purpose": "To collect cost/revenue information of cultivating rice",
+        "subtitle": "",
+        "title": "Rice-CAT"
  */
 router.put('/:id', acl(['*']), builderController.update);
 
 /**
- * @api {delete} /acat/forms/:id Delete ACAT 
+ * @api {delete} /acat/forms/:id Delete ACAT Form
  * @apiVersion 1.0.0
  * @apiName Delete
- * @apiGroup ACAT 
+ * @apiGroup ACAT Form
  *
- * @apiDescription Delete a ACAT builder with the given id
+ * @apiDescription Delete an ACAT form with the given id
  *
- * @apiSuccess {String} _id ACAT form id
+* @apiSuccess {String} _id ACAT form id
  * @apiSuccess {String} type Form Type ACAT
- * @apiSuccess {String} subtitle ACAT Form Subtitle
  * @apiSuccess {String} title ACAT Form Title
- * @apiSuccess {String} purpose ACAT Form Purpose
- * @apiSuccess {Array} sections ACAT Form sections
+ * @apiSuccess {String} subtitle ACAT Form Subtitle 
+ * @apiSuccess {String} purpose ACAT Form Purpose 
  * @apiSuccess {String} layout ACAT Form Layout ie TWO_COLUMNS or THREE_COLUMNS 
+ * @apiSuccess {Object[]} sections Return empty array, as no sections are added
  * @apiSuccess {String} created_by Officer Account registering this
  * @apiSuccess {String} crop ACAT Crop
- * @apiSuccess {String} crop_category ACAT Crop Category
- * @apiSuccess {String} crop_image ACAT Crop Image
+ * @apiSuccess {String} cropping_area_size Returned as 0, applicable for ACAT Applications of clients
+ * @apiSuccess {String} access_to_non_financial_resources Returned as false(default value), applicable only for ACAT Applications of clients
+ * @apiSuccess {String[]} non_financial_resources Returned as empty array, applicable only for ACAT Applications of clients
+ * @apiSuccess {String} first_expense_month Returned as 'None', applicable only for ACAT Applications of clients
  * @apiSuccess {Object} estimated Estimated ACAT Values
  * @apiSuccess {Object} achieved Estimated ACAT Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    _id : "556e1174a8952c9521286a60",
- *    type: "ACAT",
- *    crop: "Maize",
- *    crop_category: "Grain"
- *    crop_image: "https://fb.cdn.ugusgu.us./client/285475474224.png",
- *    description: "This is a Description",
- *    title: "ACAT Form",
- *    process: "",
- *    sections: [{
- *     _id : "556e1174a8952c9521286a60",
- *       ....
- *    }],
- *    created_by: "556e1174a8952c9521286a60",
- *    achieved: {
- *        net_cash_flow: 0,
- *        net_income: 0,
- *        total_revenue: 0,
- *        total_cost: 0
- *    },
- *    estimated: {
- *      net_cash_flow: 0,
- *      net_income: 0,
- *      total_revenue: 0,
- *      total_cost: 0
- *    }
+        "_id": "5d0a0aad61269e0001d9c700",
+        "last_modified": "2019-12-12T11:31:29.098Z",
+        "date_created": "2019-06-19T10:13:01.156Z",
+        "crop": {
+            "_id": "5d0a0a9161269e0001d9c6ff",
+            "last_modified": "2019-06-19T10:13:01.414Z",
+            "date_created": "2019-06-19T10:12:33.757Z",
+            "has_acat": true,
+            "category": "Cereal",
+            "image": "",
+            "name": "Rice"
+        },
+        "type": "ACAT",
+        "created_by": "5b925494b1cfc10001d80908",
+        "achieved": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                "sep": 0,
+                "aug": 0,
+                "july": 0,
+                "june": 0,
+                "may": 0,
+                "apr": 0,
+                "mar": 0,
+                "feb": 0,
+                "jan": 0
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "estimated": {
+            "net_cash_flow": {
+                "dec": 0,
+                "nov": 0,
+                "oct": 0,
+                "sep": 0,
+                "aug": 0,
+                "july": 0,
+                "june": 0,
+                "may": 0,
+                "apr": 0,
+                "mar": 0,
+                "feb": 0,
+                "jan": 0
+            },
+            "net_income": 0,
+            "total_revenue": 0,
+            "total_cost": 0
+        },
+        "first_expense_month": "None",
+        "non_financial_resources": [],
+        "access_to_non_financial_resources": false,
+        "cropping_area_size": "0x0",
+        "sections":[
+            {
+                "_id": "5d0a0aad61269e0001d9c701",
+                ...
+            },
+            {
+                ...
+            }
+        ],
+        "layout": "TWO_COLUMNS",
+        "purpose": "To collect cost/revenue information of cultivating rice",
+        "subtitle": "",
+        "title": "Rice-CAT"
  *  }
  */
 router.delete('/:id', acl(['*']), builderController.remove);

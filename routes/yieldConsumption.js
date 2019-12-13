@@ -18,35 +18,39 @@ var router  = Router();
  * @apiName Get
  * @apiGroup YieldConsumption
  *
- * @apiDescription Get a user yieldConsumption with the given id
+ * @apiDescription Get a yieldConsumption with the given id
  *
- * @apiSuccess {String} _id yieldConsumption id
- * @apiSuccess {String} remark YieldConsumption Remark
+ * @apiSuccess {String} _id yieldConsumption id 
+ * @apiSuccess {Object} estimated Estimated 
+ * @apiSuccess {Number} estimated.own_consumption Estimated amount for own consumption
+ * @apiSuccess {Number} estimated.seed_reserve Estimated amount for Seed reserve
+ * @apiSuccess {Number} estimated.for_market Estimated amount for for_market
+ * @apiSuccess {Object[]} estimated.market_details market details
  * @apiSuccess {Object} achieved Achieved 
+ * @apiSuccess {Number} achieved.own_consumption Actual amount for own consumption
+ * @apiSuccess {Number} achieved.seed_reserve Actual amount for Seed reserve
+ * @apiSuccess {Number} estimated.for_market Actual amount for for_market
+ * @apiSuccess {Object[]} achieved.market_details market details
+ * @apiSuccess {String} remark YieldConsumption Remark
  *
  * @apiSuccessExample Response Example:
  *  {
- *    "_id": "5ad9b5bed2c0811d228d710a",
- *    "last_modified": "2018-04-23T19:05:16.297Z",
- *    "date_created": "2018-04-20T09:41:18.879Z",
- *    "remark": "",
- *     "achieved": {
- *         "market_details": [
- *             {
- *               "to_whom": "Tony Mutai",
- *               "amount": 102
- *           }
- *        ],
- *         "for_market": 0,
- *         "seed_reserve": 0,
- *         "own_consumption": 0
- *     },
- *     "estimated": {
- *         "market_details": [],
- *         "for_market": 0,
- *         "seed_reserve": 0,
- *         "own_consumption": 0
- *     }
+        "_id": "5bd05c04017721000162be39",
+        "last_modified": "2018-12-04T14:45:50.233Z",
+        "date_created": "2018-10-24T11:48:20.736Z",
+        "remark": "",
+        "achieved": {
+            "market_details": [],
+            "for_market": 0,
+            "seed_reserve": 0,
+            "own_consumption": 0
+        },
+        "estimated": {
+            "market_details": [],
+            "for_market": 18984,
+            "seed_reserve": 0,
+            "own_consumption": 0
+        }
  *  }
  *
  */
@@ -65,36 +69,45 @@ router.get('/:id', acl(['*']), yieldConsumptionController.fetchOne);
  *
  * @apiParamExample Request example:
  * {
- *    remark: "Crop Fertiliser and Chemicals Distribution "
+        "estimated": {
+                "market_details": [],
+                "for_market": 200,
+                "seed_reserve": 1,
+                "own_consumption":5 
+            }
  * }
  *
-  * @apiSuccess {String} _id yieldConsumption id
+ * @apiSuccess {String} _id yieldConsumption id 
+ * @apiSuccess {Object} estimated Estimated 
+ * @apiSuccess {Number} estimated.own_consumption Estimated amount for own consumption
+ * @apiSuccess {Number} estimated.seed_reserve Estimated amount for Seed reserve
+ * @apiSuccess {Number} estimated.for_market Estimated amount for for_market
+ * @apiSuccess {Object[]} estimated.market_details market details
+ * @apiSuccess {Object} achieved Achieved 
+ * @apiSuccess {Number} achieved.own_consumption Actual amount for own consumption
+ * @apiSuccess {Number} achieved.seed_reserve Actual amount for Seed reserve
+ * @apiSuccess {Number} estimated.for_market Actual amount for for_market
+ * @apiSuccess {Object[]} achieved.market_details market details
  * @apiSuccess {String} remark YieldConsumption Remark
- * @apiSuccess {Object} achieved Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    "_id": "5ad9b5bed2c0811d228d710a",
- *    "last_modified": "2018-04-23T19:05:16.297Z",
- *    "date_created": "2018-04-20T09:41:18.879Z",
- *    "remark": "Crop Fertiliser and Chemicals Distribution",
- *     "achieved": {
- *         "market_details": [
- *             {
- *               "to_whom": "Tony Mutai",
- *               "amount": 102
- *           }
- *        ],
- *         "for_market": 0,
- *         "seed_reserve": 0,
- *         "own_consumption": 0
- *     },
- *     "estimated": {
- *         "market_details": [],
- *         "for_market": 0,
- *         "seed_reserve": 0,
- *         "own_consumption": 0
- *     }
+        "_id": "5bd05c04017721000162be39",
+        "last_modified": "2019-12-13T12:27:56.614Z",
+        "date_created": "2018-10-24T11:48:20.736Z",
+        "remark": "",
+        "achieved": {
+            "market_details": [],
+            "for_market": 0,
+            "seed_reserve": 0,
+            "own_consumption": 0
+        },
+        "estimated": {
+            "market_details": [],
+            "for_market": 200,
+            "seed_reserve": 1,
+            "own_consumption": 5
+        }
  *  }
  */
 router.put('/:id', acl(['*']), yieldConsumptionController.update);
@@ -109,37 +122,33 @@ router.put('/:id', acl(['*']), yieldConsumptionController.update);
  * out of the box. Use these params to query with pagination: `page=<RESULTS_PAGE`
  * and `per_page=<RESULTS_PER_PAGE>`.
  *
-  * @apiSuccess {String} _id yieldConsumption id
+ * @apiSuccess {String} _id yieldConsumption id 
+ * @apiSuccess {Object} estimated Estimated 
+ * @apiSuccess {Number} estimated.own_consumption Estimated amount for own consumption
+ * @apiSuccess {Number} estimated.seed_reserve Estimated amount for Seed reserve
+ * @apiSuccess {Number} estimated.for_market Estimated amount for for_market
+ * @apiSuccess {Object[]} estimated.market_details market details
+ * @apiSuccess {Object} achieved Achieved 
+ * @apiSuccess {Number} achieved.own_consumption Actual amount for own consumption
+ * @apiSuccess {Number} achieved.seed_reserve Actual amount for Seed reserve
+ * @apiSuccess {Number} estimated.for_market Actual amount for for_market
+ * @apiSuccess {Object[]} achieved.market_details market details
  * @apiSuccess {String} remark YieldConsumption Remark
- * @apiSuccess {Object} achieved Achieved
  *
  * @apiSuccessExample Response Example:
  *  {
- *    "total_pages": 1,
- *    "total_docs_count": 0,
- *    "docs": [{
- *    "_id": "5ad9b5bed2c0811d228d710a",
- *    "last_modified": "2018-04-23T19:05:16.297Z",
- *    "date_created": "2018-04-20T09:41:18.879Z",
- *    "remark": "Crop Fertiliser and Chemicals Distribution",
- *     "achieved": {
- *         "market_details": [
- *             {
- *               "to_whom": "Tony Mutai",
- *               "amount": 102
- *           }
- *        ],
- *         "for_market": 0,
- *         "seed_reserve": 0,
- *         "own_consumption": 0
- *     },
- *     "estimated": {
- *         "market_details": [],
- *         "for_market": 0,
- *         "seed_reserve": 0,
- *         "own_consumption": 0
- *     }
- *    }]
+        "total_pages": 13,
+        "total_docs_count": 128,
+        "current_page": 1,
+        "docs": [
+            {
+                "_id": "5df201391cd19659c8f6a0b2",
+                ...
+            },
+            {
+                ....
+            }...
+        ]
  *  }
  */
 router.get('/paginate', acl(['*']), yieldConsumptionController.fetchAllByPagination);
