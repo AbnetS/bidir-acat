@@ -68,7 +68,7 @@ let config = {
     URL: API_URL + '/media/',
     DIR: path.resolve(process.cwd(), './assets') + '/',
     PROD: 'http://api.bidir.gebeya.co/assets/',
-    DEV: 'http://api.dev.bidir.gebeya.co/assets/'
+    DEV: 'http://api.test.bidir.gebeya.co/assets/'
   },
 
   GOOGLE_BUCKETS: {
